@@ -1,0 +1,12 @@
+{
+  "BaseUrl": "https://dev.example.com",
+  "ApiBaseUrl": "https://api-dev.example.com",
+  "Credentials": {
+    "username": "dev_user",
+    "password": "dev_password"
+  },
+  "ApiKeys": {},
+  "CustomSettings": {},
+  "ApiTimeoutSeconds": 30,
+  "DatabaseConnectionString": ""
+}

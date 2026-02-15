@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AgenticAI.WebUI": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60991;http://localhost:60992"
+    }
+  }
+}

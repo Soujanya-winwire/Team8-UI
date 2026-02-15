@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AgenticAI.WebUI</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AgenticAI.Core\AgenticAI.Core.csproj" />
+    <ProjectReference Include="..\..\src\AgenticAI.UIAutomation\AgenticAI.UIAutomation.csproj" />
+    <ProjectReference Include="..\..\src\AgenticAI.APIAutomation\AgenticAI.APIAutomation.csproj" />
+  </ItemGroup>
+
+  <!-- Copy test scenarios and configuration -->
+  <ItemGroup>
+    <None Include="..\..\TestScenarios\**\*.json">
+      <Link>TestScenarios\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\Configuration\**\*.json">
+      <Link>Configuration\%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

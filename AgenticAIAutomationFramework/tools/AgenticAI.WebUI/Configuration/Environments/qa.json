@@ -1,0 +1,12 @@
+{
+  "BaseUrl": "https://qa.example.com",
+  "ApiBaseUrl": "https://api-qa.example.com",
+  "Credentials": {
+    "username": "qa_user",
+    "password": "qa_password"
+  },
+  "ApiKeys": {},
+  "CustomSettings": {},
+  "ApiTimeoutSeconds": 30,
+  "DatabaseConnectionString": ""
+}

@@ -1,0 +1,12 @@
+{
+  "BaseUrl": "https://www.example.com",
+  "ApiBaseUrl": "https://api.example.com",
+  "Credentials": {
+    "username": "prod_user",
+    "password": "prod_password"
+  },
+  "ApiKeys": {},
+  "CustomSettings": {},
+  "ApiTimeoutSeconds": 30,
+  "DatabaseConnectionString": ""
+}

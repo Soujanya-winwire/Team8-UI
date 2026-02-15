@@ -1,0 +1,17 @@
+{
+  "BaseUrl": "https://www.saucedemo.com",
+  "ApiBaseUrl": "https://www.saucedemo.com/api",
+  "Credentials": {
+    "DefaultUsername": "standard_user",
+    "DefaultPassword": "secret_sauce"
+  },
+  "ApiKeys": {
+    "DefaultApiKey": ""
+  },
+  "CustomSettings": {
+    "Timeout": "30",
+    "RetryCount": "3"
+  },
+  "ApiTimeoutSeconds": 30,
+  "DatabaseConnectionString": ""
+}
