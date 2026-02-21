@@ -230,6 +230,52 @@ namespace AgenticAI.Core.ZeroCode
                         }
                         break;
 
+                    case "select":
+                        if (!string.IsNullOrEmpty(action.Value))
+                        {
+                            var selectCss = action.Locator;
+                            action.Metadata.TryGetValue("xpath", out var selectXpath);
+
+                            await RetryHelper.ExecuteWithRetryAsync(async () =>
+                            {
+                                // For select dropdowns, we'll use Type action to set the value
+                                // This works with most modern select elements
+                                // Try CSS selector
+                                if (!string.IsNullOrEmpty(selectCss))
+                                {
+                                    try
+                                    {
+                                        await _driver.TypeAsync(selectCss, action.Value!);
+                                        return true;
+                                    }
+                                    catch { }
+                                }
+
+                                // Try XPath fallback
+                                if (!string.IsNullOrEmpty(selectXpath))
+                                {
+                                    try
+                                    {
+                                        var elXpath = await _driver.FindElementAsync(selectXpath, "xpath");
+                                        await elXpath.TypeAsync(action.Value!);
+                                        return true;
+                                    }
+                                    catch { }
+                                }
+
+                                // Auto-detect
+                                try
+                                {
+                                    await _driver.TypeAsync(action.Locator, action.Value!);
+                                    return true;
+                                }
+                                catch { }
+
+                                throw new Exception($"Could not select option in element: {action.Locator}");
+                            }, _config.MaxRetryCount);
+                        }
+                        break;
+
                     case "wait":
                         var waitTime = int.TryParse(action.Value, out var seconds) ? seconds : 5;
                         await Task.Delay(waitTime * 1000);

@@ -60,3 +60,29 @@ tools/**/obj/
 
 # Ignore OneDrive temp files
 ~$*
+
+# Ignore documentation/summary markdown files created during development
+*_SUMMARY.md
+*_COMPLETE.md
+*_FIX.md
+*_GUIDE.md
+*_TEST.md
+*_REFERENCE.md
+*_DIAGNOSTIC.md
+*_VISUAL.md
+*_CONFIRMED.md
+*_SUCCESS.md
+INSTANT_*.md
+QUICK_*.md
+RECORDING_*.md
+ADDINIT_*.md
+VISUAL_*.md
+WHATS_NEXT*.md
+30_SECOND_*.md
+
+# Ignore test scenario files created during development/testing
+TestScenarios/**/Final_*.json
+TestScenarios/**/Test_*.json
+TestScenarios/**/Quick_*.json
+
+

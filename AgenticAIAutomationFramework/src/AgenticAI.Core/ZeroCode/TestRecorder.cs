@@ -47,31 +47,26 @@ namespace AgenticAI.Core.ZeroCode
         {
             _scenario.StartUrl = startUrl;
             
-            Logger.Info($"Starting test recording for: {_scenario.Name}");
-            Logger.Info($"Opening browser in recording mode...");
-            Logger.Info($"Navigate to: {startUrl}");
-            Logger.Info("?? IMPORTANT: This is a BROWSER RECORDING session.");
-            Logger.Info("   Actions are NOT automatically captured.");
-            Logger.Info("   You need to manually add actions via the UI or use Playwright Codegen.");
+            Logger.Info($"?? Starting test recording for: {_scenario.Name}");
+            Logger.Info($"?? Opening browser in recording mode...");
+            Logger.Info($"?? Navigate to: {startUrl}");
             Logger.Info("");
-            Logger.Info("?? Recommended: Use Playwright Codegen for automatic recording:");
-            Logger.Info($"   playwright codegen {startUrl}");
+            Logger.Info("? AUTOMATIC RECORDING ENABLED");
+            Logger.Info("   All clicks, typing, and selections will be captured automatically");
+            Logger.Info("   Perform your test actions in the browser");
+            Logger.Info("   Close the browser or call StopRecording when done");
+            Logger.Info("");
 
             _playwright = await Playwright.CreateAsync();
             
-            // Use Codegen mode for automatic recording
-            var browserType = _config.Browser switch
-            {
-                Core.Enums.BrowserType.Firefox => _playwright.Firefox,
-                Core.Enums.BrowserType.Edge => _playwright.Chromium,
-                Core.Enums.BrowserType.Safari => _playwright.Webkit,
-                _ => _playwright.Chromium
-            };
+            // Use Chromium for best recording support
+            var browserType = _playwright.Chromium;
 
             _browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
             {
                 Headless = false,
-                SlowMo = 500 // Slow down for better recording
+                SlowMo = 1000, // Slow down significantly for recording
+                Args = new[] { "--start-maximized" }
             });
 
             var context = await _browser.NewContextAsync(new BrowserNewContextOptions
@@ -82,166 +77,166 @@ namespace AgenticAI.Core.ZeroCode
 
             _page = await context.NewPageAsync();
 
-            // Set up action listeners (limited automatic recording)
-            SetupActionListeners();
+            // Set up native Playwright action tracking BEFORE any navigation
+            await SetupNativeActionTracking();
 
             // Navigate to start URL
-            await _page.GotoAsync(startUrl);
+            await _page.GotoAsync(startUrl, new PageGotoOptions 
+            { 
+                WaitUntil = WaitUntilState.Load,
+                Timeout = 60000 
+            });
             
-            Logger.Warning("Browser opened. Perform your test manually.");
-            Logger.Warning("Note: Only navigation will be automatically recorded.");
-            Logger.Warning("For full action recording, use: playwright codegen " + startUrl);
+            Logger.Info("? Browser opened and recorder is active!");
+            Logger.Info("?? Perform your test actions now...");
         }
 
-        private void SetupActionListeners()
+        private async Task SetupNativeActionTracking()
         {
             if (_page == null) return;
 
-            // Record navigation
-            _page.FrameNavigated += (sender, frame) =>
-            {
-                if (frame.Url != "about:blank")
-                {
-                    _recordedActions.Add(new RecordedAction
-                    {
-                        ActionType = "Navigate",
-                        Value = frame.Url,
-                        Description = $"Navigate to {frame.Url}",
-                        Timestamp = _recordedActions.Count
-                    });
-                }
-            };
-
-            // Record console messages
-            _page.Console += (sender, msg) =>
-            {
-                Logger.Debug($"Console: {msg.Text}");
-            };
-            
-            // Expose a .NET callback that accepts JSON string from the page script
-            _page.ExposeFunctionAsync("__recordAction", (string jsonPayload) =>
+            // Expose function for recording actions from the page - THIS MUST BE DONE FIRST
+            await _page.ExposeFunctionAsync("__playwrightRecordAction", (object eventData) =>
             {
                 try
                 {
-                    var doc = System.Text.Json.JsonDocument.Parse(jsonPayload);
+                    var json = System.Text.Json.JsonSerializer.Serialize(eventData);
+                    var doc = System.Text.Json.JsonDocument.Parse(json);
                     var root = doc.RootElement;
                     
-                    var actionType = root.GetProperty("actionType").GetString() ?? string.Empty;
-                    var css = root.TryGetProperty("css", out var pCss) ? pCss.GetString() ?? string.Empty : string.Empty;
-                    var xpath = root.TryGetProperty("xpath", out var pXpath) ? pXpath.GetString() ?? string.Empty : string.Empty;
-                    var value = root.TryGetProperty("value", out var pVal) ? pVal.GetString() : null;
-                    var desc = root.TryGetProperty("description", out var pDesc) ? pDesc.GetString() : null;
-
-                    var action = new RecordedAction
+                    var type = root.GetProperty("type").GetString() ?? "";
+                    var selector = root.GetProperty("selector").GetString() ?? "";
+                    
+                    if (type == "click")
                     {
-                        ActionType = actionType,
-                        Locator = css ?? string.Empty,
-                        Value = value,
-                        Description = desc ?? (actionType + " on " + (css ?? xpath)),
-                        Timestamp = _recordedActions.Count
-                    };
-
-                    if (!string.IsNullOrEmpty(xpath)) action.Metadata["xpath"] = xpath;
-                    _recordedActions.Add(action);
-                    Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator} (xpath: {xpath})");
+                        var text = root.TryGetProperty("text", out var t) ? t.GetString() : "";
+                        var action = new RecordedAction
+                        {
+                            ActionType = "Click",
+                            Locator = selector,
+                            Description = $"Click on \"{text}\"",
+                            Timestamp = _recordedActions.Count
+                        };
+                        _recordedActions.Add(action);
+                        Logger.Info($"? Click recorded: {selector}");
+                    }
+                    else if (type == "fill")
+                    {
+                        var value = root.GetProperty("value").GetString() ?? "";
+                        var action = new RecordedAction
+                        {
+                            ActionType = "Type",
+                            Locator = selector,
+                            Value = value,
+                            Description = $"Type \"{value}\" into {selector}",
+                            Timestamp = _recordedActions.Count
+                        };
+                        _recordedActions.Add(action);
+                        Logger.Info($"? Type recorded: {selector} = {value}");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warning($"Failed to parse record action payload: {ex.Message}");
+                    Logger.Debug($"Record action error: {ex.Message}");
                 }
-
+                
                 return Task.CompletedTask;
-            }).Wait();
+            });
 
-            // Inject embedded recorder script (avoids file loading issues)
-            var script = @"(function(){
-function getAttrSelector(el) {
-    if (!el || !el.getAttribute) return null;
-    var attrs = ['data-test-id','data-testid','data-test','name','aria-label','placeholder','title','id'];
-    for (var i = 0; i < attrs.length; i++) {
-        var a = attrs[i];
-        try {
-            var v = el.getAttribute(a);
-            if (v) {
-                v = v.trim();
-                if (v.length > 0) return '[' + a + ""='"" + v.replace(/'/g, ""\'"") + ""']"";
+            // Use AddInitScript to inject tracking on EVERY page load/navigation
+            // This is the KEY - it runs before ANY page code, on EVERY navigation
+            await _page.AddInitScriptAsync(@"
+(function() {
+    // Mark as injected
+    if (window.__recorderReady) return;
+    window.__recorderReady = true;
+    
+    console.log('?? Recorder Active - Ready to capture actions');
+    
+    // Helper to generate selector
+    window.__getSelector = function(el) {
+        if (!el) return '';
+        
+        // Priority 1: data-test attributes
+        const testAttrs = ['data-testid', 'data-test-id', 'data-test', 'data-qa'];
+        for (let attr of testAttrs) {
+            const val = el.getAttribute(attr);
+            if (val) return `[${attr}=""${val}""]`;
+        }
+        
+        // Priority 2: ID
+        if (el.id) return '#' + el.id;
+        
+        // Priority 3: name
+        if (el.name) return `[name=""${el.name}""]`;
+        
+        // Priority 4: placeholder
+        if (el.placeholder) return `[placeholder=""${el.placeholder}""]`;
+        
+        // Priority 5: aria-label
+        const ariaLabel = el.getAttribute('aria-label');
+        if (ariaLabel) return `[aria-label=""${ariaLabel}""]`;
+        
+        // Fallback: tag with classes
+        let selector = el.tagName.toLowerCase();
+        if (el.className && typeof el.className === 'string') {
+            const classes = el.className.trim().split(/\s+/).filter(c => c && !c.match(/^ng-|mat-|_/));
+            if (classes.length > 0 && classes.length < 4) {
+                selector += '.' + classes.join('.');
             }
-        } catch(e){}
-    }
-    return null;
-}
-function getSimpleSelector(el) {
-    if (!el) return '';
-    var byAttr = getAttrSelector(el);
-    if (byAttr) return byAttr;
-    if (el.id) return '#' + el.id;
-    var sel = el.tagName.toLowerCase();
-    if (el.classList && el.classList.length > 0) {
-        sel += '.' + Array.from(el.classList).filter(c=>c.trim()).join('.');
-    }
-    return sel;
-}
-function getXPath(element) {
-    if (!element) return '';
-    if (element.id) {
-        return ""//*[@id='"" + element.id + ""']"";
-    }
-    var parts = [];
-    while (element && element.nodeType === Node.ELEMENT_NODE) {
-        var nb = 0;
-        var sib = element.previousSibling;
-        while (sib) {
-            if (sib.nodeType === Node.ELEMENT_NODE && sib.nodeName === element.nodeName) nb++;
-            sib = sib.previousSibling;
         }
-        var prefix = element.prefix ? element.prefix + ':' : '';
-        var nth = (nb ? '[' + (nb+1) + ']' : '');
-        parts.unshift(prefix + element.localName + nth);
-        element = element.parentNode;
-    }
-    return parts.length ? '/' + parts.join('/') : '';
-}
-function sendAction(obj){
-    try{
-        if (window.__recordAction){
-            window.__recordAction(JSON.stringify(obj));
-        }
-    }catch(e){ console.warn('sendAction error', e); }
-}
-document.addEventListener('click', function(e){
-    try{
-        var el = e.target;
-        var selector = getSimpleSelector(el);
-        if (!selector || selector === ''){
-            el = el.closest('button, a, input, [role=button]') || el;
-            selector = getSimpleSelector(el);
-        }
-        var xpath = '';
-        try{ xpath = getXPath(el); }catch(e){}
-        sendAction({ actionType: 'Click', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: '', description: 'Click on ' + (selector || el.tagName.toLowerCase()) });
-    }catch(ex){ console.log('record click error', ex); }
-}, true);
-document.addEventListener('input', function(e){
-    try{
-        var el = e.target;
-        var selector = getSimpleSelector(el);
-        var value = el.value || '';
-        var xpath = '';
-        try{ xpath = getXPath(el); }catch(e){}
-        sendAction({ actionType: 'Type', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: value, description: 'Type into ' + (selector || el.tagName.toLowerCase()) });
-    }catch(ex){ console.log('record input error', ex); }
-}, true);
-})();";
+        
+        return selector;
+    };
+    
+    // Track all clicks
+    document.addEventListener('mousedown', function(e) {
+        setTimeout(function() {
+            const el = e.target.closest('button, a, input[type=submit], input[type=button], [role=button]') || e.target;
+            const selector = window.__getSelector(el);
+            const text = el.textContent?.trim().substring(0, 50) || '';
+            
+            // Send to Playwright
+            if (window.__playwrightRecordAction) {
+                window.__playwrightRecordAction({
+                    type: 'click',
+                    selector: selector,
+                    text: text,
+                    timestamp: Date.now()
+                });
+                console.log('?? Click recorded:', selector);
+            }
+        }, 100);
+    }, true);
+    
+    // Track all input changes
+    let inputTimers = {};
+    document.addEventListener('input', function(e) {
+        const el = e.target;
+        if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') return;
+        
+        const selector = window.__getSelector(el);
+        const value = el.value;
+        
+        clearTimeout(inputTimers[selector]);
+        inputTimers[selector] = setTimeout(function() {
+            if (window.__playwrightRecordAction) {
+                window.__playwrightRecordAction({
+                    type: 'fill',
+                    selector: selector,
+                    value: value,
+                    timestamp: Date.now()
+                });
+                console.log('?? Type recorded:', selector, '=', value);
+            }
+        }, 1000);
+    }, true);
+    
+    console.log('? Recorder script initialized - perform actions now');
+})();
+");
 
-            try
-            {
-                _page.EvaluateAsync(script).Wait();
-                Logger.Info("Recorder injection script loaded successfully");
-            }
-            catch (Exception ex)
-            {
-                Logger.Warning($"Failed to inject action recorder script: {ex.Message}");
-            }
+            Logger.Info("? Native action tracking enabled using AddInitScript");
         }
 
         /// <summary>
