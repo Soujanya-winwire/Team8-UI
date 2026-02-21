@@ -474,6 +474,12 @@ function displayAllScenarios(scenariosList, historyList = []) {
 
             logsCell.appendChild(wrapper);
 
+            // allow clicking anywhere in the logs cell to open logs
+            logsCell.style.cursor = 'pointer';
+            logsCell.addEventListener('click', () => viewLogs(scenario.name));
+            // prevent the inner button from propagating twice
+            btn.addEventListener('click', (e) => { e.stopPropagation(); });
+
             const timeDiv = document.createElement('div');
             timeDiv.style.fontSize = '0.85em';
             timeDiv.style.color = '#6b7280';
@@ -482,6 +488,7 @@ function displayAllScenarios(scenariosList, historyList = []) {
             logsCell.appendChild(timeDiv);
         } else {
             logsCell.textContent = '—';
+            logsCell.style.cursor = 'default';
         }
         row.appendChild(logsCell);
 
