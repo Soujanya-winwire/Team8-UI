@@ -132,7 +132,24 @@ namespace AgenticAI.Core.ZeroCode
                         await RetryHelper.ExecuteWithRetryAsync(async () =>
                         {
                             await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
-                            await _driver.ClickAsync(action.Locator);
+                            // Try to locate multiple elements and click the first available
+                            var elements = await _driver.FindElementsAsync(action.Locator);
+                            if (elements != null && elements.Count > 0)
+                            {
+                                try
+                                {
+                                    await elements[0].ClickAsync();
+                                }
+                                catch
+                                {
+                                    // fallback to driver click
+                                    await _driver.ClickAsync(action.Locator);
+                                }
+                            }
+                            else
+                            {
+                                await _driver.ClickAsync(action.Locator);
+                            }
                             return true;
                         }, _config.MaxRetryCount);
                         break;
