@@ -3,6 +3,7 @@ using AgenticAI.Core.Logging;
 using AgenticAI.Core.ZeroCode.Models;
 using Microsoft.Playwright;
 using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace AgenticAI.Core.ZeroCode
 {
@@ -118,28 +119,39 @@ namespace AgenticAI.Core.ZeroCode
             
             // Expose a .NET callback to the page so in-page scripts can report actions
             // callback now receives css and xpath locators separately
-            _page.ExposeFunctionAsync("__recordAction", (string actionType, string cssLocator, string xpathLocator, string? value, string? description) =>
+            // Expose a function that accepts a single JSON payload object from the page
+            _page.ExposeFunctionAsync("__recordAction", (JsonElement payload) =>
             {
-                var action = new RecordedAction
+                try
                 {
-                    ActionType = actionType,
-                    Locator = cssLocator ?? string.Empty,
-                    Value = value,
-                    Description = description ?? (actionType + " on " + (cssLocator ?? xpathLocator)),
-                    Timestamp = _recordedActions.Count
-                };
+                    var actionType = payload.GetProperty("actionType").GetString() ?? string.Empty;
+                    var cssLocator = payload.TryGetProperty("css", out var pCss) ? pCss.GetString() ?? string.Empty : string.Empty;
+                    var xpathLocator = payload.TryGetProperty("xpath", out var pXpath) ? pXpath.GetString() ?? string.Empty : string.Empty;
+                    var value = payload.TryGetProperty("value", out var pVal) ? pVal.GetString() : null;
+                    var description = payload.TryGetProperty("description", out var pDesc) ? pDesc.GetString() : null;
 
-                // store xpath in metadata for fallback
-                if (!string.IsNullOrEmpty(xpathLocator))
+                    var action = new RecordedAction
+                    {
+                        ActionType = actionType,
+                        Locator = cssLocator ?? string.Empty,
+                        Value = value,
+                        Description = description ?? (actionType + " on " + (cssLocator ?? xpathLocator)),
+                        Timestamp = _recordedActions.Count
+                    };
+
+                    if (!string.IsNullOrEmpty(xpathLocator))
+                    {
+                        action.Metadata["xpath"] = xpathLocator;
+                    }
+
+                    _recordedActions.Add(action);
+                    Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator} (xpath: {xpathLocator})");
+                }
+                catch (Exception ex)
                 {
-                    action.Metadata["xpath"] = xpathLocator;
+                    Logger.Warning($"Failed to record action payload: {ex.Message}");
                 }
 
-                // also capture data-testid if available (page script will pass as attribute)
-                // page script may include dataTestId in description or as part of css - keep flexible
-
-                _recordedActions.Add(action);
-                Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator} (xpath: {xpathLocator})");
                 return Task.CompletedTask;
             }).Wait();
 
@@ -148,7 +160,24 @@ namespace AgenticAI.Core.ZeroCode
             var script = @"() => {
                 function getSimpleSelector(el) {
                     if (!el) return '';
+
+                    // prefer stable attributes
+                    var attrPriority = ['data-test-id','data-testid','data-test','name','id','aria-label','placeholder','title'];
+                    for (var i=0;i<attrPriority.length;i++){
+                        var a = attrPriority[i];
+                        if (el.getAttribute && el.getAttribute(a)){
+                            var v = el.getAttribute(a).trim();
+                            if (v) {
+                                // sanitize
+                                return '['+a+'="'+v.replace(/\"/g,'\\\"')+'"]';
+                            }
+                        }
+                    }
+
+                    // fallback to id
                     if (el.id) return '#' + el.id;
+
+                    // fallback to tag + classes
                     var sel = el.tagName.toLowerCase();
                     if (el.classList && el.classList.length > 0) {
                         sel += '.' + Array.from(el.classList).filter(c=>c.trim()).join('.');
@@ -158,7 +187,7 @@ namespace AgenticAI.Core.ZeroCode
 
                 function getXPath(element) {
                     if (element.id) {
-                        return "//*[@id='" + element.id + "']";
+                        return ""//*[@id='"" + element.id + ""']"";
                     }
                     var parts = [];
                     while (element && element.nodeType === Node.ELEMENT_NODE) {
@@ -182,14 +211,14 @@ namespace AgenticAI.Core.ZeroCode
                         var selector = getSimpleSelector(el);
                         // Some elements (like buttons inside spans) may need the closest clickable
                         if (!selector || selector === '') {
-                            el = el.closest('button, a, input, [role="button"]') || el;
+                            el = el.closest('button, a, input, [role=""button""]') || el;
                             selector = getSimpleSelector(el);
                         }
                         try {
                             var xpath = getXPath(el) || '';
-                            window.__recordAction('Click', selector || el.tagName.toLowerCase(), xpath, '', 'Click on ' + (selector || el.tagName.toLowerCase()));
+                            window.__recordAction({ actionType: 'Click', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: '', description: 'Click on ' + (selector || el.tagName.toLowerCase()) });
                         } catch(e) {
-                            window.__recordAction('Click', selector || el.tagName.toLowerCase(), '', '', 'Click on ' + (selector || el.tagName.toLowerCase()));
+                            window.__recordAction({ actionType: 'Click', css: selector || el.tagName.toLowerCase(), xpath: '', value: '', description: 'Click on ' + (selector || el.tagName.toLowerCase()) });
                         }
                     } catch (ex) { console.log('record click error', ex); }
                 }, true);
@@ -201,9 +230,9 @@ namespace AgenticAI.Core.ZeroCode
                         var value = el.value || '';
                         try {
                             var xpath = getXPath(el) || '';
-                            window.__recordAction('Type', selector || el.tagName.toLowerCase(), xpath, value, 'Type into ' + (selector || el.tagName.toLowerCase()));
+                            window.__recordAction({ actionType: 'Type', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: value, description: 'Type into ' + (selector || el.tagName.toLowerCase()) });
                         } catch(e) {
-                            window.__recordAction('Type', selector || el.tagName.toLowerCase(), '', value, 'Type into ' + (selector || el.tagName.toLowerCase()));
+                            window.__recordAction({ actionType: 'Type', css: selector || el.tagName.toLowerCase(), xpath: '', value: value, description: 'Type into ' + (selector || el.tagName.toLowerCase()) });
                         }
                     } catch (ex) { console.log('record input error', ex); }
                 }, true);
