@@ -327,15 +327,42 @@ namespace AgenticAI.WebUI.Controllers
                 });
                 
                 var results = await runner.ExecuteModuleAsync(module);
-                
-                await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", module, "completed", $"Module execution completed. {results.Count} tests executed.");
-                
+
+                // Build DTO list
+                var resultDtos = results.Select(result => new
+                {
+                    testCaseId = result.TestCaseId,
+                    testCaseName = result.TestCaseName,
+                    module = result.Module,
+                    status = result.Status.ToString(),
+                    startTime = result.StartTime.ToString("o"),
+                    endTime = result.EndTime.ToString("o"),
+                    duration = result.EndTime != default && result.StartTime != default ? (result.EndTime - result.StartTime).ToString() : "0s",
+                    steps = result.Steps.Select(s => new
+                    {
+                        stepName = s.StepName,
+                        description = s.Description,
+                        status = s.Status.ToString(),
+                        startTime = s.StartTime.ToString("o"),
+                        endTime = s.EndTime.ToString("o"),
+                        duration = s.EndTime != default && s.StartTime != default ? (s.EndTime - s.StartTime).ToString() : "0s",
+                        errorMessage = s.ErrorMessage,
+                        screenshotPath = s.ScreenshotPath
+                    }).ToList(),
+                    retryCount = result.RetryCount,
+                    errorMessage = result.ErrorMessage,
+                    stackTrace = result.StackTrace,
+                    tags = result.Tags
+                }).ToList();
+
+                await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", module, "completed", $"Module execution completed. {resultDtos.Count} tests executed.");
+
                 return Ok(new
                 {
                     success = true,
                     module,
-                    count = results.Count,
-                    results
+                    count = resultDtos.Count,
+                    results = resultDtos
                 });
             }
             catch (Exception ex)
