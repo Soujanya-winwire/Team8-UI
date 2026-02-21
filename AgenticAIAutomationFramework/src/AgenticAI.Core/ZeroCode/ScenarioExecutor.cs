@@ -128,28 +128,48 @@ namespace AgenticAI.Core.ZeroCode
                 switch (actionType)
                 {
                     case "click":
-                        // wait for element then click with retry
+                        // Attempt CSS first, then XPath fallback (stored in Metadata["xpath"]).
+                        var cssSelector = action.Locator;
+                        action.Metadata.TryGetValue("xpath", out var xpathSelector);
+
                         await RetryHelper.ExecuteWithRetryAsync(async () =>
                         {
-                            await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
-                            // Try to locate multiple elements and click the first available
-                            var elements = await _driver.FindElementsAsync(action.Locator);
-                            if (elements != null && elements.Count > 0)
+                            // Try CSS selector
+                            if (!string.IsNullOrEmpty(cssSelector))
                             {
-                                try
+                                var elements = await _driver.FindElementsAsync(cssSelector, "css");
+                                if (elements != null && elements.Count > 0)
                                 {
                                     await elements[0].ClickAsync();
-                                }
-                                catch
-                                {
-                                    // fallback to driver click
-                                    await _driver.ClickAsync(action.Locator);
+                                    return true;
                                 }
                             }
-                            else
+
+                            // Try generic/auto lookup (driver may detect xpath)
+                            try
                             {
-                                await _driver.ClickAsync(action.Locator);
+                                var elemsAuto = await _driver.FindElementsAsync(action.Locator);
+                                if (elemsAuto != null && elemsAuto.Count > 0)
+                                {
+                                    await elemsAuto[0].ClickAsync();
+                                    return true;
+                                }
                             }
+                            catch { }
+
+                            // Try XPath fallback
+                            if (!string.IsNullOrEmpty(xpathSelector))
+                            {
+                                var elementsXPath = await _driver.FindElementsAsync(xpathSelector, "xpath");
+                                if (elementsXPath != null && elementsXPath.Count > 0)
+                                {
+                                    await elementsXPath[0].ClickAsync();
+                                    return true;
+                                }
+                            }
+
+                            // As last resort attempt driver click with provided locator
+                            await _driver.ClickAsync(action.Locator);
                             return true;
                         }, _config.MaxRetryCount);
                         break;
@@ -158,9 +178,41 @@ namespace AgenticAI.Core.ZeroCode
                     case "fill":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
+                            var css = action.Locator;
+                            action.Metadata.TryGetValue("xpath", out var xpath);
+
                             await RetryHelper.ExecuteWithRetryAsync(async () =>
                             {
-                                await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
+                                // Try find by CSS
+                                if (!string.IsNullOrEmpty(css))
+                                {
+                                    try
+                                    {
+                                        var el = await _driver.FindElementAsync(css, "css");
+                                        await el.TypeAsync(action.Value!);
+                                        return true;
+                                    }
+                                    catch { }
+                                }
+
+                                // Try auto-detect
+                                try
+                                {
+                                    var elAuto = await _driver.FindElementAsync(action.Locator);
+                                    await elAuto.TypeAsync(action.Value!);
+                                    return true;
+                                }
+                                catch { }
+
+                                // XPath fallback
+                                if (!string.IsNullOrEmpty(xpath))
+                                {
+                                    var elXpath = await _driver.FindElementAsync(xpath, "xpath");
+                                    await elXpath.TypeAsync(action.Value!);
+                                    return true;
+                                }
+
+                                // As a final attempt, use driver type
                                 await _driver.TypeAsync(action.Locator, action.Value!);
                                 return true;
                             }, _config.MaxRetryCount);

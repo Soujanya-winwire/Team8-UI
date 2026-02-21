@@ -117,19 +117,29 @@ namespace AgenticAI.Core.ZeroCode
             };
             
             // Expose a .NET callback to the page so in-page scripts can report actions
-            _page.ExposeFunctionAsync("__recordAction", (string actionType, string locator, string? value, string? description) =>
+            // callback now receives css and xpath locators separately
+            _page.ExposeFunctionAsync("__recordAction", (string actionType, string cssLocator, string xpathLocator, string? value, string? description) =>
             {
                 var action = new RecordedAction
                 {
                     ActionType = actionType,
-                    Locator = locator ?? string.Empty,
+                    Locator = cssLocator ?? string.Empty,
                     Value = value,
-                    Description = description ?? (actionType + " on " + locator),
+                    Description = description ?? (actionType + " on " + (cssLocator ?? xpathLocator)),
                     Timestamp = _recordedActions.Count
                 };
 
+                // store xpath in metadata for fallback
+                if (!string.IsNullOrEmpty(xpathLocator))
+                {
+                    action.Metadata["xpath"] = xpathLocator;
+                }
+
+                // also capture data-testid if available (page script will pass as attribute)
+                // page script may include dataTestId in description or as part of css - keep flexible
+
                 _recordedActions.Add(action);
-                Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator}");
+                Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator} (xpath: {xpathLocator})");
                 return Task.CompletedTask;
             }).Wait();
 
@@ -146,16 +156,41 @@ namespace AgenticAI.Core.ZeroCode
                     return sel;
                 }
 
+                function getXPath(element) {
+                    if (element.id) {
+                        return '//*[@id="' + element.id + '"]';
+                    }
+                    var parts = [];
+                    while (element && element.nodeType === Node.ELEMENT_NODE) {
+                        var nb = 0;
+                        var sib = element.previousSibling;
+                        while (sib) {
+                            if (sib.nodeType === Node.ELEMENT_NODE && sib.nodeName === element.nodeName) nb++;
+                            sib = sib.previousSibling;
+                        }
+                        var prefix = element.prefix ? element.prefix + ':' : '';
+                        var nth = (nb ? '[' + (nb+1) + ']' : '');
+                        parts.unshift(prefix + element.localName + nth);
+                        element = element.parentNode;
+                    }
+                    return parts.length ? '/' + parts.join('/') : null;
+                }
+
                 document.addEventListener('click', function(e) {
                     try {
                         var el = e.target;
                         var selector = getSimpleSelector(el);
                         // Some elements (like buttons inside spans) may need the closest clickable
                         if (!selector || selector === '') {
-                            el = el.closest('button, a, input, [role="button"]') || el;
+                            el = el.closest('button, a, input, [role=""button""]') || el;
                             selector = getSimpleSelector(el);
                         }
-                        window.__recordAction('Click', selector || el.tagName.toLowerCase(), '', 'Click on ' + (selector || el.tagName.toLowerCase()));
+                        try {
+                            var xpath = getXPath(el) || '';
+                            window.__recordAction('Click', selector || el.tagName.toLowerCase(), xpath, '', 'Click on ' + (selector || el.tagName.toLowerCase()));
+                        } catch(e) {
+                            window.__recordAction('Click', selector || el.tagName.toLowerCase(), '', '', 'Click on ' + (selector || el.tagName.toLowerCase()));
+                        }
                     } catch (ex) { console.log('record click error', ex); }
                 }, true);
 
@@ -164,7 +199,12 @@ namespace AgenticAI.Core.ZeroCode
                         var el = e.target;
                         var selector = getSimpleSelector(el);
                         var value = el.value || '';
-                        window.__recordAction('Type', selector || el.tagName.toLowerCase(), value, 'Type into ' + (selector || el.tagName.toLowerCase()));
+                        try {
+                            var xpath = getXPath(el) || '';
+                            window.__recordAction('Type', selector || el.tagName.toLowerCase(), xpath, value, 'Type into ' + (selector || el.tagName.toLowerCase()));
+                        } catch(e) {
+                            window.__recordAction('Type', selector || el.tagName.toLowerCase(), '', value, 'Type into ' + (selector || el.tagName.toLowerCase()));
+                        }
                     } catch (ex) { console.log('record input error', ex); }
                 }, true);
             }";
