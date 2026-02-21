@@ -4,6 +4,7 @@ using AgenticAI.Core.ZeroCode.Models;
 using Microsoft.Playwright;
 using Newtonsoft.Json;
 using System.Text.Json;
+using System.IO;
 
 namespace AgenticAI.Core.ZeroCode
 {
