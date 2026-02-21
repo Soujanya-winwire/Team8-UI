@@ -153,14 +153,9 @@ async function loadDashboard() {
             const failedTests = history.filter(h => h.status === 'Failed').length;
             const skippedTests = history.filter(h => h.status === 'Skipped').length;
             
-            // Update execution stats if elements exist
-            const totalExecElement = document.getElementById('total-executions');
-            const passedElement = document.getElementById('total-passed');
-            const failedElement = document.getElementById('total-failed');
-            
-            if (totalExecElement) totalExecElement.textContent = totalExecutions;
-            if (passedElement) passedElement.textContent = passedTests;
-            if (failedElement) failedElement.textContent = failedTests;
+            // Update execution stats - these IDs match the dashboard HTML
+            document.getElementById('total-passed').textContent = passedTests;
+            document.getElementById('total-failed').textContent = failedTests;
             
             // Display recent scenarios
             displayRecentScenarios(scenarios.slice(0, 5));
@@ -399,7 +394,6 @@ function displayAllScenarios(scenariosList, historyList = []) {
                 <th>Tags</th>
                 <th>Steps</th>
                 <th>Created</th>
-                <th>Logs</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -444,54 +438,6 @@ function displayAllScenarios(scenariosList, historyList = []) {
         dateCell.textContent = scenario.createdAt ? new Date(scenario.createdAt).toLocaleDateString() : 'Unknown';
         row.appendChild(dateCell);
         
-        // Logs cell - show last execution summary if available
-        const logsCell = document.createElement('td');
-        const scenarioHistory = (historyList || []).filter(h => h.scenarioName === scenario.name || h.scenarioName === scenario.name.replace(/\s+/g,'_'));
-        if (scenarioHistory && scenarioHistory.length > 0) {
-            const last = scenarioHistory.sort((a,b) => new Date(b.executedAt) - new Date(a.executedAt))[0];
-            const statusClass = last.status === 'Passed' ? 'badge-success' : (last.status === 'Failed' ? 'badge-danger' : 'badge-warning');
-
-            const wrapper = document.createElement('div');
-            wrapper.style.display = 'flex';
-            wrapper.style.alignItems = 'center';
-            wrapper.style.gap = '8px';
-
-            const badge = document.createElement('span');
-            badge.className = `badge ${statusClass}`;
-            badge.textContent = last.status;
-            wrapper.appendChild(badge);
-
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-secondary btn-icon';
-            btn.title = 'View Logs';
-            btn.type = 'button';
-            // show icon + text to avoid missing font icon issues
-            btn.innerHTML = '<i class="fas fa-file-alt"></i> Logs';
-            btn.style.cursor = 'pointer';
-            // Attach click handler via JS to avoid quoting/escaping issues
-            btn.addEventListener('click', () => viewLogs(scenario.name));
-            wrapper.appendChild(btn);
-
-            logsCell.appendChild(wrapper);
-
-            // allow clicking anywhere in the logs cell to open logs
-            logsCell.style.cursor = 'pointer';
-            logsCell.addEventListener('click', () => viewLogs(scenario.name));
-            // prevent the inner button from propagating twice
-            btn.addEventListener('click', (e) => { e.stopPropagation(); });
-
-            const timeDiv = document.createElement('div');
-            timeDiv.style.fontSize = '0.85em';
-            timeDiv.style.color = '#6b7280';
-            timeDiv.style.marginTop = '6px';
-            timeDiv.textContent = new Date(last.executedAt).toLocaleString();
-            logsCell.appendChild(timeDiv);
-        } else {
-            logsCell.textContent = '—';
-            logsCell.style.cursor = 'default';
-        }
-        row.appendChild(logsCell);
-
         // Action buttons
         const actionsCell = document.createElement('td');
         
@@ -722,11 +668,11 @@ async function loadRecordView() {
             <h2><i class="fas fa-video"></i> Interactive Test Recorder</h2>
         </div>
 
-        <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border: 2px solid var(--primary-color);">
-            <div style="text-align: center; padding: 20px;">
-                <i class="fas fa-circle-dot" style="font-size: 3em; color: var(--primary-color); margin-bottom: 15px;"></i>
-                <h3 style="color: var(--dark); margin-bottom: 10px;">True Record & Playback Experience</h3>
-                <p style="color: #6b7280; line-height: 1.6;">
+        <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15)); border: 2px solid var(--primary-color); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);">
+            <div style="text-align: center; padding: 25px;">
+                <i class="fas fa-circle-dot" style="font-size: 3.5em; color: var(--primary-color); margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(102, 126, 234, 0.3));"></i>
+                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 1.6em; font-weight: 700;">True Record & Playback Experience</h3>
+                <p style="color: #374151; line-height: 1.8; font-size: 1.05em; font-weight: 500;">
                     Simply interact with your application in the browser - all actions are automatically recorded!
                     No need to manually enter XPath or element IDs.
                 </p>
@@ -742,9 +688,11 @@ async function loadRecordView() {
                 </div>
             </div>
 
-            <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <strong style="color: var(--success-color);">? How It Works:</strong>
-                <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">
+            <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.08)); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid var(--success-color); box-shadow: 0 4px 8px rgba(16, 185, 129, 0.15);">
+                <strong style="color: #047857; font-size: 1.1em; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="fas fa-lightbulb" style="color: #10b981;"></i> How It Works:
+                </strong>
+                <ul style="margin-top: 10px; padding-left: 30px; line-height: 2; color: #1f2937; font-weight: 500;">
                     <li>Browser opens automatically for you</li>
                     <li>Interact with your application naturally</li>
                     <li>All actions are captured automatically</li>
@@ -1529,22 +1477,144 @@ async function saveConfiguration() {
 }
 
 // Results View
-function loadResultsView() {
+async function loadResultsView() {
     const view = document.getElementById('results-view');
     
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-chart-bar"></i> Test Results</h2>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="loadResultsView()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
         </div>
 
         <div class="card">
-            <div class="empty-state">
-                <i class="fas fa-chart-line"></i>
-                <h3>Results Dashboard Coming Soon</h3>
-                <p>View detailed test execution results, trends, and analytics</p>
+            <div id="results-content">
+                <div class="spinner"></div>
             </div>
         </div>
     `;
+    
+    try {
+        // Load execution history
+        const response = await fetch(`${API_BASE_URL}/history`);
+        const data = await response.json();
+        
+        if (data.success && data.history && data.history.length > 0) {
+            displayResultsDashboard(data.history);
+        } else {
+            document.getElementById('results-content').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>No execution results yet</h3>
+                    <p>Execute some tests to see results here!</p>
+                    <button class="btn btn-primary mt-20" onclick="showView('execute')">
+                        <i class="fas fa-play"></i> Execute Tests
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading results:', error);
+        document.getElementById('results-content').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                <h3>Failed to load results</h3>
+                <p>Please try again</p>
+            </div>
+        `;
+    }
+}
+
+function displayResultsDashboard(history) {
+    const container = document.getElementById('results-content');
+    
+    // Calculate statistics
+    const totalTests = history.length;
+    const passedTests = history.filter(h => h.status === 'Passed').length;
+    const failedTests = history.filter(h => h.status === 'Failed').length;
+    const passRate = totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : 0;
+    
+    const html = `
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>${totalTests}</h3>
+                    <p>Total Executions</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>${passedTests}</h3>
+                    <p>Passed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon danger">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>${failedTests}</h3>
+                    <p>Failed</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon ${
+                    passRate >= 80 ? 'success' : passRate >= 50 ? 'warning' : 'danger'
+                }">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>${passRate}%</h3>
+                    <p>Pass Rate</p>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="margin-bottom: 20px; color: var(--dark);">Recent Test Executions</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Test Name</th>
+                    <th>Module</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Executed At</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${history.slice(0, 20).map(item => {
+                    const statusIcon = item.status === 'Passed' ? '?' : '?';
+                    const statusClass = item.status === 'Passed' ? 'success' : 'danger';
+                    const executedDate = item.executedAt ? new Date(item.executedAt).toLocaleString() : 'Unknown';
+                    
+                    return `
+                    <tr>
+                        <td><strong>${escapeHtml(item.scenarioName || 'Unknown Test')}</strong></td>
+                        <td><span class="badge badge-primary">${escapeHtml(item.module || 'N/A')}</span></td>
+                        <td>
+                            <span class="badge badge-${statusClass}">
+                                ${statusIcon} ${item.status}
+                            </span>
+                        </td>
+                        <td>${item.duration || 'N/A'}</td>
+                        <td>${executedDate}</td>
+                    </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    container.innerHTML = html;
 }
 
 // Documentation View
