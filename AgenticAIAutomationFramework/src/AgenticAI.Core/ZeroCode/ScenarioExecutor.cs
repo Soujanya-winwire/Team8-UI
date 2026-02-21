@@ -4,6 +4,7 @@ using AgenticAI.Core.Interfaces;
 using AgenticAI.Core.Logging;
 using AgenticAI.Core.Models;
 using AgenticAI.Core.ZeroCode.Models;
+using AgenticAI.Core.Utilities;
 
 namespace AgenticAI.Core.ZeroCode
 {
@@ -121,24 +122,42 @@ namespace AgenticAI.Core.ZeroCode
 
             try
             {
-                switch (action.ActionType.ToLower())
+                // Normalize action type
+                var actionType = (action.ActionType ?? string.Empty).ToLower().Trim();
+
+                switch (actionType)
                 {
                     case "click":
-                        await _driver.ClickAsync(action.Locator);
+                        // wait for element then click with retry
+                        await RetryHelper.ExecuteWithRetryAsync(async () =>
+                        {
+                            await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
+                            await _driver.ClickAsync(action.Locator);
+                            return true;
+                        }, _config.MaxRetryCount);
                         break;
 
                     case "type":
                     case "fill":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await _driver.TypeAsync(action.Locator, action.Value);
+                            await RetryHelper.ExecuteWithRetryAsync(async () =>
+                            {
+                                await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
+                                await _driver.TypeAsync(action.Locator, action.Value!);
+                                return true;
+                            }, _config.MaxRetryCount);
                         }
                         break;
 
                     case "navigate":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await _driver.NavigateAsync(action.Value);
+                            await RetryHelper.ExecuteWithRetryAsync(async () =>
+                            {
+                                await _driver.NavigateAsync(action.Value!);
+                                return true;
+                            }, _config.MaxRetryCount);
                         }
                         break;
 
@@ -148,7 +167,7 @@ namespace AgenticAI.Core.ZeroCode
                         break;
 
                     case "waitforelement":
-                        var timeout = int.TryParse(action.Value, out var timeoutSec) ? timeoutSec : 30;
+                        var timeout = int.TryParse(action.Value, out var timeoutSec) ? timeoutSec : _config.TimeoutInSeconds;
                         await _driver.WaitForElementAsync(action.Locator, timeout);
                         break;
 
