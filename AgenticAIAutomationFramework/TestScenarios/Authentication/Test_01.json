@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "0c7a9924-7946-4fa8-a96b-2afb98bc5675",
+  "Name": "Test_01",
+  "Description": "Verify user login",
+  "Module": "Authentication",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "",
+      "Value": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+      "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Navigate",
+      "Locator": "",
+      "Value": "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index",
+      "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index",
+      "Metadata": {},
+      "Timestamp": 1
+    }
+  ],
+  "Assertions": [],
+  "CreatedAt": "2026-02-15T20:28:55.3923806+05:30",
+  "ModifiedAt": "2026-02-15T20:28:55.3961701+05:30"
+}

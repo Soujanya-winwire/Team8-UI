@@ -232,7 +232,8 @@ namespace AgenticAI.WebUI.Controllers
                         scenarioName = name,
                         module = module,
                         executedAt = DateTime.Now.ToString("o"),
-                        duration = result.Duration ?? "0s",
+                        // result.Duration is a TimeSpan — format it as a string
+                        duration = result.Duration.ToString(),
                         status = result.Status.ToString(),
                         error = result.ErrorMessage
                     };
