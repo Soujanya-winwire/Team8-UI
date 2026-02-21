@@ -353,8 +353,20 @@ async function loadScenariosView() {
             document.getElementById('filter-tag').innerHTML += 
                 tags.map(t => `<option value="${t}">${t}</option>`).join('');
             
-            // Display scenarios
-            displayAllScenarios(scenarios);
+            // Load execution history to show last run logs per scenario
+            let historyList = [];
+            try {
+                const historyResponse = await fetch(`${API_BASE_URL}/history`);
+                const historyData = await historyResponse.json();
+                if (historyData.success) {
+                    historyList = historyData.history || [];
+                }
+            } catch (e) {
+                console.warn('Could not load history for scenarios view', e);
+            }
+
+            // Display scenarios with history
+            displayAllScenarios(scenarios, historyList);
         }
     } catch (error) {
         console.error('Error loading scenarios:', error);
@@ -362,7 +374,7 @@ async function loadScenariosView() {
     }
 }
 
-function displayAllScenarios(scenariosList) {
+function displayAllScenarios(scenariosList, historyList = []) {
     const container = document.getElementById('scenarios-list');
     
     if (scenariosList.length === 0) {
@@ -387,6 +399,7 @@ function displayAllScenarios(scenariosList) {
                 <th>Tags</th>
                 <th>Steps</th>
                 <th>Created</th>
+                <th>Logs</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -431,6 +444,26 @@ function displayAllScenarios(scenariosList) {
         dateCell.textContent = scenario.createdAt ? new Date(scenario.createdAt).toLocaleDateString() : 'Unknown';
         row.appendChild(dateCell);
         
+        // Logs cell - show last execution summary if available
+        const logsCell = document.createElement('td');
+        const scenarioHistory = (historyList || []).filter(h => h.scenarioName === scenario.name || h.scenarioName === scenario.name.replace(/\s+/g,'_'));
+        if (scenarioHistory && scenarioHistory.length > 0) {
+            const last = scenarioHistory.sort((a,b) => new Date(b.executedAt) - new Date(a.executedAt))[0];
+            const statusClass = last.status === 'Passed' ? 'badge-success' : (last.status === 'Failed' ? 'badge-danger' : 'badge-warning');
+            logsCell.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="badge ${statusClass}">${escapeHtml(last.status)}</span>
+                    <button class="btn btn-secondary btn-icon" title="View Logs" onclick="viewLogs('${escapeHtml(scenario.name)}')">
+                        <i class="fas fa-file-alt"></i>
+                    </button>
+                </div>
+                <div style="font-size:0.85em;color:#6b7280;margin-top:6px;">${new Date(last.executedAt).toLocaleString()}</div>
+            `;
+        } else {
+            logsCell.textContent = '—';
+        }
+        row.appendChild(logsCell);
+
         // Action buttons
         const actionsCell = document.createElement('td');
         
@@ -464,6 +497,42 @@ function displayAllScenarios(scenariosList) {
     
     container.innerHTML = '';
     container.appendChild(table);
+}
+
+// Display detailed logs for a scenario
+async function viewLogs(scenarioName) {
+    try {
+        // Fetch history for scenario
+        const response = await fetch(`${API_BASE_URL}/history/${encodeURIComponent(scenarioName)}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            showError('Could not load logs for this scenario');
+            return;
+        }
+
+        const history = data.history || [];
+
+        const content = `
+            <div style="max-height:400px; overflow:auto;">
+                ${history.map(h => `
+                    <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <div><strong>${escapeHtml(h.scenarioName)}</strong> <span style="color:#6b7280;">(${escapeHtml(h.module)})</span></div>
+                            <div><span class="badge ${h.status === 'Passed' ? 'badge-success' : 'badge-danger'}">${escapeHtml(h.status)}</span></div>
+                        </div>
+                        <div style="font-size:0.9em; color:#6b7280; margin-top:6px;">${new Date(h.executedAt).toLocaleString()}</div>
+                        <div style="margin-top:8px; white-space:pre-wrap; font-family:monospace; background:#f9fafb; padding:8px; border-radius:6px;">${escapeHtml(h.error || (h.status === 'Passed' ? 'Passed successfully' : 'No details'))}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        showModal(`Execution Logs - ${scenarioName}`, content);
+    } catch (error) {
+        console.error('Error loading logs:', error);
+        showError('Failed to load logs');
+    }
 }
 
 // Helper function to escape HTML
