@@ -158,7 +158,7 @@ namespace AgenticAI.Core.ZeroCode
 
                 function getXPath(element) {
                     if (element.id) {
-                        return '//*[@id="' + element.id + '"]';
+                        return "//*[@id='" + element.id + "']";
                     }
                     var parts = [];
                     while (element && element.nodeType === Node.ELEMENT_NODE) {
@@ -182,7 +182,7 @@ namespace AgenticAI.Core.ZeroCode
                         var selector = getSimpleSelector(el);
                         // Some elements (like buttons inside spans) may need the closest clickable
                         if (!selector || selector === '') {
-                            el = el.closest('button, a, input, [role=""button""]') || el;
+                            el = el.closest('button, a, input, [role="button"]') || el;
                             selector = getSimpleSelector(el);
                         }
                         try {
