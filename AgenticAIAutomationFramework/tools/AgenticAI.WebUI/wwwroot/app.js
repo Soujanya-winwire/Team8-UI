@@ -164,9 +164,6 @@ async function loadDashboard() {
             
             // Display recent scenarios
             displayRecentScenarios(scenarios.slice(0, 5));
-            
-            // Display execution history
-            displayExecutionHistory(history.slice(0, 10));
         }
     } catch (error) {
         hideLoading();
@@ -374,7 +371,7 @@ async function loadScenariosView() {
     }
 }
 
-function displayAllScenarios(scenariosList, historyList = []) {
+function displayAllScenarios(scenariosList) {
     const container = document.getElementById('scenarios-list');
     
     if (scenariosList.length === 0) {
@@ -399,7 +396,6 @@ function displayAllScenarios(scenariosList, historyList = []) {
                 <th>Tags</th>
                 <th>Steps</th>
                 <th>Created</th>
-                <th>Logs</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -444,54 +440,6 @@ function displayAllScenarios(scenariosList, historyList = []) {
         dateCell.textContent = scenario.createdAt ? new Date(scenario.createdAt).toLocaleDateString() : 'Unknown';
         row.appendChild(dateCell);
         
-        // Logs cell - show last execution summary if available
-        const logsCell = document.createElement('td');
-        const scenarioHistory = (historyList || []).filter(h => h.scenarioName === scenario.name || h.scenarioName === scenario.name.replace(/\s+/g,'_'));
-        if (scenarioHistory && scenarioHistory.length > 0) {
-            const last = scenarioHistory.sort((a,b) => new Date(b.executedAt) - new Date(a.executedAt))[0];
-            const statusClass = last.status === 'Passed' ? 'badge-success' : (last.status === 'Failed' ? 'badge-danger' : 'badge-warning');
-
-            const wrapper = document.createElement('div');
-            wrapper.style.display = 'flex';
-            wrapper.style.alignItems = 'center';
-            wrapper.style.gap = '8px';
-
-            const badge = document.createElement('span');
-            badge.className = `badge ${statusClass}`;
-            badge.textContent = last.status;
-            wrapper.appendChild(badge);
-
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-secondary btn-icon';
-            btn.title = 'View Logs';
-            btn.type = 'button';
-            // show icon + text to avoid missing font icon issues
-            btn.innerHTML = '<i class="fas fa-file-alt"></i> Logs';
-            btn.style.cursor = 'pointer';
-            // Attach click handler via JS to avoid quoting/escaping issues
-            btn.addEventListener('click', () => viewLogs(scenario.name));
-            wrapper.appendChild(btn);
-
-            logsCell.appendChild(wrapper);
-
-            // allow clicking anywhere in the logs cell to open logs
-            logsCell.style.cursor = 'pointer';
-            logsCell.addEventListener('click', () => viewLogs(scenario.name));
-            // prevent the inner button from propagating twice
-            btn.addEventListener('click', (e) => { e.stopPropagation(); });
-
-            const timeDiv = document.createElement('div');
-            timeDiv.style.fontSize = '0.85em';
-            timeDiv.style.color = '#6b7280';
-            timeDiv.style.marginTop = '6px';
-            timeDiv.textContent = new Date(last.executedAt).toLocaleString();
-            logsCell.appendChild(timeDiv);
-        } else {
-            logsCell.textContent = '—';
-            logsCell.style.cursor = 'default';
-        }
-        row.appendChild(logsCell);
-
         // Action buttons
         const actionsCell = document.createElement('td');
         
@@ -525,42 +473,6 @@ function displayAllScenarios(scenariosList, historyList = []) {
     
     container.innerHTML = '';
     container.appendChild(table);
-}
-
-// Display detailed logs for a scenario
-async function viewLogs(scenarioName) {
-    try {
-        // Fetch history for scenario
-        const response = await fetch(`${API_BASE_URL}/history/${encodeURIComponent(scenarioName)}`);
-        const data = await response.json();
-
-        if (!data.success) {
-            showError('Could not load logs for this scenario');
-            return;
-        }
-
-        const history = data.history || [];
-
-        const content = `
-            <div style="max-height:400px; overflow:auto;">
-                ${history.map(h => `
-                    <div style="border-bottom:1px solid #eee; padding:10px 0;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <div><strong>${escapeHtml(h.scenarioName)}</strong> <span style="color:#6b7280;">(${escapeHtml(h.module)})</span></div>
-                            <div><span class="badge ${h.status === 'Passed' ? 'badge-success' : 'badge-danger'}">${escapeHtml(h.status)}</span></div>
-                        </div>
-                        <div style="font-size:0.9em; color:#6b7280; margin-top:6px;">${new Date(h.executedAt).toLocaleString()}</div>
-                        <div style="margin-top:8px; white-space:pre-wrap; font-family:monospace; background:#f9fafb; padding:8px; border-radius:6px;">${escapeHtml(h.error || (h.status === 'Passed' ? 'Passed successfully' : 'No details'))}</div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-
-        showModal(`Execution Logs - ${scenarioName}`, content);
-    } catch (error) {
-        console.error('Error loading logs:', error);
-        showError('Failed to load logs');
-    }
 }
 
 // Helper function to escape HTML
@@ -1529,22 +1441,504 @@ async function saveConfiguration() {
 }
 
 // Results View
-function loadResultsView() {
+async function loadResultsView() {
     const view = document.getElementById('results-view');
     
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-chart-bar"></i> Test Results</h2>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="loadResultsView()">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="results-total-passed">0</h3>
+                    <p>Passed Tests</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon danger">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="results-total-failed">0</h3>
+                    <p>Failed Tests</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon info">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="results-total-executions">0</h3>
+                    <p>Total Executions</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-details">
+                    <h3 id="results-avg-duration">0s</h3>
+                    <p>Avg Duration</p>
+                </div>
+            </div>
         </div>
 
         <div class="card">
-            <div class="empty-state">
-                <i class="fas fa-chart-line"></i>
-                <h3>Results Dashboard Coming Soon</h3>
-                <p>View detailed test execution results, trends, and analytics</p>
+            <div class="card-header">
+                <div class="card-title">Execution History</div>
+            </div>
+            <div id="results-history-container">
+                <div class="spinner"></div>
             </div>
         </div>
     `;
+    
+    // Load test execution history
+    try {
+        const response = await fetch(`${API_BASE_URL}/history`);
+        const data = await response.json();
+        
+        if (data.success && data.history && data.history.length > 0) {
+            const history = data.history;
+            
+            // Calculate statistics
+            const totalExecutions = history.length;
+            const passedTests = history.filter(h => h.status === 'Passed').length;
+            const failedTests = history.filter(h => h.status === 'Failed').length;
+            
+            // Calculate average duration
+            const totalDuration = history.reduce((sum, h) => sum + (h.duration || 0), 0);
+            const avgDuration = totalExecutions > 0 ? (totalDuration / totalExecutions).toFixed(2) : 0;
+            
+            // Update stats
+            document.getElementById('results-total-passed').textContent = passedTests;
+            document.getElementById('results-total-failed').textContent = failedTests;
+            document.getElementById('results-total-executions').textContent = totalExecutions;
+            document.getElementById('results-avg-duration').textContent = `${avgDuration}s`;
+            
+            // Display history table
+            displayResultsHistory(history);
+        } else {
+            // No history found
+            document.getElementById('results-history-container').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h3>No execution history found</h3>
+                    <p>Execute some tests to see results here!</p>
+                    <button class="btn btn-primary mt-20" onclick="showView('execute')">
+                        <i class="fas fa-play"></i> Execute Tests
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading test results:', error);
+        document.getElementById('results-history-container').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Failed to load test results</h3>
+                <p>${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function normalizeScreenshotPath(path) {
+    if (!path) return '';
+    // Replace backslashes with forward slashes
+    let normalized = path.replace(/\\/g, '/');
+    // Ensure it starts with /
+    if (!normalized.startsWith('/')) {
+        normalized = '/' + normalized;
+    }
+    return normalized;
+}
+
+function displayResultsHistory(historyList) {
+    const container = document.getElementById('results-history-container');
+    
+    if (!historyList || historyList.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No test results</h3>
+                <p>Start executing tests to see results here</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = `
+        <div style="overflow-x: auto;">
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" id="select-all-results" onchange="toggleSelectAllResults(this)">
+                        </th>
+                        <th>Test Case Name</th>
+                        <th>Status</th>
+                        <th>Duration</th>
+                        <th>Browser</th>
+                        <th>Environment</th>
+                        <th>Date</th>
+                        <th>Evidence</th>
+                        <th>Logs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${historyList.map((item, index) => {
+                        const statusClass = item.status === 'Passed' ? 'success' : 
+                                          item.status === 'Failed' ? 'danger' : 'warning';
+                        const statusBadgeColor = item.status === 'Passed' ? '#10b981' : 
+                                                item.status === 'Failed' ? '#ef4444' : '#f59e0b';
+                        
+                        const executedDate = new Date(item.executedAt);
+                        const formattedDate = executedDate.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false
+                        });
+                        
+                        const browser = item.browser || 'Chrome';
+                        const environment = item.environment || 'QA';
+                        const hasEvidence = item.steps && item.steps.some(s => s.screenshotPath);
+                        const hasLogs = item.steps && item.steps.length > 0;
+                        
+                        return `
+                            <tr class="result-row">
+                                <td>
+                                    <input type="checkbox" class="result-checkbox" value="${index}">
+                                </td>
+                                <td><strong>${escapeHtml(item.scenarioName)}</strong></td>
+                                <td>
+                                    <span class="badge" style="background-color: ${statusBadgeColor}; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                        ${escapeHtml(item.status.toUpperCase())}
+                                    </span>
+                                </td>
+                                <td>${item.duration ? item.duration + 's' : 'N/A'}</td>
+                                <td>${browser}</td>
+                                <td>${environment}</td>
+                                <td style="font-size: 0.9em;">${formattedDate}</td>
+                                <td>
+                                    ${hasEvidence ? `
+                                        <button class="btn btn-primary btn-sm" onclick="viewEvidence(${index})" style="padding: 6px 16px; font-size: 13px;">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    ` : '-'}
+                                </td>
+                                <td>
+                                    ${hasLogs ? `
+                                        <button class="btn btn-primary btn-sm" onclick="viewLogs(${index})" style="padding: 6px 16px; font-size: 13px;">
+                                            <i class="fas fa-file-alt"></i> View
+                                        </button>
+                                    ` : '-'}
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+    
+    // Store history data globally for access by view functions
+    window.testResultsHistory = historyList;
+}
+
+function toggleSelectAllResults(checkbox) {
+    const checkboxes = document.querySelectorAll('.result-checkbox');
+    checkboxes.forEach(cb => cb.checked = checkbox.checked);
+}
+
+function viewEvidence(index) {
+    const item = window.testResultsHistory[index];
+    if (!item || !item.steps) return;
+    
+    const stepsWithScreenshots = item.steps.filter(s => s.screenshotPath);
+    
+    if (stepsWithScreenshots.length === 0) {
+        showToast('No screenshots available for this test', 'warning');
+        return;
+    }
+    
+    const modal = document.createElement('div');
+    modal.id = 'evidence-modal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        overflow-y: auto;
+        padding: 20px;
+    `;
+    
+    modal.innerHTML = `
+        <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 12px; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+            <div style="position: sticky; top: 0; background: white; border-bottom: 2px solid #e5e7eb; padding: 20px; z-index: 1; border-radius: 12px 12px 0 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0; color: #1f2937;">
+                        <i class="fas fa-images"></i> Evidence - ${escapeHtml(item.scenarioName)}
+                    </h2>
+                    <button onclick="closeDynamicModal('evidence-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+                <p style="margin: 8px 0 0 0; color: #6b7280;">Step-by-step screenshots from test execution</p>
+            </div>
+            <div style="padding: 24px;">
+                ${stepsWithScreenshots.map((step, idx) => `
+                    <div style="margin-bottom: 30px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: #f9fafb;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <div style="background: #3b82f6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                                ${idx + 1}
+                            </div>
+                            <div style="flex: 1;">
+                                <h3 style="margin: 0; font-size: 16px; color: #1f2937;">${escapeHtml(step.stepName)}</h3>
+                                ${step.description ? `<p style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">${escapeHtml(step.description)}</p>` : ''}
+                            </div>
+                            <span class="badge badge-${step.status === 'Passed' ? 'success' : 'danger'}" style="padding: 6px 12px;">
+                                <i class="fas fa-${step.status === 'Passed' ? 'check' : 'times'}"></i> ${escapeHtml(step.status)}
+                            </span>
+                        </div>
+                        <div style="text-align: center; background: white; padding: 12px; border-radius: 6px;">
+                            <img src="${normalizeScreenshotPath(step.screenshotPath)}" 
+                                 alt="Step ${idx + 1} screenshot" 
+                                 onclick="openScreenshotModal('${normalizeScreenshotPath(step.screenshotPath)}')"
+                                 style="max-width: 100%; cursor: pointer; border-radius: 6px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.2s;"
+                                 onmouseover="this.style.transform='scale(1.02)'"
+                                 onmouseout="this.style.transform='scale(1)'">
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Click on overlay background to close
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeDynamicModal('evidence-modal');
+        }
+    };
+    
+    document.body.appendChild(modal);
+}
+
+function viewLogs(index) {
+    const item = window.testResultsHistory[index];
+    if (!item || !item.steps) return;
+    
+    const modal = document.createElement('div');
+    modal.id = 'logs-modal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        overflow-y: auto;
+        padding: 20px;
+    `;
+    
+    const totalSteps = item.steps.length;
+    const passedSteps = item.steps.filter(s => s.status === 'Passed').length;
+    const failedSteps = item.steps.filter(s => s.status === 'Failed').length;
+    
+    modal.innerHTML = `
+        <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 12px; max-width: 1400px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+            <div style="position: sticky; top: 0; background: white; border-bottom: 2px solid #e5e7eb; padding: 20px; z-index: 1; border-radius: 12px 12px 0 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="margin: 0; color: #1f2937;">
+                            <i class="fas fa-file-alt"></i> Execution Logs - ${escapeHtml(item.scenarioName)}
+                        </h2>
+                        <p style="margin: 8px 0 0 0; color: #6b7280;">
+                            Module: <strong>${escapeHtml(item.module)}</strong> | 
+                            Duration: <strong>${item.duration}s</strong> | 
+                            Status: <strong style="color: ${item.status === 'Passed' ? '#10b981' : '#ef4444'};">${item.status}</strong>
+                        </p>
+                    </div>
+                    <button onclick="closeDynamicModal('logs-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px;">
+                    <div style="background: #f3f4f6; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">${totalSteps}</div>
+                        <div style="font-size: 13px; color: #6b7280;">Total Steps</div>
+                    </div>
+                    <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #10b981;">${passedSteps}</div>
+                        <div style="font-size: 13px; color: #6b7280;">Passed Steps</div>
+                    </div>
+                    <div style="background: #fef2f2; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #ef4444;">${failedSteps}</div>
+                        <div style="font-size: 13px; color: #6b7280;">Failed Steps</div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 24px;">
+                <div style="background: #f9fafb; border-radius: 8px; padding: 16px;">
+                    <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 16px;">
+                        <i class="fas fa-list-ol"></i> Step-by-Step Execution Details
+                    </h3>
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden;">
+                        <thead>
+                            <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                                <th style="padding: 12px; text-align: left; font-size: 13px; color: #6b7280; width: 60px;">#</th>
+                                <th style="padding: 12px; text-align: left; font-size: 13px; color: #6b7280;">Step Name</th>
+                                <th style="padding: 12px; text-align: left; font-size: 13px; color: #6b7280;">Description</th>
+                                <th style="padding: 12px; text-align: left; font-size: 13px; color: #6b7280; width: 100px;">Status</th>
+                                <th style="padding: 12px; text-align: left; font-size: 13px; color: #6b7280;">Result / Error Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${item.steps.map((step, idx) => {
+                                const statusColor = step.status === 'Passed' ? '#10b981' : 
+                                                  step.status === 'Failed' ? '#ef4444' : '#f59e0b';
+                                const statusBg = step.status === 'Passed' ? '#f0fdf4' : 
+                                               step.status === 'Failed' ? '#fef2f2' : '#fef3c7';
+                                const rowBg = step.status === 'Failed' ? '#fef2f2' : 'white';
+                                
+                                return `
+                                    <tr style="border-bottom: 1px solid #e5e7eb; background: ${rowBg};">
+                                        <td style="padding: 16px; font-weight: 600; color: #3b82f6;">${idx + 1}</td>
+                                        <td style="padding: 16px;">
+                                            <strong style="color: #1f2937;">${escapeHtml(step.stepName)}</strong>
+                                        </td>
+                                        <td style="padding: 16px; color: #6b7280; font-size: 13px;">
+                                            ${step.description ? escapeHtml(step.description) : '-'}
+                                        </td>
+                                        <td style="padding: 16px;">
+                                            <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fas fa-${step.status === 'Passed' ? 'check-circle' : step.status === 'Failed' ? 'times-circle' : 'exclamation-circle'}"></i>
+                                                ${escapeHtml(step.status)}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 16px;">
+                                            ${step.status === 'Passed' ? 
+                                                '<span style="color: #10b981; font-size: 13px;"><i class="fas fa-check"></i> Step executed successfully</span>' : 
+                                                step.error ? 
+                                                    `<div style="background: #fff7ed; border-left: 3px solid #ef4444; padding: 10px; border-radius: 4px;">
+                                                        <div style="color: #ef4444; font-weight: 600; font-size: 13px; margin-bottom: 4px;">
+                                                            <i class="fas fa-exclamation-triangle"></i> Error:
+                                                        </div>
+                                                        <div style="color: #991b1b; font-size: 13px; font-family: 'Courier New', monospace;">
+                                                            ${escapeHtml(step.error)}
+                                                        </div>
+                                                    </div>` : 
+                                                '<span style="color: #6b7280; font-size: 13px;">No error details</span>'
+                                            }
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ${item.error ? `
+                    <div style="margin-top: 20px; background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 16px;">
+                        <h3 style="margin: 0 0 12px 0; color: #991b1b; font-size: 16px;">
+                            <i class="fas fa-exclamation-triangle"></i> Test Execution Error
+                        </h3>
+                        <pre style="background: white; padding: 12px; border-radius: 4px; color: #991b1b; margin: 0; overflow-x: auto; font-size: 13px;">${escapeHtml(item.error)}</pre>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    // Click on overlay background to close
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeDynamicModal('logs-modal');
+        }
+    };
+    
+    document.body.appendChild(modal);
+}
+
+function closeDynamicModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function openScreenshotModal(imagePath) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.id = 'screenshot-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    modal.innerHTML = `
+        <div onclick="event.stopPropagation()" style="max-width: 90%; max-height: 90%; position: relative;">
+            <button onclick="closeScreenshotModal()" style="position: absolute; top: -40px; right: 0; background: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                <i class="fas fa-times"></i> Close
+            </button>
+            <img src="${imagePath}" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        </div>
+    `;
+    
+    // Click on overlay background to close
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            closeScreenshotModal();
+        }
+    };
+    
+    document.body.appendChild(modal);
+}
+
+function closeScreenshotModal() {
+    const modal = document.getElementById('screenshot-modal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 // Documentation View
