@@ -18,9 +18,9 @@ namespace AgenticAI.Core.Utilities
         public void AreEqual<T>(T expected, T actual, string message)
         {
             if (!EqualityComparer<T>.Default.Equals(expected, actual))
-+            {
-+                _errors.Add(message);
-+            }
+            {
+                _errors.Add(message);
+            }
         }
 
         public void Fail(string message)
