@@ -3,6 +3,8 @@ using AgenticAI.Core.Logging;
 using AgenticAI.Core.ZeroCode.Models;
 using Microsoft.Playwright;
 using Newtonsoft.Json;
+using System.Text.Json;
+using System.IO;
 
 namespace AgenticAI.Core.ZeroCode
 {
@@ -55,19 +57,14 @@ namespace AgenticAI.Core.ZeroCode
 
             _playwright = await Playwright.CreateAsync();
             
-            // Use Codegen mode for automatic recording
-            var browserType = _config.Browser switch
-            {
-                Core.Enums.BrowserType.Firefox => _playwright.Firefox,
-                Core.Enums.BrowserType.Edge => _playwright.Chromium,
-                Core.Enums.BrowserType.Safari => _playwright.Webkit,
-                _ => _playwright.Chromium
-            };
+            // Use Chromium for best recording support
+            var browserType = _playwright.Chromium;
 
             _browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
             {
                 Headless = false,
-                SlowMo = 500 // Slow down for better recording
+                SlowMo = 1000, // Slow down significantly for recording
+                Args = new[] { "--start-maximized" }
             });
 
             var context = await _browser.NewContextAsync(new BrowserNewContextOptions
@@ -82,14 +79,18 @@ namespace AgenticAI.Core.ZeroCode
             SetupActionListeners();
 
             // Navigate to start URL
-            await _page.GotoAsync(startUrl);
+            await _page.GotoAsync(startUrl, new PageGotoOptions 
+            { 
+                WaitUntil = WaitUntilState.Load,
+                Timeout = 60000 
+            });
             
             Logger.Info("✅ Browser opened and ready for recording!");
             Logger.Info("🎬 Perform your test actions - clicks, typing, selections will be captured automatically.");
             Logger.Info("✋ Click 'Stop Recording' when done.");
         }
 
-        private void SetupActionListeners()
+        private async Task SetupNativeActionTracking()
         {
             if (_page == null) return;
 
@@ -209,23 +210,145 @@ namespace AgenticAI.Core.ZeroCode
             // Record navigation
             _page.FrameNavigated += (sender, frame) =>
             {
-                if (frame.Url != "about:blank")
+                try
                 {
-                    _recordedActions.Add(new RecordedAction
+                    var json = System.Text.Json.JsonSerializer.Serialize(eventData);
+                    var doc = System.Text.Json.JsonDocument.Parse(json);
+                    var root = doc.RootElement;
+                    
+                    var type = root.GetProperty("type").GetString() ?? "";
+                    var selector = root.GetProperty("selector").GetString() ?? "";
+                    
+                    if (type == "click")
                     {
-                        ActionType = "Navigate",
-                        Value = frame.Url,
-                        Description = $"Navigate to {frame.Url}",
-                        Timestamp = _recordedActions.Count
-                    });
+                        var text = root.TryGetProperty("text", out var t) ? t.GetString() : "";
+                        var action = new RecordedAction
+                        {
+                            ActionType = "Click",
+                            Locator = selector,
+                            Description = $"Click on \"{text}\"",
+                            Timestamp = _recordedActions.Count
+                        };
+                        _recordedActions.Add(action);
+                        Logger.Info($"? Click recorded: {selector}");
+                    }
+                    else if (type == "fill")
+                    {
+                        var value = root.GetProperty("value").GetString() ?? "";
+                        var action = new RecordedAction
+                        {
+                            ActionType = "Type",
+                            Locator = selector,
+                            Value = value,
+                            Description = $"Type \"{value}\" into {selector}",
+                            Timestamp = _recordedActions.Count
+                        };
+                        _recordedActions.Add(action);
+                        Logger.Info($"? Type recorded: {selector} = {value}");
+                    }
                 }
-            };
+                catch (Exception ex)
+                {
+                    Logger.Debug($"Record action error: {ex.Message}");
+                }
+                
+                return Task.CompletedTask;
+            });
 
-            // Record console messages
-            _page.Console += (sender, msg) =>
-            {
-                Logger.Debug($"Console: {msg.Text}");
-            };
+            // Use AddInitScript to inject tracking on EVERY page load/navigation
+            // This is the KEY - it runs before ANY page code, on EVERY navigation
+            await _page.AddInitScriptAsync(@"
+(function() {
+    // Mark as injected
+    if (window.__recorderReady) return;
+    window.__recorderReady = true;
+    
+    console.log('?? Recorder Active - Ready to capture actions');
+    
+    // Helper to generate selector
+    window.__getSelector = function(el) {
+        if (!el) return '';
+        
+        // Priority 1: data-test attributes
+        const testAttrs = ['data-testid', 'data-test-id', 'data-test', 'data-qa'];
+        for (let attr of testAttrs) {
+            const val = el.getAttribute(attr);
+            if (val) return `[${attr}=""${val}""]`;
+        }
+        
+        // Priority 2: ID
+        if (el.id) return '#' + el.id;
+        
+        // Priority 3: name
+        if (el.name) return `[name=""${el.name}""]`;
+        
+        // Priority 4: placeholder
+        if (el.placeholder) return `[placeholder=""${el.placeholder}""]`;
+        
+        // Priority 5: aria-label
+        const ariaLabel = el.getAttribute('aria-label');
+        if (ariaLabel) return `[aria-label=""${ariaLabel}""]`;
+        
+        // Fallback: tag with classes
+        let selector = el.tagName.toLowerCase();
+        if (el.className && typeof el.className === 'string') {
+            const classes = el.className.trim().split(/\s+/).filter(c => c && !c.match(/^ng-|mat-|_/));
+            if (classes.length > 0 && classes.length < 4) {
+                selector += '.' + classes.join('.');
+            }
+        }
+        
+        return selector;
+    };
+    
+    // Track all clicks
+    document.addEventListener('mousedown', function(e) {
+        setTimeout(function() {
+            const el = e.target.closest('button, a, input[type=submit], input[type=button], [role=button]') || e.target;
+            const selector = window.__getSelector(el);
+            const text = el.textContent?.trim().substring(0, 50) || '';
+            
+            // Send to Playwright
+            if (window.__playwrightRecordAction) {
+                window.__playwrightRecordAction({
+                    type: 'click',
+                    selector: selector,
+                    text: text,
+                    timestamp: Date.now()
+                });
+                console.log('?? Click recorded:', selector);
+            }
+        }, 100);
+    }, true);
+    
+    // Track all input changes
+    let inputTimers = {};
+    document.addEventListener('input', function(e) {
+        const el = e.target;
+        if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') return;
+        
+        const selector = window.__getSelector(el);
+        const value = el.value;
+        
+        clearTimeout(inputTimers[selector]);
+        inputTimers[selector] = setTimeout(function() {
+            if (window.__playwrightRecordAction) {
+                window.__playwrightRecordAction({
+                    type: 'fill',
+                    selector: selector,
+                    value: value,
+                    timestamp: Date.now()
+                });
+                console.log('?? Type recorded:', selector, '=', value);
+            }
+        }, 1000);
+    }, true);
+    
+    console.log('? Recorder script initialized - perform actions now');
+})();
+");
+
+            Logger.Info("? Native action tracking enabled using AddInitScript");
         }
 
         /// <summary>

@@ -153,14 +153,9 @@ async function loadDashboard() {
             const failedTests = history.filter(h => h.status === 'Failed').length;
             const skippedTests = history.filter(h => h.status === 'Skipped').length;
             
-            // Update execution stats if elements exist
-            const totalExecElement = document.getElementById('total-executions');
-            const passedElement = document.getElementById('total-passed');
-            const failedElement = document.getElementById('total-failed');
-            
-            if (totalExecElement) totalExecElement.textContent = totalExecutions;
-            if (passedElement) passedElement.textContent = passedTests;
-            if (failedElement) failedElement.textContent = failedTests;
+            // Update execution stats - these IDs match the dashboard HTML
+            document.getElementById('total-passed').textContent = passedTests;
+            document.getElementById('total-failed').textContent = failedTests;
             
             // Display recent scenarios
             displayRecentScenarios(scenarios.slice(0, 5));
@@ -350,8 +345,20 @@ async function loadScenariosView() {
             document.getElementById('filter-tag').innerHTML += 
                 tags.map(t => `<option value="${t}">${t}</option>`).join('');
             
-            // Display scenarios
-            displayAllScenarios(scenarios);
+            // Load execution history to show last run logs per scenario
+            let historyList = [];
+            try {
+                const historyResponse = await fetch(`${API_BASE_URL}/history`);
+                const historyData = await historyResponse.json();
+                if (historyData.success) {
+                    historyList = historyData.history || [];
+                }
+            } catch (e) {
+                console.warn('Could not load history for scenarios view', e);
+            }
+
+            // Display scenarios with history
+            displayAllScenarios(scenarios, historyList);
         }
     } catch (error) {
         console.error('Error loading scenarios:', error);
@@ -622,11 +629,11 @@ async function loadRecordView() {
             <h2><i class="fas fa-video"></i> Interactive Test Recorder</h2>
         </div>
 
-        <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border: 2px solid var(--primary-color);">
-            <div style="text-align: center; padding: 20px;">
-                <i class="fas fa-circle-dot" style="font-size: 3em; color: var(--primary-color); margin-bottom: 15px;"></i>
-                <h3 style="color: var(--dark); margin-bottom: 10px;">True Record & Playback Experience</h3>
-                <p style="color: #6b7280; line-height: 1.6;">
+        <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15)); border: 2px solid var(--primary-color); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);">
+            <div style="text-align: center; padding: 25px;">
+                <i class="fas fa-circle-dot" style="font-size: 3.5em; color: var(--primary-color); margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(102, 126, 234, 0.3));"></i>
+                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 1.6em; font-weight: 700;">True Record & Playback Experience</h3>
+                <p style="color: #374151; line-height: 1.8; font-size: 1.05em; font-weight: 500;">
                     Simply interact with your application in the browser - all actions are automatically recorded!
                     No need to manually enter XPath or element IDs.
                 </p>
@@ -642,9 +649,11 @@ async function loadRecordView() {
                 </div>
             </div>
 
-            <div style="background: rgba(16, 185, 129, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <strong style="color: var(--success-color);">? How It Works:</strong>
-                <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.8;">
+            <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.08)); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid var(--success-color); box-shadow: 0 4px 8px rgba(16, 185, 129, 0.15);">
+                <strong style="color: #047857; font-size: 1.1em; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <i class="fas fa-lightbulb" style="color: #10b981;"></i> How It Works:
+                </strong>
+                <ul style="margin-top: 10px; padding-left: 30px; line-height: 2; color: #1f2937; font-weight: 500;">
                     <li>Browser opens automatically for you</li>
                     <li>Interact with your application naturally</li>
                     <li>All actions are captured automatically</li>
@@ -1910,6 +1919,40 @@ function openScreenshotModal(imagePath) {
             </button>
             <img src="${imagePath}" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
         </div>
+        
+        <h3 style="margin-bottom: 20px; color: var(--dark);">Recent Test Executions</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Test Name</th>
+                    <th>Module</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Executed At</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${history.slice(0, 20).map(item => {
+                    const statusIcon = item.status === 'Passed' ? '?' : '?';
+                    const statusClass = item.status === 'Passed' ? 'success' : 'danger';
+                    const executedDate = item.executedAt ? new Date(item.executedAt).toLocaleString() : 'Unknown';
+                    
+                    return `
+                    <tr>
+                        <td><strong>${escapeHtml(item.scenarioName || 'Unknown Test')}</strong></td>
+                        <td><span class="badge badge-primary">${escapeHtml(item.module || 'N/A')}</span></td>
+                        <td>
+                            <span class="badge badge-${statusClass}">
+                                ${statusIcon} ${item.status}
+                            </span>
+                        </td>
+                        <td>${item.duration || 'N/A'}</td>
+                        <td>${executedDate}</td>
+                    </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
     `;
     
     // Click on overlay background to close

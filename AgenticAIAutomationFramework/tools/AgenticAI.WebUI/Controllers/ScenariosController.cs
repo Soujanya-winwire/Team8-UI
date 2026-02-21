@@ -224,9 +224,36 @@ namespace AgenticAI.WebUI.Controllers
                 });
                 
                 var result = await runner.ExecuteScenarioAsync(name, module);
-                
-                await _hubContext.Clients.All.SendAsync("ReceiveTestResult", result);
-                
+
+                // Build a serializable DTO to ensure enums and durations are strings for the web UI
+                var resultDto = new
+                {
+                    testCaseId = result.TestCaseId,
+                    testCaseName = result.TestCaseName,
+                    module = result.Module,
+                    status = result.Status.ToString(),
+                    startTime = result.StartTime.ToString("o"),
+                    endTime = result.EndTime.ToString("o"),
+                    duration = result.EndTime != default && result.StartTime != default ? (result.EndTime - result.StartTime).ToString() : "0s",
+                    steps = result.Steps.Select(s => new
+                    {
+                        stepName = s.StepName,
+                        description = s.Description,
+                        status = s.Status.ToString(),
+                        startTime = s.StartTime.ToString("o"),
+                        endTime = s.EndTime.ToString("o"),
+                        duration = s.EndTime != default && s.StartTime != default ? (s.EndTime - s.StartTime).ToString() : "0s",
+                        errorMessage = s.ErrorMessage,
+                        screenshotPath = s.ScreenshotPath
+                    }).ToList(),
+                    retryCount = result.RetryCount,
+                    errorMessage = result.ErrorMessage,
+                    stackTrace = result.StackTrace,
+                    tags = result.Tags
+                };
+
+                await _hubContext.Clients.All.SendAsync("ReceiveTestResult", resultDto);
+
                 // Save to execution history
                 try
                 {
@@ -256,7 +283,7 @@ namespace AgenticAI.WebUI.Controllers
                             ScreenshotPath = s.ScreenshotPath
                         }).ToList()
                     };
-                    
+
                     // Send to history API
                     using var httpClient = new HttpClient();
                     httpClient.Timeout = TimeSpan.FromSeconds(5);
@@ -278,11 +305,11 @@ namespace AgenticAI.WebUI.Controllers
                     // Don't fail execution if history save fails
                     Log.Warning($"Failed to save history: {historyEx.Message}");
                 }
-                
+
                 return Ok(new
                 {
                     success = true,
-                    result
+                    result = resultDto
                 });
             }
             catch (Exception ex)
@@ -381,8 +408,8 @@ namespace AgenticAI.WebUI.Controllers
                 {
                     success = true,
                     module,
-                    count = results.Count,
-                    results
+                    count = resultDtos.Count,
+                    results = resultDtos
                 });
             }
             catch (Exception ex)

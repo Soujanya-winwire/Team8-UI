@@ -1,0 +1,14 @@
+{
+  "ScenarioId": "a57a4aa4-ff1d-4aaa-b740-6cb67ae87685",
+  "Name": "User_Login_Test",
+  "Description": "Verify Successful user login",
+  "Module": "Authentication",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://www.saucedemo.com/",
+  "Actions": [],
+  "Assertions": [],
+  "CreatedAt": "2026-01-28T15:20:22.4402786+05:30",
+  "ModifiedAt": "2026-01-28T17:04:02.4765075+05:30"
+}
