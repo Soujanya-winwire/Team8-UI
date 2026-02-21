@@ -1694,7 +1694,7 @@ function viewEvidence(index) {
                     <h2 style="margin: 0; color: #1f2937;">
                         <i class="fas fa-images"></i> Evidence - ${escapeHtml(item.scenarioName)}
                     </h2>
-                    <button id="close-evidence-btn" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                    <button onclick="closeDynamicModal('evidence-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
@@ -1732,16 +1732,11 @@ function viewEvidence(index) {
     // Click on overlay background to close
     modal.onclick = function(e) {
         if (e.target === modal) {
-            closeModal('evidence-modal');
+            closeDynamicModal('evidence-modal');
         }
     };
     
     document.body.appendChild(modal);
-    
-    // Add event listener to close button
-    document.getElementById('close-evidence-btn').addEventListener('click', function() {
-        closeModal('evidence-modal');
-    });
 }
 
 function viewLogs(index) {
@@ -1784,7 +1779,7 @@ function viewLogs(index) {
                             Status: <strong style="color: ${item.status === 'Passed' ? '#10b981' : '#ef4444'};">${item.status}</strong>
                         </p>
                     </div>
-                    <button id="close-logs-btn" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                    <button onclick="closeDynamicModal('logs-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
@@ -1877,19 +1872,14 @@ function viewLogs(index) {
     // Click on overlay background to close
     modal.onclick = function(e) {
         if (e.target === modal) {
-            closeModal('logs-modal');
+            closeDynamicModal('logs-modal');
         }
     };
     
     document.body.appendChild(modal);
-    
-    // Add event listener to close button
-    document.getElementById('close-logs-btn').addEventListener('click', function() {
-        closeModal('logs-modal');
-    });
 }
 
-function closeModal(modalId) {
+function closeDynamicModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.remove();
@@ -1915,7 +1905,7 @@ function openScreenshotModal(imagePath) {
     
     modal.innerHTML = `
         <div onclick="event.stopPropagation()" style="max-width: 90%; max-height: 90%; position: relative;">
-            <button id="close-screenshot-btn" style="position: absolute; top: -40px; right: 0; background: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px;">
+            <button onclick="closeScreenshotModal()" style="position: absolute; top: -40px; right: 0; background: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px;">
                 <i class="fas fa-times"></i> Close
             </button>
             <img src="${imagePath}" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
@@ -1930,9 +1920,6 @@ function openScreenshotModal(imagePath) {
     };
     
     document.body.appendChild(modal);
-    
-    // Add event listener to close button
-    document.getElementById('close-screenshot-btn').addEventListener('click', closeScreenshotModal);
 }
 
 function closeScreenshotModal() {
