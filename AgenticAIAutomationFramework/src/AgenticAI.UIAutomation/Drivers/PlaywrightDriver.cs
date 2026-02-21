@@ -85,11 +85,13 @@ namespace AgenticAI.UIAutomation.Drivers
 
         public async Task<IList<Core.Interfaces.IWebElement>> FindElementsAsync(string locator, string strategy = "auto")
         {
-            var selector = GetSelector(locator, strategy);
-            var elements = await _page!.QuerySelectorAllAsync(selector);
-            return await Task.FromResult<IList<Core.Interfaces.IWebElement>>(
-                elements.Select(e => new PlaywrightElement(_page!, e)).Cast<Core.Interfaces.IWebElement>().ToList()
-            );
+            // Use Playwright Locator API to support css, xpath, text and other strategies reliably
+            var locatorObj = GetLocator(locator, strategy);
+
+            // Get element handles from locator
+            var handles = await locatorObj.ElementHandlesAsync();
+            var list = handles.Select(e => new PlaywrightElement(_page!, e)).Cast<Core.Interfaces.IWebElement>().ToList();
+            return await Task.FromResult<IList<Core.Interfaces.IWebElement>>(list);
         }
 
         public async Task ClickAsync(string locator)
