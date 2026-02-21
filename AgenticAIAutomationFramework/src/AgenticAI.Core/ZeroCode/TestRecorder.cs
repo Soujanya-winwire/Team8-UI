@@ -115,6 +115,69 @@ namespace AgenticAI.Core.ZeroCode
             {
                 Logger.Debug($"Console: {msg.Text}");
             };
+            
+            // Expose a .NET callback to the page so in-page scripts can report actions
+            _page.ExposeFunctionAsync("__recordAction", (string actionType, string locator, string? value, string? description) =>
+            {
+                var action = new RecordedAction
+                {
+                    ActionType = actionType,
+                    Locator = locator ?? string.Empty,
+                    Value = value,
+                    Description = description ?? (actionType + " on " + locator),
+                    Timestamp = _recordedActions.Count
+                };
+
+                _recordedActions.Add(action);
+                Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator}");
+                return Task.CompletedTask;
+            }).Wait();
+
+            // Inject JS to capture common user interactions (clicks and input changes)
+            // Uses the exposed __recordAction to send events back to .NET
+            var script = @"() => {
+                function getSimpleSelector(el) {
+                    if (!el) return '';
+                    if (el.id) return '#' + el.id;
+                    var sel = el.tagName.toLowerCase();
+                    if (el.classList && el.classList.length > 0) {
+                        sel += '.' + Array.from(el.classList).filter(c=>c.trim()).join('.');
+                    }
+                    return sel;
+                }
+
+                document.addEventListener('click', function(e) {
+                    try {
+                        var el = e.target;
+                        var selector = getSimpleSelector(el);
+                        // Some elements (like buttons inside spans) may need the closest clickable
+                        if (!selector || selector === '') {
+                            el = el.closest('button, a, input, [role="button"]') || el;
+                            selector = getSimpleSelector(el);
+                        }
+                        window.__recordAction('Click', selector || el.tagName.toLowerCase(), '', 'Click on ' + (selector || el.tagName.toLowerCase()));
+                    } catch (ex) { console.log('record click error', ex); }
+                }, true);
+
+                document.addEventListener('input', function(e) {
+                    try {
+                        var el = e.target;
+                        var selector = getSimpleSelector(el);
+                        var value = el.value || '';
+                        window.__recordAction('Type', selector || el.tagName.toLowerCase(), value, 'Type into ' + (selector || el.tagName.toLowerCase()));
+                    } catch (ex) { console.log('record input error', ex); }
+                }, true);
+            }";
+
+            try
+            {
+                // Fire-and-forget the injection - if it fails we still have navigation recorded
+                _page.EvaluateAsync(script).Wait();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"Failed to inject action recorder script: {ex.Message}");
+            }
         }
 
         /// <summary>
