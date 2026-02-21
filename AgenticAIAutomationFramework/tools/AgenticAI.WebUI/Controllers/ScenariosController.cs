@@ -1,10 +1,13 @@
 using AgenticAI.Core.Interfaces;
 using AgenticAI.Core.ZeroCode;
 using AgenticAI.Core.ZeroCode.Models;
+using AgenticAI.Core.Configuration;
 using AgenticAI.UIAutomation.Drivers;
 using AgenticAI.WebUI.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Serilog;
+using FrameworkConfigManager = AgenticAI.Core.Configuration.ConfigurationManager;
 
 namespace AgenticAI.WebUI.Controllers
 {
@@ -254,26 +257,53 @@ namespace AgenticAI.WebUI.Controllers
                 // Save to execution history
                 try
                 {
+                    var config = FrameworkConfigManager.Instance.FrameworkConfig;
                     var historyEntry = new
                     {
-                        scenarioName = name,
-                        module = module,
-                        executedAt = DateTime.Now.ToString("o"),
-                        duration = resultDto.duration,
-                        status = result.Status.ToString(),
-                        error = result.ErrorMessage
+                        ExecutionId = Guid.NewGuid().ToString(),
+                        ScenarioName = name,
+                        Module = module,
+                        ExecutedAt = DateTime.Now.ToString("o"),
+                        Duration = (int)result.Duration.TotalSeconds,
+                        Status = result.Status.ToString(),
+                        Browser = config.Browser.ToString(),
+                        Environment = config.Environment.ToString(),
+                        Error = result.ErrorMessage,
+                        VideoPath = result.VideoPath,
+                        Screenshots = result.Steps
+                            .Where(s => !string.IsNullOrEmpty(s.ScreenshotPath))
+                            .Select(s => s.ScreenshotPath)
+                            .ToList(),
+                        Steps = result.Steps.Select(s => new
+                        {
+                            StepName = s.StepName,
+                            Description = s.Description,
+                            Status = s.Status.ToString(),
+                            Error = s.ErrorMessage,
+                            ScreenshotPath = s.ScreenshotPath
+                        }).ToList()
                     };
 
                     // Send to history API
                     using var httpClient = new HttpClient();
+                    httpClient.Timeout = TimeSpan.FromSeconds(5);
                     var historyJson = System.Text.Json.JsonSerializer.Serialize(historyEntry);
                     var content = new StringContent(historyJson, System.Text.Encoding.UTF8, "application/json");
-                    await httpClient.PostAsync("http://localhost:5000/api/history", content);
+                    var response = await httpClient.PostAsync("http://localhost:5000/api/history", content);
+                    
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Log.Information($"Test execution saved to history: {name}");
+                    }
+                    else
+                    {
+                        Log.Warning($"Failed to save history. Status: {response.StatusCode}");
+                    }
                 }
                 catch (Exception historyEx)
                 {
                     // Don't fail execution if history save fails
-                    Console.WriteLine($"Failed to save history: {historyEx.Message}");
+                    Log.Warning($"Failed to save history: {historyEx.Message}");
                 }
 
                 return Ok(new
@@ -327,36 +357,53 @@ namespace AgenticAI.WebUI.Controllers
                 });
                 
                 var results = await runner.ExecuteModuleAsync(module);
-
-                // Build DTO list
-                var resultDtos = results.Select(result => new
+                
+                // Save each test result to history
+                var config = FrameworkConfigManager.Instance.FrameworkConfig;
+                using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(5);
+                foreach (var result in results)
                 {
-                    testCaseId = result.TestCaseId,
-                    testCaseName = result.TestCaseName,
-                    module = result.Module,
-                    status = result.Status.ToString(),
-                    startTime = result.StartTime.ToString("o"),
-                    endTime = result.EndTime.ToString("o"),
-                    duration = result.EndTime != default && result.StartTime != default ? (result.EndTime - result.StartTime).ToString() : "0s",
-                    steps = result.Steps.Select(s => new
+                    try
                     {
-                        stepName = s.StepName,
-                        description = s.Description,
-                        status = s.Status.ToString(),
-                        startTime = s.StartTime.ToString("o"),
-                        endTime = s.EndTime.ToString("o"),
-                        duration = s.EndTime != default && s.StartTime != default ? (s.EndTime - s.StartTime).ToString() : "0s",
-                        errorMessage = s.ErrorMessage,
-                        screenshotPath = s.ScreenshotPath
-                    }).ToList(),
-                    retryCount = result.RetryCount,
-                    errorMessage = result.ErrorMessage,
-                    stackTrace = result.StackTrace,
-                    tags = result.Tags
-                }).ToList();
-
-                await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", module, "completed", $"Module execution completed. {resultDtos.Count} tests executed.");
-
+                        var historyEntry = new
+                        {
+                            ExecutionId = Guid.NewGuid().ToString(),
+                            ScenarioName = result.TestCaseName,
+                            Module = result.Module,
+                            ExecutedAt = DateTime.Now.ToString("o"),
+                            Duration = (int)result.Duration.TotalSeconds,
+                            Status = result.Status.ToString(),
+                            Browser = config.Browser.ToString(),
+                            Environment = config.Environment.ToString(),
+                            Error = result.ErrorMessage,
+                            VideoPath = result.VideoPath,
+                            Screenshots = result.Steps
+                                .Where(s => !string.IsNullOrEmpty(s.ScreenshotPath))
+                                .Select(s => s.ScreenshotPath)
+                                .ToList(),
+                            Steps = result.Steps.Select(s => new
+                            {
+                                StepName = s.StepName,
+                                Description = s.Description,
+                                Status = s.Status.ToString(),
+                                Error = s.ErrorMessage,
+                                ScreenshotPath = s.ScreenshotPath
+                            }).ToList()
+                        };
+                        
+                        var historyJson = System.Text.Json.JsonSerializer.Serialize(historyEntry);
+                        var content = new StringContent(historyJson, System.Text.Encoding.UTF8, "application/json");
+                        await httpClient.PostAsync("http://localhost:5000/api/history", content);
+                    }
+                    catch (Exception historyEx)
+                    {
+                        Log.Warning($"Failed to save history for {result.TestCaseName}: {historyEx.Message}");
+                    }
+                }
+                
+                await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", module, "completed", $"Module execution completed. {results.Count} tests executed.");
+                
                 return Ok(new
                 {
                     success = true,
@@ -389,6 +436,50 @@ namespace AgenticAI.WebUI.Controllers
                 });
                 
                 var results = await runner.ExecuteByTagAsync(tag);
+                
+                // Save each test result to history
+                var config = FrameworkConfigManager.Instance.FrameworkConfig;
+                using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(5);
+                foreach (var result in results)
+                {
+                    try
+                    {
+                        var historyEntry = new
+                        {
+                            ExecutionId = Guid.NewGuid().ToString(),
+                            ScenarioName = result.TestCaseName,
+                            Module = result.Module,
+                            ExecutedAt = DateTime.Now.ToString("o"),
+                            Duration = (int)result.Duration.TotalSeconds,
+                            Status = result.Status.ToString(),
+                            Browser = config.Browser.ToString(),
+                            Environment = config.Environment.ToString(),
+                            Error = result.ErrorMessage,
+                            VideoPath = result.VideoPath,
+                            Screenshots = result.Steps
+                                .Where(s => !string.IsNullOrEmpty(s.ScreenshotPath))
+                                .Select(s => s.ScreenshotPath)
+                                .ToList(),
+                            Steps = result.Steps.Select(s => new
+                            {
+                                StepName = s.StepName,
+                                Description = s.Description,
+                                Status = s.Status.ToString(),
+                                Error = s.ErrorMessage,
+                                ScreenshotPath = s.ScreenshotPath
+                            }).ToList()
+                        };
+                        
+                        var historyJson = System.Text.Json.JsonSerializer.Serialize(historyEntry);
+                        var content = new StringContent(historyJson, System.Text.Encoding.UTF8, "application/json");
+                        await httpClient.PostAsync("http://localhost:5000/api/history", content);
+                    }
+                    catch (Exception historyEx)
+                    {
+                        Log.Warning($"Failed to save history for {result.TestCaseName}: {historyEx.Message}");
+                    }
+                }
                 
                 await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", tag, "completed", $"Tagged tests execution completed. {results.Count} tests executed.");
                 
@@ -424,6 +515,44 @@ namespace AgenticAI.WebUI.Controllers
                 });
                 
                 var summary = await runner.ExecuteAllScenariosAsync();
+                
+                // Save each test result to history
+                using var httpClient = new HttpClient();
+                foreach (var result in summary.TestResults)
+                {
+                    try
+                    {
+                        var historyEntry = new
+                        {
+                            scenarioName = result.TestCaseName,
+                            module = result.Module,
+                            executedAt = DateTime.Now.ToString("o"),
+                            duration = (int)result.Duration.TotalSeconds,
+                            status = result.Status.ToString(),
+                            error = result.ErrorMessage,
+                            videoPath = result.VideoPath,
+                            screenshots = result.Steps
+                                .Where(s => !string.IsNullOrEmpty(s.ScreenshotPath))
+                                .Select(s => s.ScreenshotPath)
+                                .ToList(),
+                            steps = result.Steps.Select(s => new
+                            {
+                                stepName = s.StepName,
+                                status = s.Status.ToString(),
+                                error = s.ErrorMessage,
+                                screenshotPath = s.ScreenshotPath
+                            }).ToList()
+                        };
+                        
+                        var historyJson = System.Text.Json.JsonSerializer.Serialize(historyEntry);
+                        var content = new StringContent(historyJson, System.Text.Encoding.UTF8, "application/json");
+                        await httpClient.PostAsync("http://localhost:5000/api/history", content);
+                    }
+                    catch (Exception historyEx)
+                    {
+                        Log.Warning($"Failed to save history for {result.TestCaseName}: {historyEx.Message}");
+                    }
+                }
                 
                 await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", "all", "completed", "Full test suite execution completed.");
                 

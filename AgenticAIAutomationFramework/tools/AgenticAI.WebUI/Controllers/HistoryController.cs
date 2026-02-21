@@ -246,14 +246,20 @@ namespace AgenticAI.WebUI.Controllers
         public string ExecutedAt { get; set; } = DateTime.Now.ToString("o");
         public int Duration { get; set; }
         public string Status { get; set; } = string.Empty;
+        public string Browser { get; set; } = "Chrome";
+        public string Environment { get; set; } = "QA";
         public List<StepResult>? Steps { get; set; }
         public string? Error { get; set; }
+        public string? VideoPath { get; set; }
+        public List<string>? Screenshots { get; set; }
     }
 
     public class StepResult
     {
         public string StepName { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? Error { get; set; }
+        public string? ScreenshotPath { get; set; }
     }
 }

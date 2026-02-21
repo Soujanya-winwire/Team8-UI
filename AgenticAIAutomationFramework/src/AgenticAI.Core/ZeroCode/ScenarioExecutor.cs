@@ -4,7 +4,6 @@ using AgenticAI.Core.Interfaces;
 using AgenticAI.Core.Logging;
 using AgenticAI.Core.Models;
 using AgenticAI.Core.ZeroCode.Models;
-using AgenticAI.Core.Utilities;
 
 namespace AgenticAI.Core.ZeroCode
 {
@@ -96,12 +95,62 @@ namespace AgenticAI.Core.ZeroCode
                 await _driver.NavigateAsync(url);
                 step.Status = TestStatus.Passed;
                 Logger.StepInfo("Navigate", $"Successfully navigated to {url}");
+                
+                // Capture screenshot after successful navigation
+                if (_config.EnableScreenshots)
+                {
+                    try
+                    {
+                        var screenshot = await _driver.TakeScreenshotAsync();
+                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
+                        
+                        var directory = Path.GetDirectoryName(screenshotPath);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
+                        step.ScreenshotPath = screenshotPath;
+                        Logger.Info($"Screenshot saved: {screenshotPath}");
+                    }
+                    catch (Exception screenshotEx)
+                    {
+                        Logger.Warning($"Failed to capture screenshot: {screenshotEx.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 step.Status = TestStatus.Failed;
                 step.ErrorMessage = ex.Message;
                 Logger.Error($"Navigation failed: {ex.Message}");
+                
+                // Capture screenshot on failure
+                if (_config.EnableScreenshots)
+                {
+                    try
+                    {
+                        var screenshot = await _driver.TakeScreenshotAsync();
+                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate_FAILED_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
+                        
+                        var directory = Path.GetDirectoryName(screenshotPath);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
+                        step.ScreenshotPath = screenshotPath;
+                        Logger.Warning($"Failure screenshot saved: {screenshotPath}");
+                    }
+                    catch (Exception screenshotEx)
+                    {
+                        Logger.Warning($"Failed to capture failure screenshot: {screenshotEx.Message}");
+                    }
+                }
                 throw;
             }
             finally
@@ -293,12 +342,62 @@ namespace AgenticAI.Core.ZeroCode
 
                 step.Status = TestStatus.Passed;
                 Logger.StepInfo(action.ActionType, $"Action executed successfully");
+                
+                // Capture screenshot after successful action
+                if (_config.EnableScreenshots)
+                {
+                    try
+                    {
+                        var screenshot = await _driver.TakeScreenshotAsync();
+                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
+                        
+                        var directory = Path.GetDirectoryName(screenshotPath);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
+                        step.ScreenshotPath = screenshotPath;
+                        Logger.Info($"Screenshot saved: {screenshotPath}");
+                    }
+                    catch (Exception screenshotEx)
+                    {
+                        Logger.Warning($"Failed to capture screenshot: {screenshotEx.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 step.Status = TestStatus.Failed;
                 step.ErrorMessage = ex.Message;
                 Logger.Error($"Action execution failed: {ex.Message}");
+                
+                // Capture screenshot on failure
+                if (_config.EnableScreenshots)
+                {
+                    try
+                    {
+                        var screenshot = await _driver.TakeScreenshotAsync();
+                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}_FAILED_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
+                        
+                        var directory = Path.GetDirectoryName(screenshotPath);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
+                        step.ScreenshotPath = screenshotPath;
+                        Logger.Info($"Failure screenshot saved: {screenshotPath}");
+                    }
+                    catch (Exception screenshotEx)
+                    {
+                        Logger.Warning($"Failed to capture failure screenshot: {screenshotEx.Message}");
+                    }
+                }
                 throw;
             }
             finally
@@ -369,12 +468,62 @@ namespace AgenticAI.Core.ZeroCode
 
                 step.Status = TestStatus.Passed;
                 Logger.StepInfo("Verify", $"Assertion passed: {assertion.Type}");
+                
+                // Capture screenshot after successful assertion
+                if (_config.EnableScreenshots)
+                {
+                    try
+                    {
+                        var screenshot = await _driver.TakeScreenshotAsync();
+                        var screenshotFileName = $"{testResult.TestCaseName}_Verify_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
+                        
+                        var directory = Path.GetDirectoryName(screenshotPath);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
+                        step.ScreenshotPath = screenshotPath;
+                        Logger.Info($"Screenshot saved: {screenshotPath}");
+                    }
+                    catch (Exception screenshotEx)
+                    {
+                        Logger.Warning($"Failed to capture screenshot: {screenshotEx.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 step.Status = TestStatus.Failed;
                 step.ErrorMessage = ex.Message;
                 Logger.Error($"Assertion failed: {ex.Message}");
+                
+                // Capture screenshot on failure
+                if (_config.EnableScreenshots)
+                {
+                    try
+                    {
+                        var screenshot = await _driver.TakeScreenshotAsync();
+                        var screenshotFileName = $"{testResult.TestCaseName}_Verify_FAILED_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
+                        
+                        var directory = Path.GetDirectoryName(screenshotPath);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
+                        step.ScreenshotPath = screenshotPath;
+                        Logger.Warning($"Failure screenshot saved: {screenshotPath}");
+                    }
+                    catch (Exception screenshotEx)
+                    {
+                        Logger.Warning($"Failed to capture failure screenshot: {screenshotEx.Message}");
+                    }
+                }
                 throw;
             }
             finally
