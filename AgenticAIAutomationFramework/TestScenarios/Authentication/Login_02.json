@@ -1,0 +1,31 @@
+{
+  "ScenarioId": "cb1c0a90-8819-4814-8e2c-1603ba3c4679",
+  "Name": "Login_02",
+  "Description": "Verify successful user login",
+  "Module": "Authentication",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://www.saucedemo.com/",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "",
+      "Value": "https://www.saucedemo.com/",
+      "Description": "Navigate to https://www.saucedemo.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Navigate",
+      "Locator": "",
+      "Value": "https://www.saucedemo.com/inventory.html",
+      "Description": "Navigate to https://www.saucedemo.com/inventory.html",
+      "Metadata": {},
+      "Timestamp": 1
+    }
+  ],
+  "Assertions": [],
+  "CreatedAt": "2026-02-21T17:55:38.2820042+05:30",
+  "ModifiedAt": "2026-02-21T17:55:38.2828534+05:30"
+}

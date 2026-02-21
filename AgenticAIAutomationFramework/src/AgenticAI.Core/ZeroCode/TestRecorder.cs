@@ -118,131 +118,125 @@ namespace AgenticAI.Core.ZeroCode
                 Logger.Debug($"Console: {msg.Text}");
             };
             
-            // Expose a .NET callback to the page so in-page scripts can report actions
-            // callback now receives css and xpath locators separately
-            // Expose a function that accepts a single JSON payload object from the page
-            _page.ExposeFunctionAsync("__recordAction", (JsonElement payload) =>
+            // Expose a .NET callback that accepts JSON string from the page script
+            _page.ExposeFunctionAsync("__recordAction", (string jsonPayload) =>
             {
                 try
                 {
-                    var actionType = payload.GetProperty("actionType").GetString() ?? string.Empty;
-                    var cssLocator = payload.TryGetProperty("css", out var pCss) ? pCss.GetString() ?? string.Empty : string.Empty;
-                    var xpathLocator = payload.TryGetProperty("xpath", out var pXpath) ? pXpath.GetString() ?? string.Empty : string.Empty;
-                    var value = payload.TryGetProperty("value", out var pVal) ? pVal.GetString() : null;
-                    var description = payload.TryGetProperty("description", out var pDesc) ? pDesc.GetString() : null;
+                    var doc = System.Text.Json.JsonDocument.Parse(jsonPayload);
+                    var root = doc.RootElement;
+                    
+                    var actionType = root.GetProperty("actionType").GetString() ?? string.Empty;
+                    var css = root.TryGetProperty("css", out var pCss) ? pCss.GetString() ?? string.Empty : string.Empty;
+                    var xpath = root.TryGetProperty("xpath", out var pXpath) ? pXpath.GetString() ?? string.Empty : string.Empty;
+                    var value = root.TryGetProperty("value", out var pVal) ? pVal.GetString() : null;
+                    var desc = root.TryGetProperty("description", out var pDesc) ? pDesc.GetString() : null;
 
                     var action = new RecordedAction
                     {
                         ActionType = actionType,
-                        Locator = cssLocator ?? string.Empty,
+                        Locator = css ?? string.Empty,
                         Value = value,
-                        Description = description ?? (actionType + " on " + (cssLocator ?? xpathLocator)),
+                        Description = desc ?? (actionType + " on " + (css ?? xpath)),
                         Timestamp = _recordedActions.Count
                     };
 
-                    if (!string.IsNullOrEmpty(xpathLocator))
-                    {
-                        action.Metadata["xpath"] = xpathLocator;
-                    }
-
+                    if (!string.IsNullOrEmpty(xpath)) action.Metadata["xpath"] = xpath;
                     _recordedActions.Add(action);
-                    Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator} (xpath: {xpathLocator})");
+                    Logger.Info($"Action recorded (auto): {action.ActionType} {action.Locator} (xpath: {xpath})");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warning($"Failed to record action payload: {ex.Message}");
+                    Logger.Warning($"Failed to parse record action payload: {ex.Message}");
                 }
 
                 return Task.CompletedTask;
             }).Wait();
 
-            // Inject JS to capture common user interactions (clicks and input changes)
-            // Uses the exposed __recordAction to send events back to .NET
-            var script = @"() => {
-                function getSimpleSelector(el) {
-                    if (!el) return '';
-
-                    // prefer stable attributes
-                    var attrPriority = ['data-test-id','data-testid','data-test','name','id','aria-label','placeholder','title'];
-                    for (var i=0;i<attrPriority.length;i++){
-                        var a = attrPriority[i];
-                        if (el.getAttribute && el.getAttribute(a)){
-                            var v = el.getAttribute(a).trim();
-                            if (v) {
-                                // sanitize
-                                return '['+a+'="'+v.replace(/\"/g,'\\\"')+'"]';
-                            }
-                        }
-                    }
-
-                    // fallback to id
-                    if (el.id) return '#' + el.id;
-
-                    // fallback to tag + classes
-                    var sel = el.tagName.toLowerCase();
-                    if (el.classList && el.classList.length > 0) {
-                        sel += '.' + Array.from(el.classList).filter(c=>c.trim()).join('.');
-                    }
-                    return sel;
-                }
-
-                function getXPath(element) {
-                    if (element.id) {
-                        return ""//*[@id='"" + element.id + ""']"";
-                    }
-                    var parts = [];
-                    while (element && element.nodeType === Node.ELEMENT_NODE) {
-                        var nb = 0;
-                        var sib = element.previousSibling;
-                        while (sib) {
-                            if (sib.nodeType === Node.ELEMENT_NODE && sib.nodeName === element.nodeName) nb++;
-                            sib = sib.previousSibling;
-                        }
-                        var prefix = element.prefix ? element.prefix + ':' : '';
-                        var nth = (nb ? '[' + (nb+1) + ']' : '');
-                        parts.unshift(prefix + element.localName + nth);
-                        element = element.parentNode;
-                    }
-                    return parts.length ? '/' + parts.join('/') : null;
-                }
-
-                document.addEventListener('click', function(e) {
-                    try {
-                        var el = e.target;
-                        var selector = getSimpleSelector(el);
-                        // Some elements (like buttons inside spans) may need the closest clickable
-                        if (!selector || selector === '') {
-                            el = el.closest('button, a, input, [role=""button""]') || el;
-                            selector = getSimpleSelector(el);
-                        }
-                        try {
-                            var xpath = getXPath(el) || '';
-                            window.__recordAction({ actionType: 'Click', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: '', description: 'Click on ' + (selector || el.tagName.toLowerCase()) });
-                        } catch(e) {
-                            window.__recordAction({ actionType: 'Click', css: selector || el.tagName.toLowerCase(), xpath: '', value: '', description: 'Click on ' + (selector || el.tagName.toLowerCase()) });
-                        }
-                    } catch (ex) { console.log('record click error', ex); }
-                }, true);
-
-                document.addEventListener('input', function(e) {
-                    try {
-                        var el = e.target;
-                        var selector = getSimpleSelector(el);
-                        var value = el.value || '';
-                        try {
-                            var xpath = getXPath(el) || '';
-                            window.__recordAction({ actionType: 'Type', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: value, description: 'Type into ' + (selector || el.tagName.toLowerCase()) });
-                        } catch(e) {
-                            window.__recordAction({ actionType: 'Type', css: selector || el.tagName.toLowerCase(), xpath: '', value: value, description: 'Type into ' + (selector || el.tagName.toLowerCase()) });
-                        }
-                    } catch (ex) { console.log('record input error', ex); }
-                }, true);
-            }";
+            // Inject embedded recorder script (avoids file loading issues)
+            var script = @"(function(){
+function getAttrSelector(el) {
+    if (!el || !el.getAttribute) return null;
+    var attrs = ['data-test-id','data-testid','data-test','name','aria-label','placeholder','title','id'];
+    for (var i = 0; i < attrs.length; i++) {
+        var a = attrs[i];
+        try {
+            var v = el.getAttribute(a);
+            if (v) {
+                v = v.trim();
+                if (v.length > 0) return '[' + a + ""='"" + v.replace(/'/g, ""\'"") + ""']"";
+            }
+        } catch(e){}
+    }
+    return null;
+}
+function getSimpleSelector(el) {
+    if (!el) return '';
+    var byAttr = getAttrSelector(el);
+    if (byAttr) return byAttr;
+    if (el.id) return '#' + el.id;
+    var sel = el.tagName.toLowerCase();
+    if (el.classList && el.classList.length > 0) {
+        sel += '.' + Array.from(el.classList).filter(c=>c.trim()).join('.');
+    }
+    return sel;
+}
+function getXPath(element) {
+    if (!element) return '';
+    if (element.id) {
+        return ""//*[@id='"" + element.id + ""']"";
+    }
+    var parts = [];
+    while (element && element.nodeType === Node.ELEMENT_NODE) {
+        var nb = 0;
+        var sib = element.previousSibling;
+        while (sib) {
+            if (sib.nodeType === Node.ELEMENT_NODE && sib.nodeName === element.nodeName) nb++;
+            sib = sib.previousSibling;
+        }
+        var prefix = element.prefix ? element.prefix + ':' : '';
+        var nth = (nb ? '[' + (nb+1) + ']' : '');
+        parts.unshift(prefix + element.localName + nth);
+        element = element.parentNode;
+    }
+    return parts.length ? '/' + parts.join('/') : '';
+}
+function sendAction(obj){
+    try{
+        if (window.__recordAction){
+            window.__recordAction(JSON.stringify(obj));
+        }
+    }catch(e){ console.warn('sendAction error', e); }
+}
+document.addEventListener('click', function(e){
+    try{
+        var el = e.target;
+        var selector = getSimpleSelector(el);
+        if (!selector || selector === ''){
+            el = el.closest('button, a, input, [role=button]') || el;
+            selector = getSimpleSelector(el);
+        }
+        var xpath = '';
+        try{ xpath = getXPath(el); }catch(e){}
+        sendAction({ actionType: 'Click', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: '', description: 'Click on ' + (selector || el.tagName.toLowerCase()) });
+    }catch(ex){ console.log('record click error', ex); }
+}, true);
+document.addEventListener('input', function(e){
+    try{
+        var el = e.target;
+        var selector = getSimpleSelector(el);
+        var value = el.value || '';
+        var xpath = '';
+        try{ xpath = getXPath(el); }catch(e){}
+        sendAction({ actionType: 'Type', css: selector || el.tagName.toLowerCase(), xpath: xpath, value: value, description: 'Type into ' + (selector || el.tagName.toLowerCase()) });
+    }catch(ex){ console.log('record input error', ex); }
+}, true);
+})();";
 
             try
             {
-                // Fire-and-forget the injection - if it fails we still have navigation recorded
                 _page.EvaluateAsync(script).Wait();
+                Logger.Info("Recorder injection script loaded successfully");
             }
             catch (Exception ex)
             {
