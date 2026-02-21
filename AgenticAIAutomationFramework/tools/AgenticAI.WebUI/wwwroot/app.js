@@ -465,9 +465,9 @@ function displayAllScenarios(scenariosList, historyList = []) {
             btn.className = 'btn btn-secondary btn-icon';
             btn.title = 'View Logs';
             btn.type = 'button';
-            const icon = document.createElement('i');
-            icon.className = 'fas fa-file-alt';
-            btn.appendChild(icon);
+            // show icon + text to avoid missing font icon issues
+            btn.innerHTML = '<i class="fas fa-file-alt"></i> Logs';
+            btn.style.cursor = 'pointer';
             // Attach click handler via JS to avoid quoting/escaping issues
             btn.addEventListener('click', () => viewLogs(scenario.name));
             wrapper.appendChild(btn);
