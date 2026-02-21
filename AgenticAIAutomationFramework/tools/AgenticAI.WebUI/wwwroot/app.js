@@ -450,15 +450,36 @@ function displayAllScenarios(scenariosList, historyList = []) {
         if (scenarioHistory && scenarioHistory.length > 0) {
             const last = scenarioHistory.sort((a,b) => new Date(b.executedAt) - new Date(a.executedAt))[0];
             const statusClass = last.status === 'Passed' ? 'badge-success' : (last.status === 'Failed' ? 'badge-danger' : 'badge-warning');
-            logsCell.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="badge ${statusClass}">${escapeHtml(last.status)}</span>
-                    <button class="btn btn-secondary btn-icon" title="View Logs" onclick="viewLogs('${escapeHtml(scenario.name)}')">
-                        <i class="fas fa-file-alt"></i>
-                    </button>
-                </div>
-                <div style="font-size:0.85em;color:#6b7280;margin-top:6px;">${new Date(last.executedAt).toLocaleString()}</div>
-            `;
+
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.gap = '8px';
+
+            const badge = document.createElement('span');
+            badge.className = `badge ${statusClass}`;
+            badge.textContent = last.status;
+            wrapper.appendChild(badge);
+
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-secondary btn-icon';
+            btn.title = 'View Logs';
+            btn.type = 'button';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-file-alt';
+            btn.appendChild(icon);
+            // Attach click handler via JS to avoid quoting/escaping issues
+            btn.addEventListener('click', () => viewLogs(scenario.name));
+            wrapper.appendChild(btn);
+
+            logsCell.appendChild(wrapper);
+
+            const timeDiv = document.createElement('div');
+            timeDiv.style.fontSize = '0.85em';
+            timeDiv.style.color = '#6b7280';
+            timeDiv.style.marginTop = '6px';
+            timeDiv.textContent = new Date(last.executedAt).toLocaleString();
+            logsCell.appendChild(timeDiv);
         } else {
             logsCell.textContent = '—';
         }
