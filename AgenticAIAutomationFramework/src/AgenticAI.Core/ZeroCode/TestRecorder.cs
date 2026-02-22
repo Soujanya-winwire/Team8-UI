@@ -76,7 +76,7 @@ namespace AgenticAI.Core.ZeroCode
             _page = await context.NewPageAsync();
 
             // Set up action listeners for comprehensive recording
-            SetupActionListeners();
+            await SetupActionListeners();
 
             // Navigate to start URL
             await _page.GotoAsync(startUrl, new PageGotoOptions 
@@ -90,125 +90,12 @@ namespace AgenticAI.Core.ZeroCode
             Logger.Info("✋ Click 'Stop Recording' when done.");
         }
 
-        private async Task SetupNativeActionTracking()
+        private async Task SetupActionListeners()
         {
             if (_page == null) return;
 
-            // Inject JavaScript to capture all user interactions
-            _page.EvaluateAsync(@"
-                (() => {
-                    window.recordedActions = [];
-                    
-                    // Capture Click Events
-                    document.addEventListener('click', (e) => {
-                        const target = e.target;
-                        const selector = getOptimalSelector(target);
-                        window.recordedActions.push({
-                            type: 'Click',
-                            selector: selector,
-                            tagName: target.tagName,
-                            text: target.innerText?.substring(0, 50) || '',
-                            timestamp: Date.now()
-                        });
-                    }, true);
-                    
-                    // Capture Input/Type Events
-                    document.addEventListener('input', (e) => {
-                        const target = e.target;
-                        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                            const selector = getOptimalSelector(target);
-                            window.recordedActions.push({
-                                type: 'Type',
-                                selector: selector,
-                                value: target.value,
-                                timestamp: Date.now()
-                            });
-                        }
-                    }, true);
-                    
-                    // Capture Select Changes
-                    document.addEventListener('change', (e) => {
-                        const target = e.target;
-                        if (target.tagName === 'SELECT') {
-                            const selector = getOptimalSelector(target);
-                            window.recordedActions.push({
-                                type: 'Select',
-                                selector: selector,
-                                value: target.value,
-                                timestamp: Date.now()
-                            });
-                        }
-                    }, true);
-                    
-                    // Capture Scroll Events (throttled)
-                    let scrollTimeout;
-                    window.addEventListener('scroll', (e) => {
-                        clearTimeout(scrollTimeout);
-                        scrollTimeout = setTimeout(() => {
-                            window.recordedActions.push({
-                                type: 'Scroll',
-                                selector: 'window',
-                                value: `${window.scrollX},${window.scrollY}`,
-                                timestamp: Date.now()
-                            });
-                        }, 500);
-                    }, true);
-                    
-                    // Helper function to generate optimal selector
-                    function getOptimalSelector(element) {
-                        // Try ID first
-                        if (element.id) {
-                            return '#' + element.id;
-                        }
-                        
-                        // Try name attribute
-                        if (element.name) {
-                            return `[name='${element.name}']`;
-                        }
-                        
-                        // Try data-testid or data-test
-                        if (element.dataset.testid) {
-                            return `[data-testid='${element.dataset.testid}']`;
-                        }
-                        if (element.dataset.test) {
-                            return `[data-test='${element.dataset.test}']`;
-                        }
-                        
-                        // Try unique class combination
-                        if (element.className && typeof element.className === 'string') {
-                            const classes = element.className.trim().split(/\s+/).filter(c => c);
-                            if (classes.length > 0) {
-                                const selector = element.tagName.toLowerCase() + '.' + classes.join('.');
-                                if (document.querySelectorAll(selector).length === 1) {
-                                    return selector;
-                                }
-                            }
-                        }
-                        
-                        // Generate XPath as last resort
-                        let path = '';
-                        let current = element;
-                        while (current && current.nodeType === Node.ELEMENT_NODE) {
-                            let index = 0;
-                            let sibling = current.previousSibling;
-                            while (sibling) {
-                                if (sibling.nodeType === Node.ELEMENT_NODE && sibling.nodeName === current.nodeName) {
-                                    index++;
-                                }
-                                sibling = sibling.previousSibling;
-                            }
-                            const tagName = current.nodeName.toLowerCase();
-                            const pathIndex = index > 0 ? `[${index + 1}]` : '';
-                            path = '/' + tagName + pathIndex + path;
-                            current = current.parentNode;
-                        }
-                        return path || element.tagName.toLowerCase();
-                    }
-                })();
-            ");
-
-            // Record navigation
-            _page.FrameNavigated += (sender, frame) =>
+            // Expose a function in the browser to call when actions occur
+            await _page.ExposeFunctionAsync("__playwrightRecordAction", async (object eventData) =>
             {
                 try
                 {
@@ -230,7 +117,7 @@ namespace AgenticAI.Core.ZeroCode
                             Timestamp = _recordedActions.Count
                         };
                         _recordedActions.Add(action);
-                        Logger.Info($"? Click recorded: {selector}");
+                        Logger.Info($"🖱 Click recorded: {selector}");
                     }
                     else if (type == "fill")
                     {
@@ -244,7 +131,7 @@ namespace AgenticAI.Core.ZeroCode
                             Timestamp = _recordedActions.Count
                         };
                         _recordedActions.Add(action);
-                        Logger.Info($"? Type recorded: {selector} = {value}");
+                        Logger.Info($"⌨ Type recorded: {selector} = {value}");
                     }
                 }
                 catch (Exception ex)

@@ -1,0 +1,72 @@
+{
+  "ScenarioId": "9876fedc-ba09-8765-4321-fedcba098765",
+  "Name": "Assertion_Failure_Test",
+  "Description": "This test intentionally fails due to assertion mismatch - expects wrong text",
+  "Module": "ErrorVerification",
+  "Tags": [
+    "Error",
+    "Assertion",
+    "Intentional_Failure"
+  ],
+  "StartUrl": "https://www.saucedemo.com",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com",
+      "Value": null,
+      "Description": "Navigate to SauceDemo",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#user-name",
+      "Value": null,
+      "Description": "Click username field",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#user-name",
+      "Value": "locked_out_user",
+      "Description": "Enter locked out username",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#password",
+      "Value": null,
+      "Description": "Click password field",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#password",
+      "Value": "secret_sauce",
+      "Description": "Enter password",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#login-button",
+      "Value": null,
+      "Description": "Click login button - this will show error message",
+      "Metadata": {},
+      "Timestamp": 5
+    }
+  ],
+  "Assertions": [
+    {
+      "Type": "TextContains",
+      "Locator": "[data-test='error']",
+      "ExpectedValue": "This will not match the actual error message",
+      "Description": "INTENTIONAL FAILURE: Assert wrong error message text"
+    }
+  ],
+  "CreatedAt": "2026-02-22T10:00:00.0000000+05:30",
+  "ModifiedAt": "2026-02-22T10:00:00.0000000+05:30"
+}

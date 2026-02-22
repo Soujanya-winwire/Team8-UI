@@ -177,151 +177,28 @@ namespace AgenticAI.Core.ZeroCode
                 switch (actionType)
                 {
                     case "click":
-                        // Attempt CSS first, then XPath fallback (stored in Metadata["xpath"]).
-                        var cssSelector = action.Locator;
-                        action.Metadata.TryGetValue("xpath", out var xpathSelector);
-
-                        await RetryHelper.ExecuteWithRetryAsync(async () =>
-                        {
-                            // Try CSS selector
-                            if (!string.IsNullOrEmpty(cssSelector))
-                            {
-                                var elements = await _driver.FindElementsAsync(cssSelector, "css");
-                                if (elements != null && elements.Count > 0)
-                                {
-                                    await elements[0].ClickAsync();
-                                    return true;
-                                }
-                            }
-
-                            // Try generic/auto lookup (driver may detect xpath)
-                            try
-                            {
-                                var elemsAuto = await _driver.FindElementsAsync(action.Locator);
-                                if (elemsAuto != null && elemsAuto.Count > 0)
-                                {
-                                    await elemsAuto[0].ClickAsync();
-                                    return true;
-                                }
-                            }
-                            catch { }
-
-                            // Try XPath fallback
-                            if (!string.IsNullOrEmpty(xpathSelector))
-                            {
-                                var elementsXPath = await _driver.FindElementsAsync(xpathSelector, "xpath");
-                                if (elementsXPath != null && elementsXPath.Count > 0)
-                                {
-                                    await elementsXPath[0].ClickAsync();
-                                    return true;
-                                }
-                            }
-
-                            // As last resort attempt driver click with provided locator
-                            await _driver.ClickAsync(action.Locator);
-                            return true;
-                        }, _config.MaxRetryCount);
+                        await _driver.ClickAsync(action.Locator);
                         break;
 
                     case "type":
                     case "fill":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            var css = action.Locator;
-                            action.Metadata.TryGetValue("xpath", out var xpath);
-
-                            await RetryHelper.ExecuteWithRetryAsync(async () =>
-                            {
-                                // Try find by CSS
-                                if (!string.IsNullOrEmpty(css))
-                                {
-                                    try
-                                    {
-                                        var el = await _driver.FindElementAsync(css, "css");
-                                        await el.TypeAsync(action.Value!);
-                                        return true;
-                                    }
-                                    catch { }
-                                }
-
-                                // Try auto-detect
-                                try
-                                {
-                                    var elAuto = await _driver.FindElementAsync(action.Locator);
-                                    await elAuto.TypeAsync(action.Value!);
-                                    return true;
-                                }
-                                catch { }
-
-                                // XPath fallback
-                                if (!string.IsNullOrEmpty(xpath))
-                                {
-                                    var elXpath = await _driver.FindElementAsync(xpath, "xpath");
-                                    await elXpath.TypeAsync(action.Value!);
-                                    return true;
-                                }
-
-                                // As a final attempt, use driver type
-                                await _driver.TypeAsync(action.Locator, action.Value!);
-                                return true;
-                            }, _config.MaxRetryCount);
+                            await _driver.TypeAsync(action.Locator, action.Value!);
                         }
                         break;
 
                     case "navigate":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await RetryHelper.ExecuteWithRetryAsync(async () =>
-                            {
-                                await _driver.NavigateAsync(action.Value!);
-                                return true;
-                            }, _config.MaxRetryCount);
+                            await _driver.NavigateAsync(action.Value!);
                         }
                         break;
 
                     case "select":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            var selectCss = action.Locator;
-                            action.Metadata.TryGetValue("xpath", out var selectXpath);
-
-                            await RetryHelper.ExecuteWithRetryAsync(async () =>
-                            {
-                                // For select dropdowns, we'll use Type action to set the value
-                                // This works with most modern select elements
-                                // Try CSS selector
-                                if (!string.IsNullOrEmpty(selectCss))
-                                {
-                                    try
-                                    {
-                                        await _driver.TypeAsync(selectCss, action.Value!);
-                                        return true;
-                                    }
-                                    catch { }
-                                }
-
-                                // Try XPath fallback
-                                if (!string.IsNullOrEmpty(selectXpath))
-                                {
-                                    try
-                                    {
-                                        var elXpath = await _driver.FindElementAsync(selectXpath, "xpath");
-                                        await elXpath.TypeAsync(action.Value!);
-                                        return true;
-                                    }
-                                    catch { }
-                                }
-
-                                // Auto-detect
-                                try
-                                {
-                                    await _driver.TypeAsync(action.Locator, action.Value!);
-                                    return true;
-                                }
-                                catch { }
-
-                                throw new Exception($"Could not select option in element: {action.Locator}");
-                            }, _config.MaxRetryCount);
+                            await _driver.TypeAsync(action.Locator, action.Value!);
                         }
                         break;
 
