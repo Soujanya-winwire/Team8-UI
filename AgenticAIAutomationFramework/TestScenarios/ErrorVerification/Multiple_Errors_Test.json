@@ -1,0 +1,72 @@
+{
+  "ScenarioId": "aabbccdd-eeff-0011-2233-445566778899",
+  "Name": "Multiple_Errors_Test",
+  "Description": "This test has multiple failures to show comprehensive error logging",
+  "Module": "ErrorVerification",
+  "Tags": [
+    "Error",
+    "Multiple_Failures",
+    "Intentional_Failure"
+  ],
+  "StartUrl": "https://www.saucedemo.com",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com",
+      "Value": null,
+      "Description": "Navigate to SauceDemo - this will succeed",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#user-name",
+      "Value": null,
+      "Description": "Click username field - this will succeed",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#user-name",
+      "Value": "standard_user",
+      "Description": "Enter username - this will succeed",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#wrong-password-field",
+      "Value": null,
+      "Description": "FAILURE 1: Click on wrong password field",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#wrong-password-field",
+      "Value": "secret_sauce",
+      "Description": "FAILURE 2: Try to type in non-existent field",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#non-existent-button",
+      "Value": null,
+      "Description": "FAILURE 3: Click non-existent button",
+      "Metadata": {},
+      "Timestamp": 5
+    }
+  ],
+  "Assertions": [
+    {
+      "Type": "ElementVisible",
+      "Locator": "#this-element-does-not-exist",
+      "ExpectedValue": null,
+      "Description": "FAILURE 4: Assert visibility of non-existent element"
+    }
+  ],
+  "CreatedAt": "2026-02-22T10:00:00.0000000+05:30",
+  "ModifiedAt": "2026-02-22T10:00:00.0000000+05:30"
+}

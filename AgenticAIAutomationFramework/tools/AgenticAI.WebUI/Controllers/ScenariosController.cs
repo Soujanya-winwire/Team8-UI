@@ -408,8 +408,8 @@ namespace AgenticAI.WebUI.Controllers
                 {
                     success = true,
                     module,
-                    count = resultDtos.Count,
-                    results = resultDtos
+                    count = results.Count,
+                    results
                 });
             }
             catch (Exception ex)

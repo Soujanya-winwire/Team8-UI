@@ -1,0 +1,55 @@
+{
+  "ScenarioId": "c2ee8ee4-7df9-4236-af0c-3b3a84d244fa",
+  "Name": "Login_Test_01",
+  "Description": "",
+  "Module": "Authentication",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+  "Actions": [
+    {
+      "ActionType": "Click",
+      "Locator": "[name=\"username\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[name=\"username\"]",
+      "Value": "Admin",
+      "Description": "Type \"Admin\" into [name=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[name=\"password\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[name=\"password\"]",
+      "Value": "admin123",
+      "Description": "Type \"admin123\" into [name=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "button",
+      "Value": null,
+      "Description": "Click on \"Login\"",
+      "Metadata": {},
+      "Timestamp": 4
+    }
+  ],
+  "Assertions": [],
+  "CreatedAt": "2026-02-22T14:44:55.7535922+05:30",
+  "ModifiedAt": "2026-02-22T14:44:55.7541071+05:30"
+}

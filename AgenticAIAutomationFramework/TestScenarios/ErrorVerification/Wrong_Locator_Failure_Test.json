@@ -1,0 +1,41 @@
+{
+  "ScenarioId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "Name": "Wrong_Locator_Failure_Test",
+  "Description": "This test intentionally fails due to incorrect element locator",
+  "Module": "ErrorVerification",
+  "Tags": [
+    "Error",
+    "Locator_Issue",
+    "Intentional_Failure"
+  ],
+  "StartUrl": "https://www.saucedemo.com",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com",
+      "Value": null,
+      "Description": "Navigate to SauceDemo",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#wrong-username-field-id",
+      "Value": null,
+      "Description": "INTENTIONAL FAILURE: Click on wrong username field locator",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#wrong-username-field-id",
+      "Value": "standard_user",
+      "Description": "Try to enter username in non-existent field",
+      "Metadata": {},
+      "Timestamp": 2
+    }
+  ],
+  "Assertions": [],
+  "CreatedAt": "2026-02-22T10:00:00.0000000+05:30",
+  "ModifiedAt": "2026-02-22T10:00:00.0000000+05:30"
+}

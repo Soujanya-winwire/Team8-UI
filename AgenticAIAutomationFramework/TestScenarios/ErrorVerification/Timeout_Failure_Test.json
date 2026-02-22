@@ -1,0 +1,73 @@
+{
+  "ScenarioId": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+  "Name": "Timeout_Failure_Test",
+  "Description": "This test intentionally fails due to timeout - waiting for a non-existent element",
+  "Module": "ErrorVerification",
+  "Tags": [
+    "Error",
+    "Timeout",
+    "Intentional_Failure"
+  ],
+  "StartUrl": "https://www.saucedemo.com",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com",
+      "Value": null,
+      "Description": "Navigate to SauceDemo",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#user-name",
+      "Value": null,
+      "Description": "Click on username field",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#user-name",
+      "Value": "standard_user",
+      "Description": "Enter username",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#password",
+      "Value": null,
+      "Description": "Click on password field",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#password",
+      "Value": "secret_sauce",
+      "Description": "Enter password",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#login-button",
+      "Value": null,
+      "Description": "Click login button",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#non-existent-element-that-will-timeout",
+      "Value": null,
+      "Description": "INTENTIONAL FAILURE: Try to click non-existent element - will timeout",
+      "Metadata": {},
+      "Timestamp": 6
+    }
+  ],
+  "Assertions": [],
+  "CreatedAt": "2026-02-22T10:00:00.0000000+05:30",
+  "ModifiedAt": "2026-02-22T10:00:00.0000000+05:30"
+}

@@ -1437,7 +1437,7 @@ async function saveConfiguration() {
     }
 }
 
-// Results View
+// Enhanced Results View with Filters and Advanced Features
 async function loadResultsView() {
     const view = document.getElementById('results-view');
     
@@ -1445,12 +1445,16 @@ async function loadResultsView() {
         <div class="header">
             <h2><i class="fas fa-chart-bar"></i> Test Results</h2>
             <div class="header-actions">
-                <button class="btn btn-secondary" onclick="loadResultsView()">
+                <button class="btn btn-secondary" onclick="refreshTestResults()">
                     <i class="fas fa-sync"></i> Refresh
+                </button>
+                <button class="btn btn-primary" onclick="exportTestResults()">
+                    <i class="fas fa-download"></i> Export
                 </button>
             </div>
         </div>
 
+        <!-- Summary Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon success">
@@ -1493,9 +1497,63 @@ async function loadResultsView() {
             </div>
         </div>
 
+        <!-- Filters Section -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Execution History</div>
+                <div class="card-title">
+                    <i class="fas fa-filter"></i> Filters
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="clearAllTestFilters()">
+                    <i class="fas fa-times"></i> Clear All
+                </button>
+            </div>
+            <div style="padding: 0 25px 25px 25px;">
+                <div class="grid-4" style="gap: 15px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label>Status</label>
+                        <select class="form-control" id="filter-status" onchange="applyTestFilters()">
+                            <option value="">All</option>
+                            <option value="Passed">Passed</option>
+                            <option value="Failed">Failed</option>
+                            <option value="Skipped">Skipped</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Browser</label>
+                        <select class="form-control" id="filter-browser" onchange="applyTestFilters()">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Environment</label>
+                        <select class="form-control" id="filter-environment" onchange="applyTestFilters()">
+                            <option value="">All</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Date Range</label>
+                        <select class="form-control" id="filter-date-range" onchange="applyTestFilters()">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="last7days" selected>Last 7 Days</option>
+                            <option value="last30days">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution History Table -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-history"></i> Execution History
+                </div>
+                <div id="bulk-actions-toolbar" style="display: flex; gap: 10px;">
+                    <button class="btn btn-danger" onclick="deleteSelectedTests()">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
             </div>
             <div id="results-history-container">
                 <div class="spinner"></div>
@@ -1503,54 +1561,259 @@ async function loadResultsView() {
         </div>
     `;
     
-    // Load test execution history
+    // Add grid-4 CSS if not already added
+    if (!document.getElementById('test-results-grid-css')) {
+        const style = document.createElement('style');
+        style.id = 'test-results-grid-css';
+        style.textContent = `
+            .grid-4 {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            @media (max-width: 1200px) {
+                .grid-4 {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .grid-4 {
+                    grid-template-columns: 1fr;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Load and display test results
+    await loadAndDisplayTestResults();
+}
+
+// Global variables for test results filtering
+let allTestHistory = [];
+let filteredTestHistory = [];
+
+// Load and display test results
+async function loadAndDisplayTestResults() {
     try {
         const response = await fetch(`${API_BASE_URL}/history`);
         const data = await response.json();
         
         if (data.success && data.history && data.history.length > 0) {
-            const history = data.history;
+            allTestHistory = data.history;
             
-            // Calculate statistics
-            const totalExecutions = history.length;
-            const passedTests = history.filter(h => h.status === 'Passed').length;
-            const failedTests = history.filter(h => h.status === 'Failed').length;
+            // Populate filter dropdowns
+            populateTestFilterDropdowns();
             
-            // Calculate average duration
-            const totalDuration = history.reduce((sum, h) => sum + (h.duration || 0), 0);
-            const avgDuration = totalExecutions > 0 ? (totalDuration / totalExecutions).toFixed(2) : 0;
-            
-            // Update stats
-            document.getElementById('results-total-passed').textContent = passedTests;
-            document.getElementById('results-total-failed').textContent = failedTests;
-            document.getElementById('results-total-executions').textContent = totalExecutions;
-            document.getElementById('results-avg-duration').textContent = `${avgDuration}s`;
-            
-            // Display history table
-            displayResultsHistory(history);
+            // Apply filters and display
+            applyTestFilters();
         } else {
             // No history found
-            document.getElementById('results-history-container').innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-history"></i>
-                    <h3>No execution history found</h3>
-                    <p>Execute some tests to see results here!</p>
-                    <button class="btn btn-primary mt-20" onclick="showView('execute')">
-                        <i class="fas fa-play"></i> Execute Tests
-                    </button>
-                </div>
-            `;
+            showEmptyTestResults();
         }
     } catch (error) {
         console.error('Error loading test results:', error);
-        document.getElementById('results-history-container').innerHTML = `
+        showTestResultsError(error.message);
+    }
+}
+
+// Populate filter dropdowns with unique values
+function populateTestFilterDropdowns() {
+    // Get unique browsers
+    const browsers = [...new Set(allTestHistory.map(h => h.browser || 'Chrome'))];
+    const browserSelect = document.getElementById('filter-browser');
+    browserSelect.innerHTML = '<option value="">All</option>' + 
+        browsers.map(b => `<option value="${b}">${b}</option>`).join('');
+    
+    // Get unique environments
+    const environments = [...new Set(allTestHistory.map(h => h.environment || 'QA'))];
+    const envSelect = document.getElementById('filter-environment');
+    envSelect.innerHTML = '<option value="">All</option>' + 
+        environments.map(e => `<option value="${e}">${e}</option>`).join('');
+}
+
+// Apply filters to test results
+function applyTestFilters() {
+    const statusFilter = document.getElementById('filter-status').value;
+    const browserFilter = document.getElementById('filter-browser').value;
+    const envFilter = document.getElementById('filter-environment').value;
+    const dateRangeFilter = document.getElementById('filter-date-range').value;
+    
+    // Start with all history
+    let filtered = [...allTestHistory];
+    
+    // Apply status filter
+    if (statusFilter) {
+        filtered = filtered.filter(h => h.status === statusFilter);
+    }
+    
+    // Apply browser filter
+    if (browserFilter) {
+        filtered = filtered.filter(h => (h.browser || 'Chrome') === browserFilter);
+    }
+    
+    // Apply environment filter
+    if (envFilter) {
+        filtered = filtered.filter(h => (h.environment || 'QA') === envFilter);
+    }
+    
+    // Apply date range filter
+    if (dateRangeFilter !== 'all') {
+        const now = new Date();
+        let startDate;
+        
+        switch(dateRangeFilter) {
+            case 'today':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                break;
+            case 'last7days':
+                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                break;
+            case 'last30days':
+                startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                break;
+        }
+        
+        if (startDate) {
+            filtered = filtered.filter(h => new Date(h.executedAt) >= startDate);
+        }
+    }
+    
+    filteredTestHistory = filtered;
+    
+    // Update statistics
+    updateTestStatistics(filtered);
+    
+    // Display filtered results
+    displayFilteredTestResults(filtered);
+}
+
+// Update statistics cards
+function updateTestStatistics(history) {
+    const totalExecutions = history.length;
+    const passedTests = history.filter(h => h.status === 'Passed').length;
+    const failedTests = history.filter(h => h.status === 'Failed').length;
+    
+    // Calculate average duration
+    const totalDuration = history.reduce((sum, h) => sum + (parseFloat(h.duration) || 0), 0);
+    const avgDuration = totalExecutions > 0 ? (totalDuration / totalExecutions).toFixed(2) : 0;
+    
+    // Update stats
+    document.getElementById('results-total-passed').textContent = passedTests;
+    document.getElementById('results-total-failed').textContent = failedTests;
+    document.getElementById('results-total-executions').textContent = totalExecutions;
+    document.getElementById('results-avg-duration').textContent = `${avgDuration}s`;
+}
+
+// Display filtered test results
+function displayFilteredTestResults(history) {
+    const container = document.getElementById('results-history-container');
+    
+    if (history.length === 0) {
+        container.innerHTML = `
             <div class="empty-state">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Failed to load test results</h3>
-                <p>${error.message}</p>
+                <i class="fas fa-filter"></i>
+                <h3>No results match your filters</h3>
+                <p>Try adjusting your filter criteria or clear all filters</p>
+                <button class="btn btn-primary mt-20" onclick="clearAllTestFilters()">
+                    <i class="fas fa-times"></i> Clear Filters
+                </button>
             </div>
         `;
+        return;
     }
+    
+    displayResultsHistory(history);
+}
+
+// Clear all filters
+function clearAllTestFilters() {
+    document.getElementById('filter-status').selectedIndex = 0;
+    document.getElementById('filter-browser').selectedIndex = 0;
+    document.getElementById('filter-environment').selectedIndex = 0;
+    document.getElementById('filter-date-range').value = 'last7days';
+    applyTestFilters();
+}
+
+// Refresh test results
+async function refreshTestResults() {
+    showInfo('Refreshing test results...');
+    await loadAndDisplayTestResults();
+    showSuccess('Test results refreshed');
+}
+
+// Export test results to CSV
+function exportTestResults() {
+    if (filteredTestHistory.length === 0) {
+        showWarning('No data to export');
+        return;
+    }
+    
+    // CSV headers
+    const headers = ['Test Name', 'Status', 'Duration (s)', 'Browser', 'Environment', 'Executed At', 'Module'];
+    
+    // CSV rows
+    const rows = filteredTestHistory.map(item => [
+        item.scenarioName || 'Unknown',
+        item.status || 'Unknown',
+        item.duration || '0',
+        item.browser || 'Chrome',
+        item.environment || 'QA',
+        item.executedAt ? new Date(item.executedAt).toISOString() : '',
+        item.module || 'N/A'
+    ]);
+    
+    // Combine headers and rows
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `test-results-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showSuccess(`Exported ${filteredTestHistory.length} test results to CSV`);
+}
+
+// Show empty state
+function showEmptyTestResults() {
+    const container = document.getElementById('results-history-container');
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-history"></i>
+            <h3>No execution history found</h3>
+            <p>Execute some tests to see results here!</p>
+            <button class="btn btn-primary mt-20" onclick="showView('execute')">
+                <i class="fas fa-play"></i> Execute Tests
+            </button>
+        </div>
+    `;
+}
+
+// Show error state
+function showTestResultsError(message) {
+    const container = document.getElementById('results-history-container');
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Failed to load test results</h3>
+            <p>${escapeHtml(message)}</p>
+            <button class="btn btn-primary mt-20" onclick="refreshTestResults()">
+                <i class="fas fa-sync"></i> Try Again
+            </button>
+        </div>
+    `;
 }
 
 function normalizeScreenshotPath(path) {
@@ -1622,7 +1885,10 @@ function displayResultsHistory(historyList) {
                         return `
                             <tr class="result-row">
                                 <td>
-                                    <input type="checkbox" class="result-checkbox" value="${index}">
+                                    <input type="checkbox" class="result-checkbox" 
+                                           value="${index}" 
+                                           data-test-id="${item.scenarioName}_${item.executedAt}"
+                                           onchange="handleCheckboxChange()">
                                 </td>
                                 <td><strong>${escapeHtml(item.scenarioName)}</strong></td>
                                 <td>
@@ -1665,6 +1931,139 @@ function displayResultsHistory(historyList) {
 function toggleSelectAllResults(checkbox) {
     const checkboxes = document.querySelectorAll('.result-checkbox');
     checkboxes.forEach(cb => cb.checked = checkbox.checked);
+    handleCheckboxChange();
+}
+
+function handleCheckboxChange() {
+    // Delete button is always visible, so no need to toggle display
+    // This function can be used for other UI updates if needed in the future
+}
+
+async function deleteSelectedTests() {
+    const checkboxes = document.querySelectorAll('.result-checkbox:checked');
+    const count = checkboxes.length;
+    
+    if (count === 0) {
+        showWarning('Please select at least one test to delete');
+        return;
+    }
+    
+    // Show confirmation modal
+    const confirmModal = document.createElement('div');
+    confirmModal.id = 'delete-confirmation-modal';
+    confirmModal.className = 'modal-overlay';
+    confirmModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    
+    confirmModal.innerHTML = `
+        <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 8px; max-width: 480px; width: 90%; padding: 0; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+            <div style="background: #ef4444; color: white; padding: 24px 28px; display: flex; align-items: center; gap: 12px;">
+                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 24px;"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="margin: 0; font-size: 1.25em; font-weight: 600;">Confirm Delete</h2>
+                    <p style="margin: 4px 0 0 0; opacity: 0.95; font-size: 0.9em;">This action cannot be undone</p>
+                </div>
+                <button onclick="closeDeleteConfirmation()" style="background: none; border: none; color: white; cursor: pointer; padding: 4px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                    <i class="fas fa-times" style="font-size: 20px;"></i>
+                </button>
+            </div>
+            <div style="padding: 28px;">
+                <p style="font-size: 1em; color: #374151; margin-bottom: 12px; line-height: 1.5;">
+                    Are you sure you want to delete <strong style="color: #1f2937;">${count}</strong> test result${count > 1 ? 's' : ''}?
+                </p>
+                <p style="color: #6b7280; margin-bottom: 28px; font-size: 0.9em; line-height: 1.5;">
+                    ${count > 1 ? 'These test results' : 'This test result'} will be permanently removed from the execution history.
+                </p>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button onclick="closeDeleteConfirmation()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: all 0.2s;" onmouseover="this.style.background='#d1d5db'" onmouseout="this.style.background='#e5e7eb'">
+                        <i class="fas fa-times" style="margin-right: 6px;"></i>Cancel
+                    </button>
+                    <button onclick="confirmDelete()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+                        <i class="fas fa-trash" style="margin-right: 6px;"></i>Delete ${count > 1 ? 'Tests' : 'Test'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Click on overlay background to close
+    confirmModal.onclick = function(e) {
+        if (e.target === confirmModal) {
+            closeDeleteConfirmation();
+        }
+    };
+    
+    document.body.appendChild(confirmModal);
+}
+
+function closeDeleteConfirmation() {
+    const modal = document.getElementById('delete-confirmation-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+async function confirmDelete() {
+    const checkboxes = document.querySelectorAll('.result-checkbox:checked');
+    const indices = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    
+    // Close confirmation modal
+    closeDeleteConfirmation();
+    
+    // Show loading
+    showInfo('Deleting test results...');
+    
+    try {
+        // Get the test IDs to delete
+        const testsToDelete = indices.map(index => {
+            const test = window.testResultsHistory[index];
+            return {
+                scenarioName: test.scenarioName,
+                executedAt: test.executedAt
+            };
+        });
+        
+        // Call API to delete tests
+        const response = await fetch(`${API_BASE_URL}/history/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ tests: testsToDelete })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showSuccess(`Successfully deleted ${indices.length} test result${indices.length > 1 ? 's' : ''}`);
+            
+            // Reload the test results
+            await loadAndDisplayTestResults();
+            
+            // Hide bulk actions toolbar
+            const bulkActionsToolbar = document.getElementById('bulk-actions-toolbar');
+            if (bulkActionsToolbar) {
+                bulkActionsToolbar.style.display = 'none';
+            }
+        } else {
+            showError(data.error || 'Failed to delete test results');
+        }
+    } catch (error) {
+        console.error('Error deleting tests:', error);
+        showError('Failed to delete test results: ' + error.message);
+    }
 }
 
 function viewEvidence(index) {

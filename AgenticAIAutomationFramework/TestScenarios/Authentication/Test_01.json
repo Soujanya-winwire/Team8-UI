@@ -1,31 +1,143 @@
 {
-  "ScenarioId": "0c7a9924-7946-4fa8-a96b-2afb98bc5675",
+  "ScenarioId": "cd0ab4f9-55f8-4b74-abb9-63c4b7dc0aad",
   "Name": "Test_01",
-  "Description": "Verify user login",
+  "Description": "Test",
   "Module": "Authentication",
   "Tags": [
     "Smoke"
   ],
-  "StartUrl": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+  "StartUrl": "https://www.saucedemo.com/",
   "Actions": [
     {
-      "ActionType": "Navigate",
-      "Locator": "",
-      "Value": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-      "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+      "ActionType": "Click",
+      "Locator": "[data-test=\"username\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
       "Metadata": {},
       "Timestamp": 0
     },
     {
-      "ActionType": "Navigate",
-      "Locator": "",
-      "Value": "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index",
-      "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index",
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "sta",
+      "Description": "Type \"sta\" into [data-test=\"username\"]",
       "Metadata": {},
       "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard",
+      "Description": "Type \"standard\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_user",
+      "Description": "Type \"standard_user\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_usersecret",
+      "Description": "Type \"standard_usersecret\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_usersecret_sauce",
+      "Description": "Type \"standard_usersecret_sauce\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_usersecr",
+      "Description": "Type \"standard_usersecr\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_user",
+      "Description": "Type \"standard_user\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"password\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "secret_sauce",
+      "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"login-button\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"add-to-cart-sauce-labs-backpack\"]",
+      "Value": null,
+      "Description": "Click on \"Add to cart\"",
+      "Metadata": {},
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#react-burger-menu-btn",
+      "Value": null,
+      "Description": "Click on \"Open Menu\"",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#react-burger-cross-btn",
+      "Value": null,
+      "Description": "Click on \"Close Menu\"",
+      "Metadata": {},
+      "Timestamp": 13
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"product-sort-container\"]",
+      "Value": null,
+      "Description": "Click on \"Name (A to Z)Name (Z to A)Price (low to high)Price\"",
+      "Metadata": {},
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"product-sort-container\"]",
+      "Value": null,
+      "Description": "Click on \"Name (A to Z)Name (Z to A)Price (low to high)Price\"",
+      "Metadata": {},
+      "Timestamp": 15
     }
   ],
   "Assertions": [],
-  "CreatedAt": "2026-02-15T20:28:55.3923806+05:30",
-  "ModifiedAt": "2026-02-15T20:28:55.3961701+05:30"
+  "CreatedAt": "2026-02-22T16:18:05.6801737+05:30",
+  "ModifiedAt": "2026-02-22T16:18:05.6810802+05:30"
 }
