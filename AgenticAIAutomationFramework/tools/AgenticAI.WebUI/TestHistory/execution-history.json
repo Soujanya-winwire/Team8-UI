@@ -1,5 +1,1861 @@
 [
   {
+    "ExecutionId": "0ea89d16-fa38-4013-ba6b-93d6a13e5809",
+    "ScenarioName": "User_Login_Test",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:46:39.6298742\u002B05:30",
+    "Duration": 3,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\User_Login_Test_Navigate_2026-02-22_22-46-38_412.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\User_Login_Test_Navigate_2026-02-22_22-46-38_412.png"
+    ]
+  },
+  {
+    "ExecutionId": "19a75ac8-f50e-4af7-baf9-fda41b8789b7",
+    "ScenarioName": "Test_Me",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:46:39.5867682\u002B05:30",
+    "Duration": 10,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Navigate_2026-02-22_22-46-25_264.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_22-46-26_976.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_22-46-27_337.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_22-46-27_771.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_22-46-28_148.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Login\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_22-46-30_182.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Test_Me_Navigate_2026-02-22_22-46-25_264.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_22-46-26_976.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_22-46-27_337.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_22-46-27_771.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_22-46-28_148.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_22-46-30_182.png"
+    ]
+  },
+  {
+    "ExecutionId": "18bd8628-d873-42b0-a3d3-0d3ce1c2635b",
+    "ScenarioName": "Test_01",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:46:39.5437293\u002B05:30",
+    "Duration": 11,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_22-46-06_315.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-06_788.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022sta\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-07_196.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-07_661.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-08_084.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_usersecret\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-08_450.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_usersecret_sauce\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-08_838.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_usersecr\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-09_187.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-09_577.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-09_969.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-10_383.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-11_312.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Add to cart\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-11_887.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Open Menu\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-12_479.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Close Menu\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-13_086.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Name (A to Z)Name (Z to A)Price (low to high)Price\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-13_740.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Name (A to Z)Name (Z to A)Price (low to high)Price\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-14_397.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_22-46-06_315.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-06_788.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-07_196.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-07_661.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-08_084.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-08_450.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-08_838.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-09_187.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-09_577.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-09_969.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_22-46-10_383.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-11_312.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-11_887.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-12_479.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-13_086.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-13_740.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_22-46-14_397.png"
+    ]
+  },
+  {
+    "ExecutionId": "36fc49dd-67e8-4371-8ecc-3a82f2d067ad",
+    "ScenarioName": "Sample_Test",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:46:39.4960492\u002B05:30",
+    "Duration": 15,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Navigate_2026-02-22_22-45-48_203.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_22-45-51_125.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_22-45-51_549.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_22-45-51_974.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_22-45-52_386.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Login\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_22-45-57_949.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Navigate_2026-02-22_22-45-48_203.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_22-45-51_125.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_22-45-51_549.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_22-45-51_974.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_22-45-52_386.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_22-45-57_949.png"
+    ]
+  },
+  {
+    "ExecutionId": "12d337cd-d075-47f1-ae21-f9c40456fbc6",
+    "ScenarioName": "Login_Test_01",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:46:39.4597173\u002B05:30",
+    "Duration": 13,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Navigate_2026-02-22_22-45-31_938.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_22-45-32_316.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_22-45-32_737.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_22-45-33_102.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_22-45-33_442.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Login\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_22-45-37_757.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Navigate_2026-02-22_22-45-31_938.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_22-45-32_316.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_22-45-32_737.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_22-45-33_102.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_22-45-33_442.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_22-45-37_757.png"
+    ]
+  },
+  {
+    "ExecutionId": "2766b3c7-b8be-4e78-9743-d08d6cea1568",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:46:39.4124428\u002B05:30",
+    "Duration": 7,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_22-45-15_132.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027user-name\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-15_527.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-45-15_919.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-16_293.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-45-16_629.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-17_466.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-18_059.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-18_431.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify ElementVisible",
+        "Status": "Failed",
+        "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_22-45-18_736.png"
+      }
+    ],
+    "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_22-45-15_132.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-15_527.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-45-15_919.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-16_293.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-45-16_629.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-17_466.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-18_059.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-45-18_431.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_22-45-18_736.png"
+    ]
+  },
+  {
+    "ExecutionId": "7996c321-deaf-46b5-a101-6292f1b65dc3",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:33:52.5184215\u002B05:30",
+    "Duration": 7,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_22-33-48_170.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027user-name\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-48_587.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-33-48_990.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-49_305.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-33-49_675.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-50_566.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-51_130.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-51_535.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify ElementVisible",
+        "Status": "Failed",
+        "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_22-33-51_822.png"
+      }
+    ],
+    "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_22-33-48_170.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-48_587.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-33-48_990.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-49_305.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-33-49_675.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-50_566.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-51_130.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-33-51_535.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_22-33-51_822.png"
+    ]
+  },
+  {
+    "ExecutionId": "53a94892-221d-4d05-ba5b-afc9f0105efa",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T22:02:53.8449887\u002B05:30",
+    "Duration": 10,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_22-02-43_042.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027user-name\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-43_698.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-02-44_291.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-44_946.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-02-45_519.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-46_945.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-47_805.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-48_436.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify ElementVisible",
+        "Status": "Failed",
+        "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_22-02-48_928.png"
+      }
+    ],
+    "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_22-02-43_042.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-43_698.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-02-44_291.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-44_946.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_22-02-45_519.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-46_945.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-47_805.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_22-02-48_436.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_22-02-48_928.png"
+    ]
+  },
+  {
+    "ExecutionId": "9efd0af9-d3c6-4544-8137-b5f839deab88",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T21:40:59.8661530\u002B05:30",
+    "Duration": 9,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-40-49_918.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027user-name\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-50_476.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-40-51_101.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-51_662.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-40-52_201.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-53_645.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-54_586.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-55_266.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify ElementVisible",
+        "Status": "Failed",
+        "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-40-55_788.png"
+      }
+    ],
+    "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-40-49_918.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-50_476.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-40-51_101.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-51_662.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-40-52_201.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-53_645.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-54_586.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-40-55_266.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-40-55_788.png"
+    ]
+  },
+  {
+    "ExecutionId": "74267754-e5fb-4bf7-a703-ba10c1f58e00",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T21:40:06.4132305\u002B05:30",
+    "Duration": 10,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-39-53_373.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027user-name\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-53_976.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-39-54_640.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-55_228.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-39-55_766.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-57_165.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-58_044.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-58_687.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify ElementVisible",
+        "Status": "Failed",
+        "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-39-59_181.png"
+      }
+    ],
+    "Error": "Element not visible: //button[@id=\u0027react-burger-menu-btn\u0027]",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-39-53_373.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-53_976.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-39-54_640.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-55_228.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-39-55_766.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-57_165.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-58_044.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-39-58_687.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-39-59_181.png"
+    ]
+  },
+  {
+    "ExecutionId": "c4932cda-3a6f-4353-9dd4-4a38c81d53a4",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T21:27:49.1648984\u002B05:30",
+    "Duration": 6,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-27-43_229.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027user-name\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-43_535.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-27-43_869.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-44_207.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-27-44_571.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-45_202.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-45_625.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-46_094.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify TextEquals",
+        "Status": "Failed",
+        "Error": "Text mismatch. Expected: username, Actual: ",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-27-46_306.png"
+      }
+    ],
+    "Error": "Text mismatch. Expected: username, Actual: ",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-27-43_229.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-43_535.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-27-43_869.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-44_207.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-27-44_571.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-45_202.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-45_625.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-27-46_094.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-27-46_306.png"
+    ]
+  },
+  {
+    "ExecutionId": "e85b683f-6615-4c64-93e1-0ba92796a935",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T21:14:00.5668253\u002B05:30",
+    "Duration": 5,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-13-55_737.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027password\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-56_124.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-13-56_745.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-57_106.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-13-57_463.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-58_357.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-58_770.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-59_110.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify TextContains",
+        "Status": "Failed",
+        "Error": "Text does not contain expected value: Password",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-13-59_279.png"
+      }
+    ],
+    "Error": "Text does not contain expected value: Password",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_21-13-55_737.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-56_124.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-13-56_745.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-57_106.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_21-13-57_463.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-58_357.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-58_770.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_21-13-59_110.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_21-13-59_279.png"
+    ]
+  },
+  {
+    "ExecutionId": "c150ba5c-6a8b-48a7-aae5-61b503107644",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T20:59:32.5225665\u002B05:30",
+    "Duration": 6,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_20-59-27_041.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027password\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-27_462.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-59-27_873.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-28_212.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-59-28_609.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-29_500.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //button[@id=\u0027react-burger-menu-btn\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-30_070.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //a[@id=\u0027logout_sidebar_link\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-30_490.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify TextEquals",
+        "Status": "Failed",
+        "Error": "Text mismatch. Expected: Password, Actual: ",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_20-59-30_839.png"
+      }
+    ],
+    "Error": "Text mismatch. Expected: Password, Actual: ",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_20-59-27_041.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-27_462.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-59-27_873.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-28_212.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-59-28_609.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-29_500.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-30_070.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-59-30_490.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_20-59-30_839.png"
+    ]
+  },
+  {
+    "ExecutionId": "bcc96a58-c0d9-418c-b9f9-a77889e5f877",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T20:54:38.6021056\u002B05:30",
+    "Duration": 36,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_20-53-59_547.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on //input[@class=\u0027input_error form_input\u0027 and @id=\u0027password\u0027]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-53-59_920.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-54-00_309.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-54-00_709.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-54-01_101.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-54-01_887.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify TextEquals",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022//input[@class=\u0027input_error form_input\u0027 and @id=\u0027password\u0027]\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_20-54-32_415.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022//input[@class=\u0027input_error form_input\u0027 and @id=\u0027password\u0027]\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_20-53-59_547.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-53-59_920.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-54-00_309.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-54-00_709.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_20-54-01_101.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_20-54-01_887.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Verify_FAILED_2026-02-22_20-54-32_415.png"
+    ]
+  },
+  {
+    "ExecutionId": "c4cf49d6-9b76-4e13-a9e1-e8d7b12f034e",
+    "ScenarioName": "Test_Me",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T20:24:48.9473802\u002B05:30",
+    "Duration": 13,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Navigate_2026-02-22_20-24-43_084.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_20-24-43_446.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_20-24-43_818.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_20-24-44_183.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_20-24-44_551.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Login\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_20-24-47_896.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Test_Me_Navigate_2026-02-22_20-24-43_084.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_20-24-43_446.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_20-24-43_818.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_20-24-44_183.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Type_2026-02-22_20-24-44_551.png",
+      "TestResults/Screenshots\\Authentication\\Test_Me_Click_2026-02-22_20-24-47_896.png"
+    ]
+  },
+  {
+    "ExecutionId": "0088b677-9777-4d45-9a49-819020b42894",
+    "ScenarioName": "Wrong_Locator_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-22T19:45:38.4148516\u002B05:30",
+    "Duration": 33,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-22_19-45-02_517.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-22_19-45-02_836.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "INTENTIONAL FAILURE: Click on wrong username field locator",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#wrong-username-field-id\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Click_FAILED_2026-02-22_19-45-33_170.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#wrong-username-field-id\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-22_19-45-02_517.png",
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-22_19-45-02_836.png",
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Click_FAILED_2026-02-22_19-45-33_170.png"
+    ]
+  },
+  {
+    "ExecutionId": "e97d775e-dc6b-4e13-b06c-9762c10fc679",
+    "ScenarioName": "Timeout_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-22T19:45:38.3705747\u002B05:30",
+    "Duration": 36,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Navigate_2026-02-22_19-44-17_186.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Navigate_2026-02-22_19-44-17_473.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on username field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_2026-02-22_19-44-17_894.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter username",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Type_2026-02-22_19-44-18_288.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on password field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_2026-02-22_19-44-18_736.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter password",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Type_2026-02-22_19-44-19_072.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click login button",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_2026-02-22_19-44-19_908.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "INTENTIONAL FAILURE: Try to click non-existent element - will timeout",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#non-existent-element-that-will-timeout\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_FAILED_2026-02-22_19-44-50_301.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#non-existent-element-that-will-timeout\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Navigate_2026-02-22_19-44-17_186.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Navigate_2026-02-22_19-44-17_473.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_2026-02-22_19-44-17_894.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Type_2026-02-22_19-44-18_288.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_2026-02-22_19-44-18_736.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Type_2026-02-22_19-44-19_072.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_2026-02-22_19-44-19_908.png",
+      "TestResults/Screenshots\\ErrorVerification\\Timeout_Failure_Test_Click_FAILED_2026-02-22_19-44-50_301.png"
+    ]
+  },
+  {
+    "ExecutionId": "1ba7115c-8a54-44ff-92a2-0f87720083fd",
+    "ScenarioName": "Multiple_Errors_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-22T19:45:38.3154043\u002B05:30",
+    "Duration": 34,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Navigate_2026-02-22_19-43-38_761.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo - this will succeed",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Navigate_2026-02-22_19-43-39_080.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click username field - this will succeed",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Click_2026-02-22_19-43-39_480.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter username - this will succeed",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Type_2026-02-22_19-43-39_890.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "FAILURE 1: Click on wrong password field",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#wrong-password-field\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Click_FAILED_2026-02-22_19-44-10_218.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#wrong-password-field\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Navigate_2026-02-22_19-43-38_761.png",
+      "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Navigate_2026-02-22_19-43-39_080.png",
+      "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Click_2026-02-22_19-43-39_480.png",
+      "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Type_2026-02-22_19-43-39_890.png",
+      "TestResults/Screenshots\\ErrorVerification\\Multiple_Errors_Test_Click_FAILED_2026-02-22_19-44-10_218.png"
+    ]
+  },
+  {
+    "ExecutionId": "06f23611-eb9f-4355-8ca6-a84b428e7b20",
+    "ScenarioName": "Invalid_URL_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-22T19:45:38.2782103\u002B05:30",
+    "Duration": 1,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://this-domain-does-not-exist-12345.com",
+        "Status": "Failed",
+        "Error": "net::ERR_NAME_NOT_RESOLVED at https://this-domain-does-not-exist-12345.com/\nCall log:\n  - navigating to \u0022https://this-domain-does-not-exist-12345.com/\u0022, waiting until \u0022networkidle\u0022",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Invalid_URL_Failure_Test_Navigate_FAILED_2026-02-22_19-43-31_442.png"
+      }
+    ],
+    "Error": "net::ERR_NAME_NOT_RESOLVED at https://this-domain-does-not-exist-12345.com/\nCall log:\n  - navigating to \u0022https://this-domain-does-not-exist-12345.com/\u0022, waiting until \u0022networkidle\u0022",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Invalid_URL_Failure_Test_Navigate_FAILED_2026-02-22_19-43-31_442.png"
+    ]
+  },
+  {
+    "ExecutionId": "c11dc592-a8e4-40c0-adb5-5bbaea778a20",
+    "ScenarioName": "Assertion_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-22T19:45:38.2435847\u002B05:30",
+    "Duration": 6,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-22_19-43-23_048.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-22_19-43-23_340.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click username field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_19-43-23_838.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter locked out username",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-22_19-43-24_164.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click password field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_19-43-24_571.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter password",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-22_19-43-24_908.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click login button - this will show error message",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_19-43-25_322.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "INTENTIONAL FAILURE: Assert wrong error message text",
+        "Status": "Failed",
+        "Error": "Text does not contain expected value: This will not match the actual error message",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Verify_FAILED_2026-02-22_19-43-25_669.png"
+      }
+    ],
+    "Error": "Text does not contain expected value: This will not match the actual error message",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-22_19-43-23_048.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-22_19-43-23_340.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_19-43-23_838.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-22_19-43-24_164.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_19-43-24_571.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-22_19-43-24_908.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_19-43-25_322.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Verify_FAILED_2026-02-22_19-43-25_669.png"
+    ]
+  },
+  {
+    "ExecutionId": "5b4e6ff2-db08-4b67-8f83-636d056832d3",
+    "ScenarioName": "User_Login_Test",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T19:42:27.0543604\u002B05:30",
+    "Duration": 3,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\User_Login_Test_Navigate_2026-02-22_19-42-25_608.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\User_Login_Test_Navigate_2026-02-22_19-42-25_608.png"
+    ]
+  },
+  {
+    "ExecutionId": "19db1f7e-6dc9-4f64-9518-c60c92dafa6e",
+    "ScenarioName": "Test_01",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T19:42:27.0210839\u002B05:30",
+    "Duration": 11,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_19-42-08_713.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-09_087.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022sta\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-09_482.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-09_834.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-10_201.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_usersecret\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-10_593.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_usersecret_sauce\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-11_002.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_usersecr\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-11_330.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-11_709.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-12_092.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-12_419.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-13_241.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Add to cart\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-13_740.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Open Menu\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-14_265.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Close Menu\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-14_838.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Name (A to Z)Name (Z to A)Price (low to high)Price\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-15_365.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Name (A to Z)Name (Z to A)Price (low to high)Price\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-15_893.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_19-42-08_713.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-09_087.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-09_482.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-09_834.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-10_201.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-10_593.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-11_002.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-11_330.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-11_709.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-12_092.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_19-42-12_419.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-13_241.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-13_740.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-14_265.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-14_838.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-15_365.png",
+      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_19-42-15_893.png"
+    ]
+  },
+  {
+    "ExecutionId": "ae533e99-6883-4ab6-bd92-1a39ca30fc95",
+    "ScenarioName": "Sample_Test",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T19:42:26.9862274\u002B05:30",
+    "Duration": 10,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Navigate_2026-02-22_19-41-55_665.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_19-41-56_080.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_19-41-56_454.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_19-41-56_869.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_19-41-57_243.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Login\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_19-41-59_548.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Navigate_2026-02-22_19-41-55_665.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_19-41-56_080.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_19-41-56_454.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_19-41-56_869.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Type_2026-02-22_19-41-57_243.png",
+      "TestResults/Screenshots\\Authentication\\Sample_Test_Click_2026-02-22_19-41-59_548.png"
+    ]
+  },
+  {
+    "ExecutionId": "b0f28a8d-bc5f-4099-960b-8024d64882d4",
+    "ScenarioName": "Login_Test_01",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T19:42:26.9620562\u002B05:30",
+    "Duration": 12,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Navigate_2026-02-22_19-41-40_074.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_19-41-40_455.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_19-41-40_830.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_19-41-41_166.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_19-41-41_518.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Login\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_19-41-43_569.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Navigate_2026-02-22_19-41-40_074.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_19-41-40_455.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_19-41-40_830.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_19-41-41_166.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_19-41-41_518.png",
+      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_19-41-43_569.png"
+    ]
+  },
+  {
+    "ExecutionId": "452fbe83-24f5-4407-a159-c7ffd4412bb2",
+    "ScenarioName": "Final_Login",
+    "Module": "Authentication",
+    "ExecutedAt": "2026-02-22T19:42:26.9284001\u002B05:30",
+    "Duration": 5,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_19-41-22_566.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_19-41-22_972.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_19-41-23_353.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_19-41-23_787.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_19-41-24_175.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_19-41-25_075.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Authentication\\Final_Login_Navigate_2026-02-22_19-41-22_566.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_19-41-22_972.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_19-41-23_353.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_19-41-23_787.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Type_2026-02-22_19-41-24_175.png",
+      "TestResults/Screenshots\\Authentication\\Final_Login_Click_2026-02-22_19-41-25_075.png"
+    ]
+  },
+  {
     "ExecutionId": "51af73f4-af22-4297-9e96-2f581041c0f2",
     "ScenarioName": "Assertion_Failure_Test",
     "Module": "ErrorVerification",
@@ -77,326 +1933,6 @@
       "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-22_16-25-42_981.png",
       "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-22_16-25-43_276.png",
       "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Verify_FAILED_2026-02-22_16-25-43_556.png"
-    ]
-  },
-  {
-    "ExecutionId": "e3e03e8e-824c-498d-8b0f-59ee80cf2d99",
-    "ScenarioName": "Login_Test_01",
-    "Module": "Authentication",
-    "ExecutedAt": "2026-02-22T16:19:51.5018386\u002B05:30",
-    "Duration": 14,
-    "Status": "Passed",
-    "Browser": "Chrome",
-    "Environment": "QA",
-    "Steps": [
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Navigate_2026-02-22_16-19-45_511.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_16-19-45_891.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022Admin\u0022 into [name=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_16-19-46_207.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_16-19-46_489.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022admin123\u0022 into [name=\u0022password\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_16-19-46_724.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022Login\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_16-19-49_730.png"
-      }
-    ],
-    "Error": null,
-    "VideoPath": null,
-    "Screenshots": [
-      "TestResults/Screenshots\\Authentication\\Login_Test_01_Navigate_2026-02-22_16-19-45_511.png",
-      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_16-19-45_891.png",
-      "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_16-19-46_207.png",
-      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_16-19-46_489.png",
-      "TestResults/Screenshots\\Authentication\\Login_Test_01_Type_2026-02-22_16-19-46_724.png",
-      "TestResults/Screenshots\\Authentication\\Login_Test_01_Click_2026-02-22_16-19-49_730.png"
-    ]
-  },
-  {
-    "ExecutionId": "20456df7-cabd-4b59-b667-357b7cf777d8",
-    "ScenarioName": "Test_01",
-    "Module": "Authentication",
-    "ExecutedAt": "2026-02-22T16:18:36.5566968\u002B05:30",
-    "Duration": 9,
-    "Status": "Passed",
-    "Browser": "Chrome",
-    "Environment": "QA",
-    "Steps": [
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://www.saucedemo.com/",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-18-25_075.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-25_364.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022sta\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-25_663.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022standard\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-25_970.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_238.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022standard_usersecret\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_468.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022standard_usersecret_sauce\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_711.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022standard_usersecr\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_978.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-27_214.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-27_533.png"
-      },
-      {
-        "StepName": "Type",
-        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-27_807.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-28_361.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022Add to cart\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-28_846.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022Open Menu\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-29_282.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022Close Menu\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-29_886.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022Name (A to Z)Name (Z to A)Price (low to high)Price\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-30_361.png"
-      },
-      {
-        "StepName": "Click",
-        "Description": "Click on \u0022Name (A to Z)Name (Z to A)Price (low to high)Price\u0022",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-30_938.png"
-      }
-    ],
-    "Error": null,
-    "VideoPath": null,
-    "Screenshots": [
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-18-25_075.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-25_364.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-25_663.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-25_970.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_238.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_468.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_711.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-26_978.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-27_214.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-27_533.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Type_2026-02-22_16-18-27_807.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-28_361.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-28_846.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-29_282.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-29_886.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-30_361.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Click_2026-02-22_16-18-30_938.png"
-    ]
-  },
-  {
-    "ExecutionId": "451f0d89-4b8e-40bb-9f94-621dc4dbfaa8",
-    "ScenarioName": "Test_01",
-    "Module": "Authentication",
-    "ExecutedAt": "2026-02-22T16:16:09.9693511\u002B05:30",
-    "Duration": 12,
-    "Status": "Passed",
-    "Browser": "Chrome",
-    "Environment": "QA",
-    "Steps": [
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-16-01_493.png"
-      },
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-16-03_732.png"
-      },
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-16-06_423.png"
-      }
-    ],
-    "Error": null,
-    "VideoPath": null,
-    "Screenshots": [
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-16-01_493.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-16-03_732.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-16-06_423.png"
-    ]
-  },
-  {
-    "ExecutionId": "8c7fc48c-38c2-4c6a-8a11-a5a47a512e8d",
-    "ScenarioName": "User_Login_Test",
-    "Module": "Authentication",
-    "ExecutedAt": "2026-02-22T16:10:53.0527105\u002B05:30",
-    "Duration": 4,
-    "Status": "Passed",
-    "Browser": "Chrome",
-    "Environment": "QA",
-    "Steps": [
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://www.saucedemo.com/",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\User_Login_Test_Navigate_2026-02-22_16-10-50_990.png"
-      }
-    ],
-    "Error": null,
-    "VideoPath": null,
-    "Screenshots": [
-      "TestResults/Screenshots\\Authentication\\User_Login_Test_Navigate_2026-02-22_16-10-50_990.png"
-    ]
-  },
-  {
-    "ExecutionId": "ecc26b2a-6236-4685-9c92-6e6fcaebafcc",
-    "ScenarioName": "Test_01",
-    "Module": "Authentication",
-    "ExecutedAt": "2026-02-22T16:10:33.1399765\u002B05:30",
-    "Duration": 13,
-    "Status": "Passed",
-    "Browser": "Chrome",
-    "Environment": "QA",
-    "Steps": [
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-10-22_566.png"
-      },
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-10-27_373.png"
-      },
-      {
-        "StepName": "Navigate",
-        "Description": "Navigate to https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index",
-        "Status": "Passed",
-        "Error": null,
-        "ScreenshotPath": "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-10-30_220.png"
-      }
-    ],
-    "Error": null,
-    "VideoPath": null,
-    "Screenshots": [
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-10-22_566.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-10-27_373.png",
-      "TestResults/Screenshots\\Authentication\\Test_01_Navigate_2026-02-22_16-10-30_220.png"
     ]
   },
   {

@@ -11,10 +11,54 @@ namespace AgenticAI.Core.ZeroCode.Models
         public string Module { get; set; } = "Default";
         public List<string> Tags { get; set; } = new();
         public string StartUrl { get; set; } = "";
+        
+        /// <summary>
+        /// Legacy: Kept for backward compatibility with existing test scenarios
+        /// New scenarios should use Steps instead
+        /// </summary>
         public List<RecordedAction> Actions { get; set; } = new();
+        
+        /// <summary>
+        /// Legacy: Kept for backward compatibility with existing test scenarios
+        /// New scenarios should use Steps instead
+        /// </summary>
         public List<Assertion> Assertions { get; set; } = new();
+        
+        /// <summary>
+        /// Unified list of executable steps (actions + assertions) in execution order
+        /// This is the new recommended approach for inline assertion execution
+        /// </summary>
+        public List<TestStep> Steps { get; set; } = new();
+        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? ModifiedAt { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a single executable step in a test scenario
+    /// Can be either an action or an assertion
+    /// </summary>
+    public class TestStep
+    {
+        /// <summary>
+        /// Type of step: "Action" or "Assertion"
+        /// </summary>
+        public string StepType { get; set; } = "";
+        
+        /// <summary>
+        /// Execution order (0-based index)
+        /// </summary>
+        public int Order { get; set; }
+        
+        /// <summary>
+        /// Action data (populated if StepType = "Action")
+        /// </summary>
+        public RecordedAction? Action { get; set; }
+        
+        /// <summary>
+        /// Assertion data (populated if StepType = "Assertion")
+        /// </summary>
+        public Assertion? Assertion { get; set; }
     }
 
     /// <summary>
@@ -26,5 +70,12 @@ namespace AgenticAI.Core.ZeroCode.Models
         public string Locator { get; set; } = "";
         public string? ExpectedValue { get; set; }
         public string? Description { get; set; }
+        
+        /// <summary>
+        /// Legacy: Index of the action after which this assertion should be executed.
+        /// Kept for backward compatibility.
+        /// New scenarios should use the Steps collection instead.
+        /// </summary>
+        public int? ExecuteAfterActionIndex { get; set; }
     }
 }
