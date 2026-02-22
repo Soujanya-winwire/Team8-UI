@@ -1590,9 +1590,11 @@ async function loadResultsView() {
     await loadAndDisplayTestResults();
 }
 
-// Global variables for test results filtering
+// Global variables for test results filtering and pagination
 let allTestHistory = [];
 let filteredTestHistory = [];
+let currentPage = 1;
+const recordsPerPage = 10;
 
 // Load and display test results
 async function loadAndDisplayTestResults() {
@@ -1706,7 +1708,7 @@ function updateTestStatistics(history) {
     document.getElementById('results-avg-duration').textContent = `${avgDuration}s`;
 }
 
-// Display filtered test results
+// Display filtered test results with pagination
 function displayFilteredTestResults(history) {
     const container = document.getElementById('results-history-container');
     
@@ -1724,6 +1726,8 @@ function displayFilteredTestResults(history) {
         return;
     }
     
+    // Reset to page 1 when filters change
+    currentPage = 1;
     displayResultsHistory(history);
 }
 
@@ -1828,39 +1832,48 @@ function normalizeScreenshotPath(path) {
 }
 
 function displayResultsHistory(historyList) {
-    const container = document.getElementById('results-history-container');
+const container = document.getElementById('results-history-container');
     
-    if (!historyList || historyList.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <h3>No test results</h3>
-                <p>Start executing tests to see results here</p>
-            </div>
-        `;
-        return;
-    }
+if (!historyList || historyList.length === 0) {
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>No test results</h3>
+            <p>Start executing tests to see results here</p>
+        </div>
+    `;
+    return;
+}
     
-    const html = `
-        <div style="overflow-x: auto;">
-            <table id="results-table">
-                <thead>
-                    <tr>
-                        <th style="width: 40px;">
-                            <input type="checkbox" id="select-all-results" onchange="toggleSelectAllResults(this)">
-                        </th>
-                        <th>Test Case Name</th>
-                        <th>Status</th>
-                        <th>Duration</th>
-                        <th>Browser</th>
-                        <th>Environment</th>
-                        <th>Date</th>
-                        <th>Evidence</th>
-                        <th>Logs</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${historyList.map((item, index) => {
+// Calculate pagination
+const totalRecords = historyList.length;
+const totalPages = Math.ceil(totalRecords / recordsPerPage);
+const startIndex = (currentPage - 1) * recordsPerPage;
+const endIndex = startIndex + recordsPerPage;
+const paginatedHistory = historyList.slice(startIndex, endIndex);
+    
+const html = `
+    <div style="overflow-x: auto;">
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" id="select-all-results" onchange="toggleSelectAllResults(this)">
+                    </th>
+                    <th>Test Case Name</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Browser</th>
+                    <th>Environment</th>
+                    <th>Date</th>
+                    <th>Evidence</th>
+                    <th>Logs</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${paginatedHistory.map((item, paginatedIndex) => {
+                    // Calculate original index in the full list
+                    const index = startIndex + paginatedIndex;
                         const statusClass = item.status === 'Passed' ? 'success' : 
                                           item.status === 'Failed' ? 'danger' : 'warning';
                         const statusBadgeColor = item.status === 'Passed' ? '#10b981' : 
@@ -1920,12 +1933,84 @@ function displayResultsHistory(historyList) {
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+            <div style="color: #6b7280; font-size: 14px;">
+                Showing ${paginatedHistory.length} of ${totalRecords} records
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <button onclick="goToPage(1)" 
+                        ${currentPage === 1 ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button onclick="goToPage(${currentPage - 1})" 
+                        ${currentPage === 1 ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-angle-left"></i> Previous
+                </button>
+                
+                ${generatePageButtons(currentPage, totalPages)}
+                
+                <button onclick="goToPage(${currentPage + 1})" 
+                        ${currentPage === totalPages ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    Next <i class="fas fa-angle-right"></i>
+                </button>
+                <button onclick="goToPage(${totalPages})" 
+                        ${currentPage === totalPages ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
     `;
     
     container.innerHTML = html;
     
     // Store history data globally for access by view functions
     window.testResultsHistory = historyList;
+}
+
+// Generate page number buttons
+function generatePageButtons(currentPage, totalPages) {
+    let buttons = '';
+    const maxButtons = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    
+    // Adjust start if we're near the end
+    if (endPage - startPage < maxButtons - 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        buttons += `
+            <button onclick="goToPage(${i})" 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#3b82f6' : '#d1d5db'}; 
+                           background: ${isActive ? '#3b82f6' : 'white'}; 
+                           color: ${isActive ? 'white' : '#374151'};
+                           border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
+                ${i}
+            </button>
+        `;
+    }
+    
+    return buttons;
+}
+
+// Navigate to specific page
+function goToPage(page) {
+    const totalPages = Math.ceil(filteredTestHistory.length / recordsPerPage);
+    
+    if (page < 1 || page > totalPages) {
+        return;
+    }
+    
+    currentPage = page;
+    displayResultsHistory(filteredTestHistory);
 }
 
 function toggleSelectAllResults(checkbox) {
@@ -1948,7 +2033,24 @@ async function deleteSelectedTests() {
         return;
     }
     
-    // Show confirmation modal
+    // Get the test names
+    const indices = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    const testNames = indices.map(index => {
+        const test = window.testResultsHistory[index];
+        return test.scenarioName;
+    });
+    
+    // Create display text for test names
+    let testNamesDisplay;
+    if (count === 1) {
+        testNamesDisplay = `<strong>${escapeHtml(testNames[0])}</strong>`;
+    } else if (count <= 3) {
+        testNamesDisplay = testNames.map(name => `<strong>${escapeHtml(name)}</strong>`).join(', ');
+    } else {
+        testNamesDisplay = `${testNames.slice(0, 2).map(name => `<strong>${escapeHtml(name)}</strong>`).join(', ')} and <strong>${count - 2}</strong> more`;
+    }
+    
+    // Show confirmation modal - simple style matching reference screenshot
     const confirmModal = document.createElement('div');
     confirmModal.id = 'delete-confirmation-modal';
     confirmModal.className = 'modal-overlay';
@@ -1966,32 +2068,25 @@ async function deleteSelectedTests() {
     `;
     
     confirmModal.innerHTML = `
-        <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 8px; max-width: 480px; width: 90%; padding: 0; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-            <div style="background: #ef4444; color: white; padding: 24px 28px; display: flex; align-items: center; gap: 12px;">
-                <div style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 24px;"></i>
-                </div>
-                <div style="flex: 1;">
-                    <h2 style="margin: 0; font-size: 1.25em; font-weight: 600;">Confirm Delete</h2>
-                    <p style="margin: 4px 0 0 0; opacity: 0.95; font-size: 0.9em;">This action cannot be undone</p>
-                </div>
-                <button onclick="closeDeleteConfirmation()" style="background: none; border: none; color: white; cursor: pointer; padding: 4px; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
-                    <i class="fas fa-times" style="font-size: 20px;"></i>
-                </button>
-            </div>
-            <div style="padding: 28px;">
-                <p style="font-size: 1em; color: #374151; margin-bottom: 12px; line-height: 1.5;">
-                    Are you sure you want to delete <strong style="color: #1f2937;">${count}</strong> test result${count > 1 ? 's' : ''}?
-                </p>
-                <p style="color: #6b7280; margin-bottom: 28px; font-size: 0.9em; line-height: 1.5;">
-                    ${count > 1 ? 'These test results' : 'This test result'} will be permanently removed from the execution history.
-                </p>
-                <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                    <button onclick="closeDeleteConfirmation()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: all 0.2s;" onmouseover="this.style.background='#d1d5db'" onmouseout="this.style.background='#e5e7eb'">
-                        <i class="fas fa-times" style="margin-right: 6px;"></i>Cancel
+        <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 6px; max-width: 400px; width: 90%; padding: 0; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 1.1em; color: #1f2937;">Confirm Deletion</h3>
+                    <button onclick="closeDeleteConfirmation()" style="background: none; border: none; color: #6b7280; cursor: pointer; padding: 4px; font-size: 18px;" title="Close">
+                        <i class="fas fa-times"></i>
                     </button>
-                    <button onclick="confirmDelete()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.9em; transition: all 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
-                        <i class="fas fa-trash" style="margin-right: 6px;"></i>Delete ${count > 1 ? 'Tests' : 'Test'}
+                </div>
+            </div>
+            <div style="padding: 20px;">
+                <p style="margin: 0 0 20px 0; color: #374151; line-height: 1.6;">
+                    Are you sure you want to delete ${testNamesDisplay}?
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="closeDeleteConfirmation()" style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; min-width: 80px;">
+                        Cancel
+                    </button>
+                    <button onclick="confirmDelete()" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; min-width: 80px;">
+                        Delete
                     </button>
                 </div>
             </div>
@@ -2035,6 +2130,12 @@ async function confirmDelete() {
             };
         });
         
+        // Get test names for success message
+        const testNames = indices.map(index => {
+            const test = window.testResultsHistory[index];
+            return test.scenarioName;
+        });
+        
         // Call API to delete tests
         const response = await fetch(`${API_BASE_URL}/history/delete`, {
             method: 'DELETE',
@@ -2047,16 +2148,22 @@ async function confirmDelete() {
         const data = await response.json();
         
         if (data.success) {
-            showSuccess(`Successfully deleted ${indices.length} test result${indices.length > 1 ? 's' : ''}`);
+            // Build success message with scenario names
+            let successMessage;
+            if (testNames.length === 1) {
+                successMessage = `Successfully deleted "${testNames[0]}"`;
+            } else if (testNames.length <= 3) {
+                successMessage = `Successfully deleted: ${testNames.join(', ')}`;
+            } else {
+                successMessage = `Successfully deleted ${testNames.length} test results: ${testNames.slice(0, 2).join(', ')} and ${testNames.length - 2} more`;
+            }
+            
+            showSuccess(successMessage);
             
             // Reload the test results
             await loadAndDisplayTestResults();
             
-            // Hide bulk actions toolbar
-            const bulkActionsToolbar = document.getElementById('bulk-actions-toolbar');
-            if (bulkActionsToolbar) {
-                bulkActionsToolbar.style.display = 'none';
-            }
+            // Note: Delete button stays visible (always shown)
         } else {
             showError(data.error || 'Failed to delete test results');
         }

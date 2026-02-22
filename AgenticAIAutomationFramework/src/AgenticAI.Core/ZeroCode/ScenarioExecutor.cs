@@ -51,16 +51,61 @@ namespace AgenticAI.Core.ZeroCode
                     Logger.Warning("No Start URL specified and no Base URL configured. Skipping navigation.");
                 }
 
-                // Execute each action
-                foreach (var action in scenario.Actions)
+                // Check if scenario uses new unified Steps model
+                if (scenario.Steps != null && scenario.Steps.Count > 0)
                 {
-                    await ExecuteActionAsync(action, testResult);
+                    // NEW APPROACH: Execute unified steps in order
+                    Logger.TestInfo(scenario.Name, $"Executing {scenario.Steps.Count} steps in sequence (unified model)");
+                    
+                    var orderedSteps = scenario.Steps.OrderBy(s => s.Order).ToList();
+                    
+                    foreach (var step in orderedSteps)
+                    {
+                        if (step.StepType == "Action" && step.Action != null)
+                        {
+                            await ExecuteActionAsync(step.Action, testResult);
+                        }
+                        else if (step.StepType == "Assertion" && step.Assertion != null)
+                        {
+                            await ExecuteAssertionAsync(step.Assertion, testResult);
+                        }
+                        else
+                        {
+                            Logger.Warning($"Invalid step at order {step.Order}: StepType={step.StepType}, has data={step.Action != null || step.Assertion != null}");
+                        }
+                    }
                 }
-
-                // Verify assertions
-                foreach (var assertion in scenario.Assertions)
+                else
                 {
-                    await ExecuteAssertionAsync(assertion, testResult);
+                    // LEGACY APPROACH: Execute actions then assertions (backward compatibility)
+                    Logger.TestInfo(scenario.Name, "Using legacy execution model (Actions then Assertions)");
+                    
+                    // Execute actions with their assertions interleaved
+                    for (int i = 0; i < scenario.Actions.Count; i++)
+                    {
+                        // Execute the action
+                        await ExecuteActionAsync(scenario.Actions[i], testResult);
+                        
+                        // Execute assertions that should run after this action
+                        var assertionsForThisAction = scenario.Assertions
+                            .Where(a => a.ExecuteAfterActionIndex == i)
+                            .ToList();
+                        
+                        foreach (var assertion in assertionsForThisAction)
+                        {
+                            await ExecuteAssertionAsync(assertion, testResult);
+                        }
+                    }
+
+                    // Execute remaining assertions that don't have a specific action index (legacy support)
+                    var remainingAssertions = scenario.Assertions
+                        .Where(a => !a.ExecuteAfterActionIndex.HasValue)
+                        .ToList();
+                    
+                    foreach (var assertion in remainingAssertions)
+                    {
+                        await ExecuteAssertionAsync(assertion, testResult);
+                    }
                 }
 
                 testResult.Status = TestStatus.Passed;
@@ -310,16 +355,18 @@ namespace AgenticAI.Core.ZeroCode
                         var actualText = await _driver.GetTextAsync(assertion.Locator);
                         if (actualText != assertion.ExpectedValue)
                         {
-                            throw new Exception($"Text mismatch. Expected: {assertion.ExpectedValue}, Actual: {actualText}");
+                            throw new Exception($"Text mismatch. Expected: '{assertion.ExpectedValue}', Actual: '{actualText}'");
                         }
+                        Logger.Info($"Text equals assertion passed. Expected: '{assertion.ExpectedValue}', Actual: '{actualText}'");
                         break;
 
                     case "textcontains":
                         var text = await _driver.GetTextAsync(assertion.Locator);
                         if (!text.Contains(assertion.ExpectedValue ?? ""))
                         {
-                            throw new Exception($"Text does not contain expected value: {assertion.ExpectedValue}");
+                            throw new Exception($"Text does not contain expected value. Expected text to contain: '{assertion.ExpectedValue}', but actual text was: '{text}'");
                         }
+                        Logger.Info($"Text contains assertion passed. Expected to contain: '{assertion.ExpectedValue}', Actual text: '{text}'");
                         break;
 
                     case "urlcontains":

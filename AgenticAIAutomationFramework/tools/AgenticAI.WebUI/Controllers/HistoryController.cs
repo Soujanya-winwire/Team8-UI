@@ -134,6 +134,57 @@ namespace AgenticAI.WebUI.Controllers
         }
 
         /// <summary>
+        /// Delete multiple test executions (bulk delete)
+        /// </summary>
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteMultipleExecutions([FromBody] DeleteTestsRequest request)
+        {
+            try
+            {
+                if (request == null || request.Tests == null || request.Tests.Count == 0)
+                {
+                    return BadRequest(new { success = false, error = "No tests specified for deletion" });
+                }
+
+                var history = await LoadHistoryAsync();
+                var originalCount = history.Count;
+                
+                // Remove tests that match the scenarioName and executedAt criteria
+                foreach (var testToDelete in request.Tests)
+                {
+                    history.RemoveAll(h => 
+                        h.ScenarioName == testToDelete.ScenarioName && 
+                        h.ExecutedAt == testToDelete.ExecutedAt);
+                }
+                
+                var deletedCount = originalCount - history.Count;
+                
+                if (deletedCount > 0)
+                {
+                    await SaveHistoryAsync(history);
+                    return Ok(new 
+                    { 
+                        success = true, 
+                        deletedCount = deletedCount,
+                        message = $"Successfully deleted {deletedCount} test result{(deletedCount > 1 ? "s" : "")}" 
+                    });
+                }
+                else
+                {
+                    return NotFound(new { success = false, error = "No matching test results found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    error = $"Failed to delete test results: {ex.Message}"
+                });
+            }
+        }
+
+        /// <summary>
         /// Delete a specific execution from history
         /// </summary>
         [HttpDelete("{executionId}")]
@@ -261,5 +312,17 @@ namespace AgenticAI.WebUI.Controllers
         public string Status { get; set; } = string.Empty;
         public string? Error { get; set; }
         public string? ScreenshotPath { get; set; }
+    }
+
+    // Request model for bulk delete
+    public class DeleteTestsRequest
+    {
+        public List<TestIdentifier> Tests { get; set; } = new List<TestIdentifier>();
+    }
+
+    public class TestIdentifier
+    {
+        public string ScenarioName { get; set; } = string.Empty;
+        public string ExecutedAt { get; set; } = string.Empty;
     }
 }

@@ -38,6 +38,9 @@ namespace AgenticAI.Core.ZeroCode
         {
             scenario.ModifiedAt = DateTime.Now;
             
+            // Build unified Steps collection for inline execution
+            BuildUnifiedStepsCollection(scenario);
+            
             var moduleDir = Path.Combine(_scenariosPath, scenario.Module);
             if (!Directory.Exists(moduleDir))
             {
@@ -47,6 +50,63 @@ namespace AgenticAI.Core.ZeroCode
             var filePath = Path.Combine(moduleDir, $"{SanitizeFileName(scenario.Name)}.json");
             var json = JsonConvert.SerializeObject(scenario, Formatting.Indented);
             File.WriteAllText(filePath, json);
+        }
+        
+        /// <summary>
+        /// Builds the unified Steps collection from Actions and Assertions
+        /// This ensures assertions execute inline at their correct position
+        /// </summary>
+        private void BuildUnifiedStepsCollection(TestScenario scenario)
+        {
+            // Initialize Steps collection
+            scenario.Steps = new List<TestStep>();
+            int stepOrder = 0;
+            
+            // Process each action and its associated assertions
+            for (int i = 0; i < scenario.Actions.Count; i++)
+            {
+                // Add the action as a step
+                scenario.Steps.Add(new TestStep
+                {
+                    StepType = "Action",
+                    Order = stepOrder++,
+                    Action = scenario.Actions[i],
+                    Assertion = null
+                });
+                
+                // Find assertions that should execute after this action
+                var assertionsForThisAction = scenario.Assertions
+                    .Where(a => a.ExecuteAfterActionIndex == i)
+                    .ToList();
+                
+                // Add each assertion as a step immediately after the action
+                foreach (var assertion in assertionsForThisAction)
+                {
+                    scenario.Steps.Add(new TestStep
+                    {
+                        StepType = "Assertion",
+                        Order = stepOrder++,
+                        Action = null,
+                        Assertion = assertion
+                    });
+                }
+            }
+            
+            // Add any assertions without a specific action index at the end
+            var remainingAssertions = scenario.Assertions
+                .Where(a => !a.ExecuteAfterActionIndex.HasValue)
+                .ToList();
+            
+            foreach (var assertion in remainingAssertions)
+            {
+                scenario.Steps.Add(new TestStep
+                {
+                    StepType = "Assertion",
+                    Order = stepOrder++,
+                    Action = null,
+                    Assertion = assertion
+                });
+            }
         }
 
         public TestScenario? LoadScenario(string scenarioName, string module = "Default")
@@ -63,7 +123,19 @@ namespace AgenticAI.Core.ZeroCode
             }
 
             var json = File.ReadAllText(filePath);
-            return JsonConvert.DeserializeObject<TestScenario>(json);
+            var scenario = JsonConvert.DeserializeObject<TestScenario>(json);
+            
+            if (scenario != null)
+            {
+                // Ensure Steps collection is built for scenarios that don't have it
+                // (backward compatibility with legacy scenarios)
+                if (scenario.Steps == null || scenario.Steps.Count == 0)
+                {
+                    BuildUnifiedStepsCollection(scenario);
+                }
+            }
+            
+            return scenario;
         }
 
         public List<TestScenario> LoadAllScenarios()
@@ -85,6 +157,11 @@ namespace AgenticAI.Core.ZeroCode
                     var scenario = JsonConvert.DeserializeObject<TestScenario>(json);
                     if (scenario != null)
                     {
+                        // Ensure Steps collection is built for backward compatibility
+                        if (scenario.Steps == null || scenario.Steps.Count == 0)
+                        {
+                            BuildUnifiedStepsCollection(scenario);
+                        }
                         scenarios.Add(scenario);
                     }
                 }
