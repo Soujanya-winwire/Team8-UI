@@ -1,0 +1,185 @@
+{
+  "ScenarioId": "b06d79e1-af0c-4aca-ac41-2f8f1910384f",
+  "Name": "login9",
+  "Description": "",
+  "Module": "authentication",
+  "Tags": [
+    "smoke"
+  ],
+  "StartUrl": "https://www.saucedemo.com/",
+  "Actions": [
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"username\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "problem_user",
+      "Description": "Type \"problem_user\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"password\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "secret",
+      "Description": "Type \"secret\" into [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "secret_sauce",
+      "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"login-button\"]",
+      "Value": null,
+      "Description": "Click on \"\"",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"secondary-header\"]",
+      "Value": null,
+      "Description": "Click on \"ProductsName (A to Z)Name (A to Z)Name (Z to A)Pri\"",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"item-4-title-link\"]",
+      "Value": null,
+      "Description": "Click on \"Sauce Labs Backpack\"",
+      "Metadata": {},
+      "Timestamp": 7
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"username\"]",
+        "Value": null,
+        "Description": "Click on \"\"",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"username\"]",
+        "Value": "problem_user",
+        "Description": "Type \"problem_user\" into [data-test=\"username\"]",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"password\"]",
+        "Value": null,
+        "Description": "Click on \"\"",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"password\"]",
+        "Value": "secret",
+        "Description": "Type \"secret\" into [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"password\"]",
+        "Value": "secret_sauce",
+        "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"login-button\"]",
+        "Value": null,
+        "Description": "Click on \"\"",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"secondary-header\"]",
+        "Value": null,
+        "Description": "Click on \"ProductsName (A to Z)Name (A to Z)Name (Z to A)Pri\"",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"item-4-title-link\"]",
+        "Value": null,
+        "Description": "Click on \"Sauce Labs Backpack\"",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-02-23T05:57:10.3904613+05:30",
+  "ModifiedAt": "2026-02-23T05:57:10.3916503+05:30"
+}

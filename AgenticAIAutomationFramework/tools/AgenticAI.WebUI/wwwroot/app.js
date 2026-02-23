@@ -13,13 +13,13 @@ let executionResults = [];
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('?? Initializing Agentic AI Test Management Platform...');
-    
+
     // Initialize SignalR connection
     await initializeSignalR();
-    
+
     // Load initial data
     await loadDashboard();
-    
+
     console.log('? Platform initialized successfully!');
 });
 
@@ -58,15 +58,15 @@ function showView(viewName) {
     document.querySelectorAll('.view-content').forEach(view => {
         view.classList.add('hidden');
     });
-    
+
     // Show selected view
     document.getElementById(`${viewName}-view`).classList.remove('hidden');
-    
+
     // Update active nav item (only if event is available)
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     if (typeof event !== 'undefined' && event && event.target) {
         const navItem = event.target.closest('.nav-item');
         if (navItem) {
@@ -82,11 +82,11 @@ function showView(viewName) {
             }
         });
     }
-    
+
     currentView = viewName;
-    
+
     // Load view-specific content
-    switch(viewName) {
+    switch (viewName) {
         case 'dashboard':
             loadDashboard();
             break;
@@ -118,11 +118,11 @@ function showView(viewName) {
 async function loadDashboard() {
     try {
         showLoading('Loading dashboard data...');
-        
+
         // Load scenarios
         const response = await fetch(`${API_BASE_URL}/scenarios`);
         const data = await response.json();
-        
+
         // Load execution history
         let historyData = { history: [] };
         try {
@@ -133,30 +133,30 @@ async function loadDashboard() {
         } catch (historyError) {
             console.warn('Could not load execution history:', historyError);
         }
-        
+
         hideLoading();
-        
+
         if (data.success) {
             scenarios = data.scenarios;
-            
+
             // Update stats
             document.getElementById('total-scenarios').textContent = data.count;
-            
+
             // Get modules
             const modules = [...new Set(scenarios.map(s => s.module))];
             document.getElementById('total-modules').textContent = modules.length;
-            
+
             // Calculate execution statistics from history
             const history = historyData.history || [];
             const totalExecutions = history.length;
             const passedTests = history.filter(h => h.status === 'Passed').length;
             const failedTests = history.filter(h => h.status === 'Failed').length;
             const skippedTests = history.filter(h => h.status === 'Skipped').length;
-            
+
             // Update execution stats - these IDs match the dashboard HTML
             document.getElementById('total-passed').textContent = passedTests;
             document.getElementById('total-failed').textContent = failedTests;
-            
+
             // Display recent scenarios
             displayRecentScenarios(scenarios.slice(0, 5));
         }
@@ -169,7 +169,7 @@ async function loadDashboard() {
 
 function displayRecentScenarios(recentScenarios) {
     const container = document.getElementById('recent-scenarios');
-    
+
     if (recentScenarios.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -183,7 +183,7 @@ function displayRecentScenarios(recentScenarios) {
         `;
         return;
     }
-    
+
     const html = `
         <table>
             <thead>
@@ -201,9 +201,9 @@ function displayRecentScenarios(recentScenarios) {
                         <td><strong>${scenario.name}</strong></td>
                         <td><span class="badge badge-primary">${scenario.module}</span></td>
                         <td>
-                            ${scenario.tags.slice(0, 3).map(tag => 
-                                `<span class="badge badge-info">${tag}</span>`
-                            ).join(' ')}
+                            ${scenario.tags.slice(0, 3).map(tag =>
+        `<span class="badge badge-info">${tag}</span>`
+    ).join(' ')}
                         </td>
                         <td>${scenario.actionCount} steps</td>
                         <td>
@@ -219,14 +219,14 @@ function displayRecentScenarios(recentScenarios) {
             </tbody>
         </table>
     `;
-    
+
     container.innerHTML = html;
 }
 
 function displayExecutionHistory(historyList) {
     const container = document.getElementById('execution-history');
     if (!container) return; // Element might not exist on dashboard
-    
+
     if (historyList.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -240,7 +240,7 @@ function displayExecutionHistory(historyList) {
         `;
         return;
     }
-    
+
     const html = `
         <table>
             <thead>
@@ -253,11 +253,11 @@ function displayExecutionHistory(historyList) {
             </thead>
             <tbody>
                 ${historyList.map(item => {
-                    const statusIcon = item.status === 'Passed' ? '?' : item.status === 'Failed' ? '?' : '??';
-                    const statusClass = item.status === 'Passed' ? 'success' : item.status === 'Failed' ? 'danger' : 'warning';
-                    const executedDate = item.executedAt ? new Date(item.executedAt).toLocaleString() : 'Unknown';
-                    
-                    return `
+        const statusIcon = item.status === 'Passed' ? '?' : item.status === 'Failed' ? '?' : '??';
+        const statusClass = item.status === 'Passed' ? 'success' : item.status === 'Failed' ? 'danger' : 'warning';
+        const executedDate = item.executedAt ? new Date(item.executedAt).toLocaleString() : 'Unknown';
+
+        return `
                     <tr>
                         <td><strong>${escapeHtml(item.testName || 'Unknown Test')}</strong></td>
                         <td>
@@ -269,11 +269,11 @@ function displayExecutionHistory(historyList) {
                         <td>${executedDate}</td>
                     </tr>
                     `;
-                }).join('')}
+    }).join('')}
             </tbody>
         </table>
     `;
-    
+
     container.innerHTML = html;
 }
 
@@ -281,7 +281,7 @@ function displayExecutionHistory(historyList) {
 // Scenarios View
 async function loadScenariosView() {
     const view = document.getElementById('scenarios-view');
-    
+
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-list-check"></i> Test Scenarios</h2>
@@ -326,25 +326,25 @@ async function loadScenariosView() {
             </div>
         </div>
     `;
-    
+
     try {
         // Load scenarios
         const response = await fetch(`${API_BASE_URL}/scenarios`);
         const data = await response.json();
-        
+
         if (data.success) {
             scenarios = data.scenarios;
-            
+
             // Populate filters
             const modules = [...new Set(scenarios.map(s => s.module))];
             const tags = [...new Set(scenarios.flatMap(s => s.tags))];
-            
-            document.getElementById('filter-module').innerHTML += 
+
+            document.getElementById('filter-module').innerHTML +=
                 modules.map(m => `<option value="${m}">${m}</option>`).join('');
-            
-            document.getElementById('filter-tag').innerHTML += 
+
+            document.getElementById('filter-tag').innerHTML +=
                 tags.map(t => `<option value="${t}">${t}</option>`).join('');
-            
+
             // Load execution history to show last run logs per scenario
             let historyList = [];
             try {
@@ -368,7 +368,7 @@ async function loadScenariosView() {
 
 function displayAllScenarios(scenariosList) {
     const container = document.getElementById('scenarios-list');
-    
+
     if (scenariosList.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -379,7 +379,7 @@ function displayAllScenarios(scenariosList) {
         `;
         return;
     }
-    
+
     // Create table
     const table = document.createElement('table');
     table.innerHTML = `
@@ -396,48 +396,48 @@ function displayAllScenarios(scenariosList) {
         </thead>
         <tbody></tbody>
     `;
-    
+
     const tbody = table.querySelector('tbody');
-    
+
     // Add each scenario row
     scenariosList.forEach(scenario => {
         const row = document.createElement('tr');
-        
+
         // Name
         const nameCell = document.createElement('td');
         nameCell.innerHTML = `<strong>${escapeHtml(scenario.name)}</strong>`;
         row.appendChild(nameCell);
-        
+
         // Module
         const moduleCell = document.createElement('td');
         moduleCell.innerHTML = `<span class="badge badge-primary">${escapeHtml(scenario.module)}</span>`;
         row.appendChild(moduleCell);
-        
+
         // Description
         const descCell = document.createElement('td');
         descCell.textContent = scenario.description || 'No description';
         row.appendChild(descCell);
-        
+
         // Tags
         const tagsCell = document.createElement('td');
-        tagsCell.innerHTML = (scenario.tags || []).map(tag => 
+        tagsCell.innerHTML = (scenario.tags || []).map(tag =>
             `<span class="badge badge-info">${escapeHtml(tag)}</span>`
         ).join(' ');
         row.appendChild(tagsCell);
-        
+
         // Action count
         const stepsCell = document.createElement('td');
         stepsCell.textContent = `${scenario.actionCount || scenario.actions?.length || 0} steps`;
         row.appendChild(stepsCell);
-        
+
         // Created date
         const dateCell = document.createElement('td');
         dateCell.textContent = scenario.createdAt ? new Date(scenario.createdAt).toLocaleDateString() : 'Unknown';
         row.appendChild(dateCell);
-        
+
         // Action buttons
         const actionsCell = document.createElement('td');
-        
+
         // Execute button
         const executeBtn = document.createElement('button');
         executeBtn.className = 'btn btn-success btn-icon';
@@ -445,7 +445,7 @@ function displayAllScenarios(scenariosList) {
         executeBtn.innerHTML = '<i class="fas fa-play"></i>';
         executeBtn.onclick = () => executeScenario(scenario.module, scenario.name);
         actionsCell.appendChild(executeBtn);
-        
+
         // View button
         const viewBtn = document.createElement('button');
         viewBtn.className = 'btn btn-secondary btn-icon';
@@ -453,7 +453,7 @@ function displayAllScenarios(scenariosList) {
         viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
         viewBtn.onclick = () => viewScenario(scenario.module, scenario.name);
         actionsCell.appendChild(viewBtn);
-        
+
         // Delete button
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn btn-danger btn-icon';
@@ -461,11 +461,11 @@ function displayAllScenarios(scenariosList) {
         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
         deleteBtn.onclick = () => deleteScenario(scenario.module, scenario.name);
         actionsCell.appendChild(deleteBtn);
-        
+
         row.appendChild(actionsCell);
         tbody.appendChild(row);
     });
-    
+
     container.innerHTML = '';
     container.appendChild(table);
 }
@@ -481,31 +481,31 @@ function filterScenarios() {
     const moduleFilter = document.getElementById('filter-module').value;
     const tagFilter = document.getElementById('filter-tag').value;
     const searchText = document.getElementById('search-scenarios').value.toLowerCase();
-    
+
     let filtered = scenarios;
-    
+
     if (moduleFilter) {
         filtered = filtered.filter(s => s.module === moduleFilter);
     }
-    
+
     if (tagFilter) {
         filtered = filtered.filter(s => s.tags.includes(tagFilter));
     }
-    
+
     if (searchText) {
-        filtered = filtered.filter(s => 
-            s.name.toLowerCase().includes(searchText) || 
+        filtered = filtered.filter(s =>
+            s.name.toLowerCase().includes(searchText) ||
             (s.description && s.description.toLowerCase().includes(searchText))
         );
     }
-    
+
     displayAllScenarios(filtered);
 }
 
 // Create Test View
 function loadCreateView() {
     const view = document.getElementById('create-view');
-    
+
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-edit"></i> Create Test Scenario</h2>
@@ -601,7 +601,7 @@ function loadCreateView() {
             </form>
         </div>
     `;
-    
+
     window.currentActions = [];
     window.currentAssertions = [];
 }
@@ -613,7 +613,7 @@ let isRecording = false;
 // Record Test View (NEW)
 async function loadRecordView() {
     const view = document.getElementById('record-view');
-    
+
     // Check recording status
     try {
         const statusResponse = await fetch(`${API_BASE_URL}/recorder/status`);
@@ -623,7 +623,7 @@ async function loadRecordView() {
         console.error('Error checking recording status:', error);
         isRecording = false;
     }
-    
+
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-video"></i> Interactive Test Recorder</h2>
@@ -798,7 +798,7 @@ async function loadRecordView() {
 
 async function startAssistedRecording(event) {
     event.preventDefault();
-    
+
     const request = {
         scenarioName: document.getElementById('record-name').value,
         module: document.getElementById('record-module').value,
@@ -806,14 +806,14 @@ async function startAssistedRecording(event) {
         startUrl: document.getElementById('record-url').value,
         tags: document.getElementById('record-tags').value.split(',').map(t => t.trim()).filter(t => t)
     };
-    
+
     try {
         // Show loading state
         const startBtn = document.getElementById('start-recording-btn');
         const originalText = startBtn.innerHTML;
         startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
         startBtn.disabled = true;
-        
+
         const response = await fetch(`${API_BASE_URL}/recorder/start`, {
             method: 'POST',
             headers: {
@@ -821,23 +821,23 @@ async function startAssistedRecording(event) {
             },
             body: JSON.stringify(request)
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             isRecording = true;
             document.getElementById('start-recording-btn').innerHTML = originalText;
             document.getElementById('start-recording-btn').disabled = true;
             document.getElementById('stop-recording-btn').disabled = false;
             document.getElementById('recording-status').classList.remove('hidden');
-            
+
             // Try to add console log if available
             try {
                 addConsoleLog('Recording started! Browser opened. Perform your test actions.', 'success');
             } catch (e) {
                 console.log('Console not available:', e);
             }
-            
+
             showSuccess('Recording started! Interact with the browser that just opened.');
         } else {
             // Reset button
@@ -847,14 +847,14 @@ async function startAssistedRecording(event) {
         }
     } catch (error) {
         console.error('Start recording error:', error);
-        
+
         // Reset button state
         const startBtn = document.getElementById('start-recording-btn');
         if (startBtn) {
             startBtn.innerHTML = '<i class="fas fa-circle-dot"></i> Start Recording';
             startBtn.disabled = false;
         }
-        
+
         showError('Failed to start recording: ' + error.message);
     }
 }
@@ -866,46 +866,46 @@ async function stopRecording() {
         const originalText = stopBtn.innerHTML;
         stopBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Stopping...';
         stopBtn.disabled = true;
-        
+
         const response = await fetch(`${API_BASE_URL}/recorder/stop`, {
             method: 'POST'
         });
-        
+
         const data = await response.json();
-        
+
         // Reset button
         stopBtn.innerHTML = originalText;
-        
+
         if (data.success) {
             isRecording = false;
             document.getElementById('start-recording-btn').disabled = false;
             document.getElementById('stop-recording-btn').disabled = true;
             document.getElementById('recording-status').classList.add('hidden');
-            
+
             // Handle different response formats
-            const actionCount = data.scenario?.actionCount || 
-                               data.scenario?.actions?.length || 
-                               data.actionCount || 
-                               0;
-            const scenarioName = data.scenario?.name || 
-                                data.scenarioName || 
-                                'Test Scenario';
-            
+            const actionCount = data.scenario?.actionCount ||
+                data.scenario?.actions?.length ||
+                data.actionCount ||
+                0;
+            const scenarioName = data.scenario?.name ||
+                data.scenarioName ||
+                'Test Scenario';
+
             showSuccess(`Recording saved! ${actionCount} action(s) captured.`);
-            
+
             // Try to add console log if console exists
             try {
                 addConsoleLog(`Recording completed: ${scenarioName}`, 'success');
             } catch (e) {
                 console.log('Console log not available:', e);
             }
-            
+
             // Clear form
             const form = document.getElementById('assisted-record-form');
             if (form) {
                 form.reset();
             }
-            
+
             // Ask if user wants to view the scenario
             if (confirm('Recording saved! Would you like to view the scenario?')) {
                 showView('scenarios');
@@ -916,14 +916,14 @@ async function stopRecording() {
         }
     } catch (error) {
         console.error('Stop recording error:', error);
-        
+
         // Reset button state
         const stopBtn = document.getElementById('stop-recording-btn');
         if (stopBtn) {
             stopBtn.innerHTML = '<i class="fas fa-stop-circle"></i> Stop Recording';
             stopBtn.disabled = false;
         }
-        
+
         // Show user-friendly error
         showError('Failed to stop recording. Please check if the browser window is still open.');
     }
@@ -932,7 +932,7 @@ async function stopRecording() {
 // Execute Tests View
 async function loadExecuteView() {
     const view = document.getElementById('execute-view');
-    
+
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-play-circle"></i> Execute Tests</h2>
@@ -1009,51 +1009,102 @@ async function loadExecuteView() {
                 <div class="console-line">Ready to execute tests...</div>
             </div>
         </div>
+
+        <!-- DATA-DRIVEN EXECUTION -->
+        <div class="card" style="border:2px solid var(--info-color);box-shadow:0 8px 24px rgba(59,130,246,0.15);">
+            <div class="card-header" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(37,99,235,0.04));border-radius:12px 12px 0 0;">
+                <div class="card-title" style="display:flex;align-items:center;gap:10px;color:var(--info-color);">
+                    <i class="fas fa-table"></i>
+                    <span>Data-Driven Execution</span>
+                </div>
+                <span class="badge badge-info"><i class="fas fa-flask"></i> CSV / JSON</span>
+            </div>
+            <div style="padding:4px 0 16px;">
+                <p style="color:#6b7280;font-size:0.92em;line-height:1.7;margin-bottom:18px;">
+                    Run a scenario once per data row. Use <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">\${ColumnName}</code>
+                    placeholders in your scenario action values (e.g. <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">\${username}</code>).
+                </p>
+                <div class="grid-2">
+                    <div class="form-group"><label>Module</label><select class="form-control" id="dd-module" onchange="loadDDScenarios()"><option value="">Select Module</option></select></div>
+                    <div class="form-group"><label>Scenario</label><select class="form-control" id="dd-scenario"><option value="">Select Scenario</option></select></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label>Data Format</label><select class="form-control" id="dd-format"><option value="CSV">CSV (comma-separated)</option><option value="JSON">JSON (array of objects)</option></select></div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
+                        <input type="file" id="dd-file-upload" accept=".csv,.json" style="display:none;" onchange="handleDDFileUpload(event)">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('dd-file-upload').click()">
+                            <i class="fas fa-file-upload"></i> Upload File
+                        </button>
+                        <button class="btn btn-secondary" style="flex:1;" onclick="loadSampleData()">
+                            <i class="fas fa-magic"></i> Example
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Data (paste CSV/JSON or upload a file)</label>
+                    <textarea class="form-control" id="dd-data" rows="6" placeholder="username,password&#10;standard_user,secret_sauce&#10;locked_out_user,secret_sauce"></textarea>
+                </div>
+                <div id="dd-preview-area" class="hidden" style="margin-bottom:16px;padding:14px;background:#f0f9ff;border-radius:8px;border-left:4px solid var(--info-color);">
+                    <div style="font-weight:600;color:var(--info-color);margin-bottom:8px;"><i class="fas fa-columns"></i> Preview</div>
+                    <div id="dd-preview-content"></div>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn" style="background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;" onclick="previewDataSet()"><i class="fas fa-eye"></i> Preview Data</button>
+                    <button class="btn btn-primary" id="dd-execute-btn" onclick="executeDataDriven()"><i class="fas fa-play"></i> Execute Data-Driven Test</button>
+                </div>
+                <div id="dd-results-area" class="hidden" style="margin-top:20px;">
+                    <div id="dd-summary-bar" style="padding:14px;border-radius:8px;margin-bottom:16px;"></div>
+                    <div id="dd-results-table"></div>
+                </div>
+            </div>
+        </div>
     `;
-    
     // Load modules and tags
     try {
         const modulesResponse = await fetch(`${API_BASE_URL}/scenarios/modules`);
         const modulesData = await modulesResponse.json();
-        
+
         if (modulesData.success) {
-            const moduleOptions = modulesData.modules.map(m => 
+            const moduleOptions = modulesData.modules.map(m =>
                 `<option value="${m}">${m}</option>`
             ).join('');
-            
-            document.getElementById('exec-module').innerHTML += moduleOptions;
-            document.getElementById('exec-module-all').innerHTML += moduleOptions;
+
+            document.getElementById('exec-module').innerHTML = '<option value="">Select Module</option>' + moduleOptions;
+            document.getElementById('exec-module-all').innerHTML = '<option value="">Select Module</option>' + moduleOptions;
+
+            // Populate data-driven module dropdown
+            const ddModuleEl = document.getElementById('dd-module');
+            if (ddModuleEl) ddModuleEl.innerHTML = '<option value="">Select Module</option>' + moduleOptions;
         }
-        
+
         const tagsResponse = await fetch(`${API_BASE_URL}/scenarios/tags`);
         const tagsData = await tagsResponse.json();
-        
+
         if (tagsData.success) {
-            const tagOptions = tagsData.tags.map(t => 
+            const tagOptions = tagsData.tags.map(t =>
                 `<option value="${t}">${t}</option>`
             ).join('');
-            
-            document.getElementById('exec-tag').innerHTML += tagOptions;
+
+            document.getElementById('exec-tag').innerHTML = '<option value="">Select Tag</option>' + tagOptions;
         }
     } catch (error) {
         console.error('Error loading execution options:', error);
     }
-    
+
     // Load scenarios when module changes
     document.getElementById('exec-module').addEventListener('change', async (e) => {
         const module = e.target.value;
         if (!module) return;
-        
+
         try {
             const response = await fetch(`${API_BASE_URL}/scenarios/module/${module}`);
             const data = await response.json();
-            
+
             if (data.success) {
-                const scenarioOptions = data.scenarios.map(s => 
+                const scenarioOptions = data.scenarios.map(s =>
                     `<option value="${s.name}">${s.name}</option>`
                 ).join('');
-                
-                document.getElementById('exec-scenario').innerHTML = 
+
+                document.getElementById('exec-scenario').innerHTML =
                     '<option value="">Select Scenario</option>' + scenarioOptions;
             }
         } catch (error) {
@@ -1065,12 +1116,12 @@ async function loadExecuteView() {
 async function executeSingleScenario() {
     const module = document.getElementById('exec-module').value;
     const scenario = document.getElementById('exec-scenario').value;
-    
+
     if (!module || !scenario) {
         showError('Please select both module and scenario');
         return;
     }
-    
+
     await executeScenario(module, scenario);
 }
 
@@ -1078,44 +1129,44 @@ async function executeScenario(module, name) {
     try {
         // Check if we're on the execute view
         const isOnExecuteView = currentView === 'execute';
-        
+
         if (!isOnExecuteView) {
             // Show notification and navigate to execute view
             showInfo(`Executing test: ${name}. Navigating to Execute Tests view...`);
-            
+
             // Small delay to show the notification
             await new Promise(resolve => setTimeout(resolve, 500));
-            
+
             // Navigate to execute view
             showView('execute');
-            
+
             // Wait for view to load
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
-        
+
         // Now execute the scenario
         if (typeof updateExecutionStatus === 'function') {
             updateExecutionStatus('running', `Executing ${name}...`);
         }
-        
+
         if (typeof addConsoleLog === 'function') {
             addConsoleLog(`Starting execution of ${name}`, 'info');
         }
-        
+
         showInfo(`Executing test scenario: ${name}...`);
-        
+
         const response = await fetch(`${API_BASE_URL}/scenarios/execute/${module}/${name}`, {
             method: 'POST'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Check actual test result status
             const testPassed = data.result.status === 'Passed';
             const statusType = testPassed ? 'success' : 'failed';
             const statusMessage = testPassed ? 'success' : 'error';
-            
+
             if (typeof updateExecutionStatus === 'function') {
                 updateExecutionStatus(statusType, testPassed ? 'Execution completed successfully' : 'Test execution completed with failures');
             }
@@ -1123,7 +1174,7 @@ async function executeScenario(module, name) {
                 addConsoleLog(`? Test completed: ${data.result.status}`, statusMessage);
                 displayTestResult(data.result);
             }
-            
+
             // Show appropriate notification based on actual test result
             if (testPassed) {
                 showSuccess(`? Test passed: ${data.result.status}`);
@@ -1153,22 +1204,22 @@ async function executeScenario(module, name) {
 
 async function executeModule() {
     const module = document.getElementById('exec-module-all').value;
-    
+
     if (!module) {
         showError('Please select a module');
         return;
     }
-    
+
     try {
         updateExecutionStatus('running', `Executing module: ${module}...`);
         addConsoleLog(`Starting module execution: ${module}`, 'info');
-        
+
         const response = await fetch(`${API_BASE_URL}/scenarios/execute/module/${module}`, {
             method: 'POST'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             updateExecutionStatus('success', `Module completed: ${data.count} tests executed`);
             addConsoleLog(`? Module completed: ${data.count} tests`, 'success');
@@ -1184,22 +1235,22 @@ async function executeModule() {
 
 async function executeTag() {
     const tag = document.getElementById('exec-tag').value;
-    
+
     if (!tag) {
         showError('Please select a tag');
         return;
     }
-    
+
     try {
         updateExecutionStatus('running', `Executing tests with tag: ${tag}...`);
         addConsoleLog(`Starting tagged execution: ${tag}`, 'info');
-        
+
         const response = await fetch(`${API_BASE_URL}/scenarios/execute/tag/${tag}`, {
             method: 'POST'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             updateExecutionStatus('success', `Tagged tests completed: ${data.count} tests executed`);
             addConsoleLog(`? Tagged tests completed: ${data.count} tests`, 'success');
@@ -1226,11 +1277,11 @@ function updateExecutionStatus(status, message) {
     const textEl = document.getElementById('execution-status-text');
     const messageEl = document.getElementById('execution-message');
     const spinner = document.getElementById('execution-spinner');
-    
+
     statusEl.className = 'execution-status active ' + status;
     textEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
     messageEl.textContent = message;
-    
+
     if (status === 'running') {
         spinner.classList.remove('hidden');
     } else {
@@ -1246,12 +1297,12 @@ function updateProgressBar(current, total) {
 function addConsoleLog(message, type = 'info') {
     const console = document.getElementById('console-output');
     if (!console) return;
-    
+
     const timestamp = new Date().toLocaleTimeString();
     const line = document.createElement('div');
     line.className = `console-line ${type}`;
     line.textContent = `[${timestamp}] ${message}`;
-    
+
     console.appendChild(line);
     console.scrollTop = console.scrollHeight;
 }
@@ -1272,16 +1323,16 @@ function displayTestResult(result) {
 // Configuration View
 async function loadConfigurationView() {
     const view = document.getElementById('configuration-view');
-    
+
     view.innerHTML = '<div class="spinner"></div>';
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/configuration`);
         const data = await response.json();
-        
+
         if (data.success) {
             configuration = data.configuration;
-            
+
             view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-cog"></i> Configuration</h2>
@@ -1440,7 +1491,7 @@ async function saveConfiguration() {
 // Enhanced Results View with Filters and Advanced Features
 async function loadResultsView() {
     const view = document.getElementById('results-view');
-    
+
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-chart-bar"></i> Test Results</h2>
@@ -1560,7 +1611,7 @@ async function loadResultsView() {
             </div>
         </div>
     `;
-    
+
     // Add grid-4 CSS if not already added
     if (!document.getElementById('test-results-grid-css')) {
         const style = document.createElement('style');
@@ -1585,7 +1636,7 @@ async function loadResultsView() {
         `;
         document.head.appendChild(style);
     }
-    
+
     // Load and display test results
     await loadAndDisplayTestResults();
 }
@@ -1601,13 +1652,13 @@ async function loadAndDisplayTestResults() {
     try {
         const response = await fetch(`${API_BASE_URL}/history`);
         const data = await response.json();
-        
+
         if (data.success && data.history && data.history.length > 0) {
             allTestHistory = data.history;
-            
+
             // Populate filter dropdowns
             populateTestFilterDropdowns();
-            
+
             // Apply filters and display
             applyTestFilters();
         } else {
@@ -1625,13 +1676,13 @@ function populateTestFilterDropdowns() {
     // Get unique browsers
     const browsers = [...new Set(allTestHistory.map(h => h.browser || 'Chrome'))];
     const browserSelect = document.getElementById('filter-browser');
-    browserSelect.innerHTML = '<option value="">All</option>' + 
+    browserSelect.innerHTML = '<option value="">All</option>' +
         browsers.map(b => `<option value="${b}">${b}</option>`).join('');
-    
+
     // Get unique environments
     const environments = [...new Set(allTestHistory.map(h => h.environment || 'QA'))];
     const envSelect = document.getElementById('filter-environment');
-    envSelect.innerHTML = '<option value="">All</option>' + 
+    envSelect.innerHTML = '<option value="">All</option>' +
         environments.map(e => `<option value="${e}">${e}</option>`).join('');
 }
 
@@ -1641,31 +1692,31 @@ function applyTestFilters() {
     const browserFilter = document.getElementById('filter-browser').value;
     const envFilter = document.getElementById('filter-environment').value;
     const dateRangeFilter = document.getElementById('filter-date-range').value;
-    
+
     // Start with all history
     let filtered = [...allTestHistory];
-    
+
     // Apply status filter
     if (statusFilter) {
         filtered = filtered.filter(h => h.status === statusFilter);
     }
-    
+
     // Apply browser filter
     if (browserFilter) {
         filtered = filtered.filter(h => (h.browser || 'Chrome') === browserFilter);
     }
-    
+
     // Apply environment filter
     if (envFilter) {
         filtered = filtered.filter(h => (h.environment || 'QA') === envFilter);
     }
-    
+
     // Apply date range filter
     if (dateRangeFilter !== 'all') {
         const now = new Date();
         let startDate;
-        
-        switch(dateRangeFilter) {
+
+        switch (dateRangeFilter) {
             case 'today':
                 startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 break;
@@ -1676,17 +1727,17 @@ function applyTestFilters() {
                 startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
                 break;
         }
-        
+
         if (startDate) {
             filtered = filtered.filter(h => new Date(h.executedAt) >= startDate);
         }
     }
-    
+
     filteredTestHistory = filtered;
-    
+
     // Update statistics
     updateTestStatistics(filtered);
-    
+
     // Display filtered results
     displayFilteredTestResults(filtered);
 }
@@ -1696,11 +1747,11 @@ function updateTestStatistics(history) {
     const totalExecutions = history.length;
     const passedTests = history.filter(h => h.status === 'Passed').length;
     const failedTests = history.filter(h => h.status === 'Failed').length;
-    
+
     // Calculate average duration
     const totalDuration = history.reduce((sum, h) => sum + (parseFloat(h.duration) || 0), 0);
     const avgDuration = totalExecutions > 0 ? (totalDuration / totalExecutions).toFixed(2) : 0;
-    
+
     // Update stats
     document.getElementById('results-total-passed').textContent = passedTests;
     document.getElementById('results-total-failed').textContent = failedTests;
@@ -1711,7 +1762,7 @@ function updateTestStatistics(history) {
 // Display filtered test results with pagination
 function displayFilteredTestResults(history) {
     const container = document.getElementById('results-history-container');
-    
+
     if (history.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -1725,7 +1776,7 @@ function displayFilteredTestResults(history) {
         `;
         return;
     }
-    
+
     // Reset to page 1 when filters change
     currentPage = 1;
     displayResultsHistory(history);
@@ -1753,10 +1804,10 @@ function exportTestResults() {
         showWarning('No data to export');
         return;
     }
-    
+
     // CSV headers
     const headers = ['Test Name', 'Status', 'Duration (s)', 'Browser', 'Environment', 'Executed At', 'Module'];
-    
+
     // CSV rows
     const rows = filteredTestHistory.map(item => [
         item.scenarioName || 'Unknown',
@@ -1767,26 +1818,26 @@ function exportTestResults() {
         item.executedAt ? new Date(item.executedAt).toISOString() : '',
         item.module || 'N/A'
     ]);
-    
+
     // Combine headers and rows
     const csvContent = [
         headers.join(','),
         ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
     ].join('\n');
-    
+
     // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `test-results-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     showSuccess(`Exported ${filteredTestHistory.length} test results to CSV`);
 }
 
@@ -1832,27 +1883,27 @@ function normalizeScreenshotPath(path) {
 }
 
 function displayResultsHistory(historyList) {
-const container = document.getElementById('results-history-container');
-    
-if (!historyList || historyList.length === 0) {
-    container.innerHTML = `
+    const container = document.getElementById('results-history-container');
+
+    if (!historyList || historyList.length === 0) {
+        container.innerHTML = `
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
             <h3>No test results</h3>
             <p>Start executing tests to see results here</p>
         </div>
     `;
-    return;
-}
-    
-// Calculate pagination
-const totalRecords = historyList.length;
-const totalPages = Math.ceil(totalRecords / recordsPerPage);
-const startIndex = (currentPage - 1) * recordsPerPage;
-const endIndex = startIndex + recordsPerPage;
-const paginatedHistory = historyList.slice(startIndex, endIndex);
-    
-const html = `
+        return;
+    }
+
+    // Calculate pagination
+    const totalRecords = historyList.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+    const startIndex = (currentPage - 1) * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+    const paginatedHistory = historyList.slice(startIndex, endIndex);
+
+    const html = `
     <div style="overflow-x: auto;">
         <table id="results-table">
             <thead>
@@ -1872,30 +1923,30 @@ const html = `
             </thead>
             <tbody>
                 ${paginatedHistory.map((item, paginatedIndex) => {
-                    // Calculate original index in the full list
-                    const index = startIndex + paginatedIndex;
-                        const statusClass = item.status === 'Passed' ? 'success' : 
-                                          item.status === 'Failed' ? 'danger' : 'warning';
-                        const statusBadgeColor = item.status === 'Passed' ? '#10b981' : 
-                                                item.status === 'Failed' ? '#ef4444' : '#f59e0b';
-                        
-                        const executedDate = new Date(item.executedAt);
-                        const formattedDate = executedDate.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: false
-                        });
-                        
-                        const browser = item.browser || 'Chrome';
-                        const environment = item.environment || 'QA';
-                        const hasEvidence = item.steps && item.steps.some(s => s.screenshotPath);
-                        const hasLogs = item.steps && item.steps.length > 0;
-                        
-                        return `
+        // Calculate original index in the full list
+        const index = startIndex + paginatedIndex;
+        const statusClass = item.status === 'Passed' ? 'success' :
+            item.status === 'Failed' ? 'danger' : 'warning';
+        const statusBadgeColor = item.status === 'Passed' ? '#10b981' :
+            item.status === 'Failed' ? '#ef4444' : '#f59e0b';
+
+        const executedDate = new Date(item.executedAt);
+        const formattedDate = executedDate.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+
+        const browser = item.browser || 'Chrome';
+        const environment = item.environment || 'QA';
+        const hasEvidence = item.steps && item.steps.some(s => s.screenshotPath);
+        const hasLogs = item.steps && item.steps.length > 0;
+
+        return `
                             <tr class="result-row">
                                 <td>
                                     <input type="checkbox" class="result-checkbox" 
@@ -1929,7 +1980,7 @@ const html = `
                                 </td>
                             </tr>
                         `;
-                    }).join('')}
+    }).join('')}
                 </tbody>
             </table>
         </div>
@@ -1966,9 +2017,9 @@ const html = `
             </div>
         </div>
     `;
-    
+
     container.innerHTML = html;
-    
+
     // Store history data globally for access by view functions
     window.testResultsHistory = historyList;
 }
@@ -1979,12 +2030,12 @@ function generatePageButtons(currentPage, totalPages) {
     const maxButtons = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
     let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-    
+
     // Adjust start if we're near the end
     if (endPage - startPage < maxButtons - 1) {
         startPage = Math.max(1, endPage - maxButtons + 1);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
         const isActive = i === currentPage;
         buttons += `
@@ -1997,18 +2048,18 @@ function generatePageButtons(currentPage, totalPages) {
             </button>
         `;
     }
-    
+
     return buttons;
 }
 
 // Navigate to specific page
 function goToPage(page) {
     const totalPages = Math.ceil(filteredTestHistory.length / recordsPerPage);
-    
+
     if (page < 1 || page > totalPages) {
         return;
     }
-    
+
     currentPage = page;
     displayResultsHistory(filteredTestHistory);
 }
@@ -2027,19 +2078,19 @@ function handleCheckboxChange() {
 async function deleteSelectedTests() {
     const checkboxes = document.querySelectorAll('.result-checkbox:checked');
     const count = checkboxes.length;
-    
+
     if (count === 0) {
         showWarning('Please select at least one test to delete');
         return;
     }
-    
+
     // Get the test names
     const indices = Array.from(checkboxes).map(cb => parseInt(cb.value));
     const testNames = indices.map(index => {
         const test = window.testResultsHistory[index];
         return test.scenarioName;
     });
-    
+
     // Create display text for test names
     let testNamesDisplay;
     if (count === 1) {
@@ -2049,7 +2100,7 @@ async function deleteSelectedTests() {
     } else {
         testNamesDisplay = `${testNames.slice(0, 2).map(name => `<strong>${escapeHtml(name)}</strong>`).join(', ')} and <strong>${count - 2}</strong> more`;
     }
-    
+
     // Show confirmation modal - simple style matching reference screenshot
     const confirmModal = document.createElement('div');
     confirmModal.id = 'delete-confirmation-modal';
@@ -2066,7 +2117,7 @@ async function deleteSelectedTests() {
         justify-content: center;
         z-index: 10000;
     `;
-    
+
     confirmModal.innerHTML = `
         <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 6px; max-width: 400px; width: 90%; padding: 0; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
@@ -2092,14 +2143,14 @@ async function deleteSelectedTests() {
             </div>
         </div>
     `;
-    
+
     // Click on overlay background to close
-    confirmModal.onclick = function(e) {
+    confirmModal.onclick = function (e) {
         if (e.target === confirmModal) {
             closeDeleteConfirmation();
         }
     };
-    
+
     document.body.appendChild(confirmModal);
 }
 
@@ -2113,13 +2164,13 @@ function closeDeleteConfirmation() {
 async function confirmDelete() {
     const checkboxes = document.querySelectorAll('.result-checkbox:checked');
     const indices = Array.from(checkboxes).map(cb => parseInt(cb.value));
-    
+
     // Close confirmation modal
     closeDeleteConfirmation();
-    
+
     // Show loading
     showInfo('Deleting test results...');
-    
+
     try {
         // Get the test IDs to delete
         const testsToDelete = indices.map(index => {
@@ -2129,13 +2180,13 @@ async function confirmDelete() {
                 executedAt: test.executedAt
             };
         });
-        
+
         // Get test names for success message
         const testNames = indices.map(index => {
             const test = window.testResultsHistory[index];
             return test.scenarioName;
         });
-        
+
         // Call API to delete tests
         const response = await fetch(`${API_BASE_URL}/history/delete`, {
             method: 'DELETE',
@@ -2144,9 +2195,9 @@ async function confirmDelete() {
             },
             body: JSON.stringify({ tests: testsToDelete })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Build success message with scenario names
             let successMessage;
@@ -2157,12 +2208,12 @@ async function confirmDelete() {
             } else {
                 successMessage = `Successfully deleted ${testNames.length} test results: ${testNames.slice(0, 2).join(', ')} and ${testNames.length - 2} more`;
             }
-            
+
             showSuccess(successMessage);
-            
+
             // Reload the test results
             await loadAndDisplayTestResults();
-            
+
             // Note: Delete button stays visible (always shown)
         } else {
             showError(data.error || 'Failed to delete test results');
@@ -2176,14 +2227,14 @@ async function confirmDelete() {
 function viewEvidence(index) {
     const item = window.testResultsHistory[index];
     if (!item || !item.steps) return;
-    
+
     const stepsWithScreenshots = item.steps.filter(s => s.screenshotPath);
-    
+
     if (stepsWithScreenshots.length === 0) {
         showToast('No screenshots available for this test', 'warning');
         return;
     }
-    
+
     const modal = document.createElement('div');
     modal.id = 'evidence-modal';
     modal.className = 'modal-overlay';
@@ -2201,7 +2252,7 @@ function viewEvidence(index) {
         overflow-y: auto;
         padding: 20px;
     `;
-    
+
     modal.innerHTML = `
         <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 12px; max-width: 1200px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
             <div style="position: sticky; top: 0; background: white; border-bottom: 2px solid #e5e7eb; padding: 20px; z-index: 1; border-radius: 12px 12px 0 0;">
@@ -2243,21 +2294,21 @@ function viewEvidence(index) {
             </div>
         </div>
     `;
-    
+
     // Click on overlay background to close
-    modal.onclick = function(e) {
+    modal.onclick = function (e) {
         if (e.target === modal) {
             closeDynamicModal('evidence-modal');
         }
     };
-    
+
     document.body.appendChild(modal);
 }
 
 function viewLogs(index) {
     const item = window.testResultsHistory[index];
     if (!item || !item.steps) return;
-    
+
     const modal = document.createElement('div');
     modal.id = 'logs-modal';
     modal.className = 'modal-overlay';
@@ -2275,11 +2326,11 @@ function viewLogs(index) {
         overflow-y: auto;
         padding: 20px;
     `;
-    
+
     const totalSteps = item.steps.length;
     const passedSteps = item.steps.filter(s => s.status === 'Passed').length;
     const failedSteps = item.steps.filter(s => s.status === 'Failed').length;
-    
+
     modal.innerHTML = `
         <div class="modal-content" onclick="event.stopPropagation()" style="background: white; border-radius: 12px; max-width: 1400px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
             <div style="position: sticky; top: 0; background: white; border-bottom: 2px solid #e5e7eb; padding: 20px; z-index: 1; border-radius: 12px 12px 0 0;">
@@ -2330,13 +2381,13 @@ function viewLogs(index) {
                         </thead>
                         <tbody>
                             ${item.steps.map((step, idx) => {
-                                const statusColor = step.status === 'Passed' ? '#10b981' : 
-                                                  step.status === 'Failed' ? '#ef4444' : '#f59e0b';
-                                const statusBg = step.status === 'Passed' ? '#f0fdf4' : 
-                                               step.status === 'Failed' ? '#fef2f2' : '#fef3c7';
-                                const rowBg = step.status === 'Failed' ? '#fef2f2' : 'white';
-                                
-                                return `
+        const statusColor = step.status === 'Passed' ? '#10b981' :
+            step.status === 'Failed' ? '#ef4444' : '#f59e0b';
+        const statusBg = step.status === 'Passed' ? '#f0fdf4' :
+            step.status === 'Failed' ? '#fef2f2' : '#fef3c7';
+        const rowBg = step.status === 'Failed' ? '#fef2f2' : 'white';
+
+        return `
                                     <tr style="border-bottom: 1px solid #e5e7eb; background: ${rowBg};">
                                         <td style="padding: 16px; font-weight: 600; color: #3b82f6;">${idx + 1}</td>
                                         <td style="padding: 16px;">
@@ -2352,23 +2403,23 @@ function viewLogs(index) {
                                             </span>
                                         </td>
                                         <td style="padding: 16px;">
-                                            ${step.status === 'Passed' ? 
-                                                '<span style="color: #10b981; font-size: 13px;"><i class="fas fa-check"></i> Step executed successfully</span>' : 
-                                                step.error ? 
-                                                    `<div style="background: #fff7ed; border-left: 3px solid #ef4444; padding: 10px; border-radius: 4px;">
+                                            ${step.status === 'Passed' ?
+                '<span style="color: #10b981; font-size: 13px;"><i class="fas fa-check"></i> Step executed successfully</span>' :
+                step.error ?
+                    `<div style="background: #fff7ed; border-left: 3px solid #ef4444; padding: 10px; border-radius: 4px;">
                                                         <div style="color: #ef4444; font-weight: 600; font-size: 13px; margin-bottom: 4px;">
                                                             <i class="fas fa-exclamation-triangle"></i> Error:
                                                         </div>
                                                         <div style="color: #991b1b; font-size: 13px; font-family: 'Courier New', monospace;">
                                                             ${escapeHtml(step.error)}
                                                         </div>
-                                                    </div>` : 
-                                                '<span style="color: #6b7280; font-size: 13px;">No error details</span>'
-                                            }
+                                                    </div>` :
+                    '<span style="color: #6b7280; font-size: 13px;">No error details</span>'
+            }
                                         </td>
                                     </tr>
                                 `;
-                            }).join('')}
+    }).join('')}
                         </tbody>
                     </table>
                 </div>
@@ -2383,14 +2434,14 @@ function viewLogs(index) {
             </div>
         </div>
     `;
-    
+
     // Click on overlay background to close
-    modal.onclick = function(e) {
+    modal.onclick = function (e) {
         if (e.target === modal) {
             closeDynamicModal('logs-modal');
         }
     };
-    
+
     document.body.appendChild(modal);
 }
 
@@ -2417,7 +2468,7 @@ function openScreenshotModal(imagePath) {
         justify-content: center;
         z-index: 10000;
     `;
-    
+
     modal.innerHTML = `
         <div onclick="event.stopPropagation()" style="max-width: 90%; max-height: 90%; position: relative;">
             <button onclick="closeScreenshotModal()" style="position: absolute; top: -40px; right: 0; background: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px;">
@@ -2439,11 +2490,11 @@ function openScreenshotModal(imagePath) {
             </thead>
             <tbody>
                 ${history.slice(0, 20).map(item => {
-                    const statusIcon = item.status === 'Passed' ? '?' : '?';
-                    const statusClass = item.status === 'Passed' ? 'success' : 'danger';
-                    const executedDate = item.executedAt ? new Date(item.executedAt).toLocaleString() : 'Unknown';
-                    
-                    return `
+        const statusIcon = item.status === 'Passed' ? '?' : '?';
+        const statusClass = item.status === 'Passed' ? 'success' : 'danger';
+        const executedDate = item.executedAt ? new Date(item.executedAt).toLocaleString() : 'Unknown';
+
+        return `
                     <tr>
                         <td><strong>${escapeHtml(item.scenarioName || 'Unknown Test')}</strong></td>
                         <td><span class="badge badge-primary">${escapeHtml(item.module || 'N/A')}</span></td>
@@ -2456,18 +2507,18 @@ function openScreenshotModal(imagePath) {
                         <td>${executedDate}</td>
                     </tr>
                     `;
-                }).join('')}
+    }).join('')}
             </tbody>
         </table>
     `;
-    
+
     // Click on overlay background to close
-    modal.onclick = function(e) {
+    modal.onclick = function (e) {
         if (e.target === modal) {
             closeScreenshotModal();
         }
     };
-    
+
     document.body.appendChild(modal);
 }
 
@@ -2481,7 +2532,7 @@ function closeScreenshotModal() {
 // Documentation View
 function loadDocumentationView() {
     const view = document.getElementById('documentation-view');
-    
+
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-book"></i> Documentation</h2>
@@ -2529,10 +2580,10 @@ async function viewScenario(module, name) {
     try {
         const response = await fetch(`${API_BASE_URL}/scenarios/${module}/${name}`);
         const data = await response.json();
-        
+
         if (data.success) {
             const scenario = data.scenario;
-            
+
             showModal('Scenario Details', `
                 <div>
                     <div style="margin-bottom: 20px;">
@@ -2588,14 +2639,14 @@ async function deleteScenario(module, name) {
     if (!confirm(`Are you sure you want to delete "${name}"?`)) {
         return;
     }
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/scenarios/${module}/${name}`, {
             method: 'DELETE'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             showSuccess('Scenario deleted successfully');
             loadScenariosView();
@@ -2646,16 +2697,16 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.id = 'toast-notification';
     notification.className = `toast-notification toast-${type}`;
-    
+
     const icons = {
         success: 'fa-check-circle',
         error: 'fa-exclamation-circle',
         warning: 'fa-exclamation-triangle',
         info: 'fa-info-circle'
     };
-    
+
     const icon = icons[type] || icons.info;
-    
+
     notification.innerHTML = `
         <div style="display: flex; align-items: center; gap: 15px;">
             <i class="fas ${icon}" style="font-size: 1.5em;"></i>
@@ -2671,9 +2722,9 @@ function showNotification(message, type = 'info') {
             </button>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Auto-remove after 5 seconds
     setTimeout(() => {
         if (notification && notification.parentElement) {
@@ -2703,9 +2754,9 @@ function showConfirm(message, onConfirm, onCancel) {
 // Enhanced error handler with details
 function handleError(error, context = '') {
     console.error(`Error in ${context}:`, error);
-    
+
     let errorMessage = error.message || 'An unknown error occurred';
-    
+
     // Provide helpful error messages
     if (error.message && error.message.includes('fetch')) {
         errorMessage = 'Cannot connect to server. Make sure the Web UI is running.';
@@ -2714,7 +2765,7 @@ function handleError(error, context = '') {
     } else if (error.message && error.message.includes('Playwright')) {
         errorMessage = 'Playwright error. Make sure Playwright browsers are installed. Run: .\\InstallPlaywrightBrowsers.ps1';
     }
-    
+
     showError(context ? `${context}: ${errorMessage}` : errorMessage);
 }
 
@@ -2729,7 +2780,7 @@ function showLoading(message) {
             <div class="loading-message">${message || 'Loading...'}</div>
         </div>
     `;
-    
+
     document.body.appendChild(overlay);
 }
 
@@ -2738,4 +2789,199 @@ function hideLoading() {
     if (overlay) {
         overlay.remove();
     }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATA-DRIVEN EXECUTION — JavaScript Functions
+// ═══════════════════════════════════════════════════════════
+
+/** Populate dd-scenario dropdown when module changes */
+async function loadDDScenarios() {
+    const module = document.getElementById('dd-module')?.value;
+    if (!module) return;
+    try {
+        const r = await fetch(`${API_BASE_URL}/scenarios/module/${module}`);
+        const d = await r.json();
+        if (d.success) {
+            document.getElementById('dd-scenario').innerHTML =
+                '<option value="">Select Scenario</option>' +
+                d.scenarios.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+        }
+    } catch (e) { console.error('loadDDScenarios:', e); }
+}
+
+/** Handle file upload for data-driven test */
+function handleDDFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('dd-data').value = e.target.result;
+        // Auto-select format based on extension
+        const fmtSelect = document.getElementById('dd-format');
+        if (file.name.toLowerCase().endsWith('.json')) {
+            fmtSelect.value = 'JSON';
+        } else if (file.name.toLowerCase().endsWith('.csv')) {
+            fmtSelect.value = 'CSV';
+        }
+        showSuccess(`Loaded file: ${file.name}`);
+    };
+    reader.onerror = function () {
+        showError('Error reading file');
+    };
+    reader.readAsText(file);
+
+    // Reset file input so same file can be selected again
+    event.target.value = '';
+}
+
+/** Load sample CSV into the textarea */
+function loadSampleData() {
+    const fmt = document.getElementById('dd-format')?.value;
+    if (fmt === 'JSON') {
+        document.getElementById('dd-data').value =
+            JSON.stringify([
+                { username: 'standard_user', password: 'secret_sauce', expectedResult: 'success' },
+                { username: 'locked_out_user', password: 'secret_sauce', expectedResult: 'failure' }
+            ], null, 2);
+    } else {
+        document.getElementById('dd-data').value =
+            'username,password,expectedResult\nstandard_user,secret_sauce,success\nlocked_out_user,secret_sauce,failure';
+    }
+}
+
+/** Preview the data set columns + row count */
+async function previewDataSet() {
+    const dataContent = document.getElementById('dd-data')?.value?.trim();
+    const dataFormat = document.getElementById('dd-format')?.value || 'CSV';
+
+    if (!dataContent) { showError('Please enter some data first.'); return; }
+
+    try {
+        const r = await fetch(`${API_BASE_URL}/datadriven/preview`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dataFormat, dataContent })
+        });
+        const d = await r.json();
+
+        const area = document.getElementById('dd-preview-area');
+        const content = document.getElementById('dd-preview-content');
+
+        if (d.success) {
+            area.classList.remove('hidden');
+            content.innerHTML = `
+                <div style="margin-bottom:10px;">
+                    <strong style="color:#0369a1;">${d.rowCount} row(s)</strong> &nbsp;|&nbsp;
+                    Columns: ${d.columns.map(c => `<code style="background:#dbeafe;padding:2px 6px;border-radius:4px;margin:0 2px;">${escapeHtml(c)}</code>`).join(' ')}
+                </div>
+                <div style="overflow-x:auto;">
+                    <table style="font-size:0.85em;border-collapse:collapse;width:100%;">
+                        <thead style="background:#bfdbfe;">
+                            <tr>${d.columns.map(c => `<th style="padding:6px 10px;text-align:left;border:1px solid #93c5fd;">${escapeHtml(c)}</th>`).join('')}</tr>
+                        </thead>
+                        <tbody>
+                            ${(d.preview || []).map(row => `
+                                <tr style="background:#fff;">
+                                    ${d.columns.map(c => `<td style="padding:6px 10px;border:1px solid #e2e8f0;">${escapeHtml(row[c] || '')}</td>`).join('')}
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        } else {
+            showError('Preview failed: ' + d.error);
+        }
+    } catch (e) {
+        showError('Preview error: ' + e.message);
+    }
+}
+
+/** Execute data-driven test and display per-row results */
+async function executeDataDriven() {
+    const module = document.getElementById('dd-module')?.value;
+    const scenario = document.getElementById('dd-scenario')?.value;
+    const dataContent = document.getElementById('dd-data')?.value?.trim();
+    const dataFormat = document.getElementById('dd-format')?.value || 'CSV';
+
+    if (!module || !scenario) { showError('Please select a module and scenario.'); return; }
+    if (!dataContent) { showError('Please enter test data.'); return; }
+
+    const btn = document.getElementById('dd-execute-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+
+    try {
+        addConsoleLog(`[Data-Driven] Starting "${scenario}" with ${dataFormat} data...`, 'info');
+
+        const r = await fetch(`${API_BASE_URL}/datadriven/execute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ scenarioName: scenario, module, dataFormat, dataContent })
+        });
+        const d = await r.json();
+
+        if (d.success) {
+            addConsoleLog(`[Data-Driven] Completed. Passed: ${d.passed}, Failed: ${d.failed}`, d.failed > 0 ? 'warning' : 'success');
+            renderDataDrivenResults(d);
+        } else {
+            addConsoleLog('[Data-Driven] Execution failed: ' + d.error, 'error');
+            showError('Data-driven execution failed: ' + d.error);
+        }
+    } catch (e) {
+        addConsoleLog('[Data-Driven] Error: ' + e.message, 'error');
+        showError('Error: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-play"></i> Execute Data-Driven Test';
+    }
+}
+
+/** Render per-row results table */
+function renderDataDrivenResults(data) {
+    const area = document.getElementById('dd-results-area');
+    const summary = document.getElementById('dd-summary-bar');
+    const table = document.getElementById('dd-results-table');
+
+    area.classList.remove('hidden');
+
+    const allPassed = data.failed === 0;
+    summary.style.background = allPassed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)';
+    summary.style.borderLeft = `4px solid ${allPassed ? 'var(--success-color)' : 'var(--danger-color)'}`;
+    summary.style.borderRadius = '8px';
+    summary.innerHTML = `
+        <strong style="font-size:1.05em;">${allPassed ? '✅' : '⚠️'} Data-Driven Results: ${data.scenarioName}</strong>
+        &nbsp;&nbsp;
+        <span class="badge badge-success">✅ ${data.passed} Passed</span>
+        <span class="badge badge-danger" style="margin-left:6px;">❌ ${data.failed} Failed</span>
+        <span class="badge badge-info" style="margin-left:6px;">Total: ${data.totalRows} rows</span>`;
+
+    const cols = data.results.length > 0 ? Object.keys(data.results[0].dataRow) : [];
+    table.innerHTML = `
+        <table style="width:100%;border-collapse:collapse;font-size:0.88em;">
+            <thead style="background:#f9fafb;">
+                <tr>
+                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Row #</th>
+                    ${cols.map(c => `<th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">${escapeHtml(c)}</th>`).join('')}
+                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Status</th>
+                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Duration</th>
+                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.results.map(r => {
+        const passed = r.status === 'Passed';
+        const rowBg = passed ? '' : 'background:rgba(239,68,68,0.04);';
+        return `<tr style="${rowBg}">
+                        <td style="padding:10px;border-bottom:1px solid var(--border);">${r.rowNumber}</td>
+                        ${cols.map(c => `<td style="padding:10px;border-bottom:1px solid var(--border);">${escapeHtml(r.dataRow[c] || '')}</td>`).join('')}
+                        <td style="padding:10px;border-bottom:1px solid var(--border);">
+                            <span class="badge badge-${passed ? 'success' : 'danger'}">${passed ? '✅ Passed' : '❌ Failed'}</span>
+                        </td>
+                        <td style="padding:10px;border-bottom:1px solid var(--border);">${escapeHtml(r.duration)}</td>
+                        <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--danger-color);font-size:0.85em;">${escapeHtml(r.errorMessage || '')}</td>
+                    </tr>`;
+    }).join('')}
+            </tbody>
+        </table>`;
 }
