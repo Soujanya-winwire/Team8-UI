@@ -13,10 +13,10 @@ async function viewScenario(module, name) {
     try {
         const response = await fetch(`${API_BASE_URL}/scenarios/${module}/${name}`);
         const data = await response.json();
-        
+
         if (data.success) {
             const scenario = data.scenario;
-            
+
             // CRITICAL FIX: Convert backend executeAfterActionIndex to frontend afterActionIndex
             // This ensures assertions display correctly in the UI
             const assertions = (scenario.assertions || []).map(a => {
@@ -26,7 +26,7 @@ async function viewScenario(module, name) {
                     expectedValue: a.expectedValue,
                     description: a.description
                 };
-                
+
                 // Convert executeAfterActionIndex to afterActionIndex for frontend
                 // This is CRITICAL for rendering assertions in correct position
                 if (a.executeAfterActionIndex !== undefined && a.executeAfterActionIndex !== null) {
@@ -35,14 +35,14 @@ async function viewScenario(module, name) {
                 } else {
                     console.log(`?? Assertion without index: type=${a.type}, locator=${a.locator} (will show at end)`);
                 }
-                
+
                 return assertionWithIndex;
             });
-            
+
             console.log('?? Total assertions loaded:', assertions.length);
             console.log('?? Assertions with positions:', assertions.filter(a => a.afterActionIndex !== undefined).length);
             console.log('?? Assertions without positions:', assertions.filter(a => a.afterActionIndex === undefined).length);
-            
+
             currentEditingScenario = {
                 module: module,
                 name: name,
@@ -52,11 +52,11 @@ async function viewScenario(module, name) {
                 actions: JSON.parse(JSON.stringify(scenario.actions || [])), // Deep copy
                 assertions: assertions
             };
-            
+
             console.log('?? Current editing scenario:', currentEditingScenario);
             console.log('?? Actions count:', currentEditingScenario.actions.length);
             console.log('?? Assertions count:', currentEditingScenario.assertions.length);
-            
+
             renderScenarioModal();
         }
     } catch (error) {
@@ -70,7 +70,7 @@ async function viewScenario(module, name) {
  */
 function renderScenarioModal() {
     const scenario = currentEditingScenario;
-    
+
     showModal('Scenario Details', `
         <div style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
             <!-- Basic Info - Read Only Display -->
@@ -137,7 +137,7 @@ function renderScenarioModal() {
 function renderStepsList() {
     const actions = currentEditingScenario.actions;
     const assertions = currentEditingScenario.assertions;
-    
+
     if (actions.length === 0 && assertions.length === 0) {
         return `
             <div style="text-align: center; padding: 40px; background: #f9fafb; border-radius: 8px; border: 2px dashed #d1d5db;">
@@ -149,14 +149,14 @@ function renderStepsList() {
             </div>
         `;
     }
-    
+
     let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
-    
+
     // Render all actions (they maintain their original order)
     actions.forEach((action, actionIndex) => {
         html += renderStepItem(action, actionIndex, 'action');
     });
-    
+
     html += '</div>';
     return html;
 }
@@ -171,12 +171,12 @@ function renderStepItem(step, index, type) {
     const borderColor = isAction ? '#e5e7eb' : '#86efac';
     const iconColor = isAction ? '#3b82f6' : '#10b981';
     const iconBg = isAction ? '#eff6ff' : '#d1fae5';
-    
+
     // Get step type and details
     const stepType = isAction ? step.actionType : step.type;
     const locator = step.locator || '';
     const value = step.value || step.expectedValue || '';
-    
+
     // Build step description
     let stepDescription = '';
     if (isAction) {
@@ -220,7 +220,7 @@ function renderStepItem(step, index, type) {
                 stepDescription = `? ${stepType}: <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${escapeHtml(locator)}</code>`;
         }
     }
-    
+
     return `
         <div style="position: relative; background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 8px; padding: 12px; padding-left: 50px;">
             <!-- Step Number -->
@@ -282,31 +282,31 @@ function renderStepItem(step, index, type) {
 function renderAssertionsForStep(actionIndex) {
     // Filter assertions that are specifically tied to this action
     // Only show assertions that have afterActionIndex explicitly set to this index
-    const assertions = currentEditingScenario.assertions.filter(a => 
-        a.afterActionIndex !== undefined && 
-        a.afterActionIndex !== null && 
+    const assertions = currentEditingScenario.assertions.filter(a =>
+        a.afterActionIndex !== undefined &&
+        a.afterActionIndex !== null &&
         a.afterActionIndex === actionIndex
     );
-    
+
     console.log(`?? Rendering assertions for action index ${actionIndex}:`, assertions.length);
     console.log(`   Available assertions in scenario:`, currentEditingScenario.assertions.length);
     currentEditingScenario.assertions.forEach((a, idx) => {
         console.log(`   Assertion ${idx}: type=${a.type}, afterActionIndex=${a.afterActionIndex}, locator=${a.locator}`);
     });
-    
+
     if (assertions.length === 0) {
         console.log(`   ? No assertions found for action index ${actionIndex}`);
         return '';
     }
-    
+
     console.log(`   ? Found ${assertions.length} assertion(s) for action index ${actionIndex}`);
-    
+
     let html = '<div style="margin-top: 8px; margin-left: 8px; padding-left: 20px; border-left: 3px solid #86efac;">';
-    
+
     assertions.forEach((assertion, assertionIndex) => {
         const globalAssertionIndex = currentEditingScenario.assertions.indexOf(assertion);
         console.log(`      Rendering assertion ${assertionIndex}: type=${assertion.type}, globalIndex=${globalAssertionIndex}`);
-        
+
         html += `
             <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -332,7 +332,7 @@ function renderAssertionsForStep(actionIndex) {
             </div>
         `;
     });
-    
+
     html += '</div>';
     return html;
 }
@@ -343,7 +343,7 @@ function renderAssertionsForStep(actionIndex) {
 function getAssertionDescription(assertion) {
     const locator = assertion.locator || '';
     const value = assertion.expectedValue || '';
-    
+
     switch (assertion.type) {
         case 'ElementVisible':
             return `Element visible: <code style="background: #dcfce7; padding: 1px 4px; border-radius: 2px; font-size: 11px;">${escapeHtml(locator)}</code>`;
@@ -367,7 +367,7 @@ function addNewStep(position, type) {
     // Create modal for adding step
     const isAction = type === 'action';
     const title = isAction ? 'Add Test Step' : 'Add Assertion';
-    
+
     const modalContent = `
         <div style="padding: 20px;">
             <h4 style="margin-bottom: 20px; color: #1f2937;">
@@ -421,9 +421,9 @@ function addNewStep(position, type) {
             </div>
         </div>
     `;
-    
+
     showModal(title, modalContent);
-    
+
     // Initialize value field visibility
     handleStepTypeChange(isAction ? 'Click' : 'ElementVisible', isAction);
 }
@@ -434,19 +434,19 @@ function addNewStep(position, type) {
 function handleStepTypeChange(stepType, isAction) {
     const container = document.getElementById('value-field-container');
     if (!container) return;
-    
-    const needsValue = isAction 
+
+    const needsValue = isAction
         ? (stepType === 'Type' || stepType === 'Select')
         : (stepType === 'TextEquals' || stepType === 'TextContains');
-    
+
     if (needsValue) {
-        const label = isAction 
+        const label = isAction
             ? (stepType === 'Type' ? 'Text to Type' : 'Option to Select')
             : 'Expected Value';
         const placeholder = isAction
             ? (stepType === 'Type' ? 'Enter the text to type' : 'Select option text or value')
             : 'Enter expected text value';
-        
+
         container.innerHTML = `
             <div class="form-group">
                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
@@ -469,18 +469,18 @@ function saveNewStep(position, isAction) {
     const locator = document.getElementById('new-step-locator').value.trim();
     const valueField = document.getElementById('new-step-value');
     const value = valueField ? valueField.value.trim() : '';
-    
+
     // Validation
     if (!locator) {
         showError('Please enter a locator or URL');
         return;
     }
-    
+
     if ((stepType === 'Type' || stepType === 'Select' || stepType === 'TextEquals' || stepType === 'TextContains') && !value) {
         showError('Please enter a value');
         return;
     }
-    
+
     // Add the step
     if (isAction) {
         const newAction = {
@@ -490,7 +490,7 @@ function saveNewStep(position, isAction) {
         };
         currentEditingScenario.actions.splice(position, 0, newAction);
     }
-    
+
     closeModal();
     renderScenarioModal();
     showSuccess(`Step added successfully at position ${position + 1}`);
@@ -542,7 +542,7 @@ function addAssertionAfterStep(actionIndex) {
             </div>
         </div>
     `;
-    
+
     showModal('Add Assertion', modalContent);
     handleStepTypeChange('ElementVisible', false);
 }
@@ -555,18 +555,18 @@ function saveNewAssertion(actionIndex) {
     const locator = document.getElementById('new-assertion-locator').value.trim();
     const valueField = document.getElementById('new-step-value');
     const expectedValue = valueField ? valueField.value.trim() : '';
-    
+
     // Validation
     if (!locator) {
         showError('Please enter a locator or URL pattern');
         return;
     }
-    
+
     if ((assertionType === 'TextEquals' || assertionType === 'TextContains') && !expectedValue) {
         showError('Please enter an expected value');
         return;
     }
-    
+
     // Add the assertion
     const newAssertion = {
         type: assertionType,
@@ -574,9 +574,9 @@ function saveNewAssertion(actionIndex) {
         expectedValue: expectedValue,
         afterActionIndex: actionIndex
     };
-    
+
     currentEditingScenario.assertions.push(newAssertion);
-    
+
     closeModal();
     renderScenarioModal();
     showSuccess('Assertion added successfully');
@@ -589,7 +589,7 @@ function editStep(index, type) {
     const isAction = type === 'action';
     const step = isAction ? currentEditingScenario.actions[index] : currentEditingScenario.assertions[index];
     const title = isAction ? `Edit Step ${index + 1}` : `Edit Assertion ${index + 1}`;
-    
+
     const modalContent = `
         <div style="padding: 20px;">
             <h4 style="margin-bottom: 20px; color: #1f2937;">
@@ -641,13 +641,13 @@ function editStep(index, type) {
             </div>
         </div>
     `;
-    
+
     showModal(title, modalContent);
-    
+
     // Initialize with current values
     const stepType = isAction ? step.actionType : step.type;
     handleStepTypeChange(stepType, isAction);
-    
+
     // Set value if it exists
     setTimeout(() => {
         const valueField = document.getElementById('new-step-value');
@@ -665,13 +665,13 @@ function saveEditedStep(index, isAction) {
     const locator = document.getElementById('edit-step-locator').value.trim();
     const valueField = document.getElementById('new-step-value');
     const value = valueField ? valueField.value.trim() : '';
-    
+
     // Validation
     if (!locator) {
         showError('Please enter a locator or URL');
         return;
     }
-    
+
     // Update the step
     if (isAction) {
         currentEditingScenario.actions[index] = {
@@ -687,7 +687,7 @@ function saveEditedStep(index, isAction) {
             expectedValue: value
         };
     }
-    
+
     closeModal();
     renderScenarioModal();
     showSuccess('Step updated successfully');
@@ -706,7 +706,7 @@ function editAssertion(index) {
 function deleteStep(index, type) {
     const isAction = type === 'action';
     const stepNumber = index + 1;
-    
+
     if (confirm(`Are you sure you want to delete step ${stepNumber}?`)) {
         if (isAction) {
             currentEditingScenario.actions.splice(index, 1);
@@ -721,7 +721,7 @@ function deleteStep(index, type) {
                 }
             });
         }
-        
+
         renderScenarioModal();
         showSuccess(`Step ${stepNumber} deleted`);
     }
@@ -756,62 +756,90 @@ async function saveScenarioChanges() {
             showError('Start URL is required');
             return;
         }
-        
+
         if (currentEditingScenario.actions.length === 0) {
             if (!confirm('This scenario has no test steps. Save anyway?')) {
                 return;
             }
         }
-        
+
         console.log('?? Starting save process...');
         console.log('?? Current scenario state:');
         console.log('   Actions:', currentEditingScenario.actions.length);
         console.log('   Assertions:', currentEditingScenario.assertions.length);
-        
+
         // Build actions and assertions with proper execution order
         const orderedActions = [];
         const orderedAssertions = [];
-        
+
+        // Build unified steps collection to guarantee sequential execution order
+        const unifiedSteps = [];
+        let orderIndex = 0;
+
         currentEditingScenario.actions.forEach((action, actionIndex) => {
             // Add the action
             orderedActions.push(action);
-            
+            unifiedSteps.push({
+                order: orderIndex++,
+                stepName: 'Action_' + actionIndex,
+                stepType: 'Action',
+                action: action,
+                assertion: null
+            });
+
             // Find and add assertions that come after this action
             const assertionsForThisStep = currentEditingScenario.assertions.filter(
                 a => a.afterActionIndex === actionIndex
             );
-            
+
             console.log(`   Action ${actionIndex}: Found ${assertionsForThisStep.length} assertion(s)`);
-            
+
             assertionsForThisStep.forEach(assertion => {
-                // Include executeAfterActionIndex to tell backend where to run this assertion
+                // Include executeAfterActionIndex to tell backend where to run this assertion (legacy)
                 const savedAssertion = {
                     type: assertion.type,
                     locator: assertion.locator,
                     expectedValue: assertion.expectedValue,
-                    executeAfterActionIndex: actionIndex  // CRITICAL: Tells backend to execute after this action
+                    executeAfterActionIndex: actionIndex
                 };
                 orderedAssertions.push(savedAssertion);
+
+                // Add to unified steps model
+                unifiedSteps.push({
+                    order: orderIndex++,
+                    stepName: 'Assertion_' + savedAssertion.type,
+                    stepType: 'Assertion',
+                    action: null,
+                    assertion: savedAssertion
+                });
                 console.log(`      ? Saving assertion: type=${assertion.type}, executeAfterActionIndex=${actionIndex}, locator=${assertion.locator}`);
             });
         });
-        
+
         // Add any assertions that don't have a specific action index (legacy support)
         const unmatchedAssertions = currentEditingScenario.assertions.filter(
             a => a.afterActionIndex === undefined || a.afterActionIndex === null
         );
-        
+
         console.log(`   Unmatched assertions (will execute at end): ${unmatchedAssertions.length}`);
-        
+
         unmatchedAssertions.forEach(assertion => {
-            orderedAssertions.push({
+            const savedAssertion = {
                 type: assertion.type,
                 locator: assertion.locator,
                 expectedValue: assertion.expectedValue
-                // No executeAfterActionIndex - will run at end
+            };
+            orderedAssertions.push(savedAssertion);
+
+            unifiedSteps.push({
+                order: orderIndex++,
+                stepName: 'Assertion_' + savedAssertion.type,
+                stepType: 'Assertion',
+                action: null,
+                assertion: savedAssertion
             });
         });
-        
+
         const updatedScenario = {
             name: currentEditingScenario.name,
             module: currentEditingScenario.module,
@@ -819,16 +847,17 @@ async function saveScenarioChanges() {
             startUrl: currentEditingScenario.startUrl,
             tags: currentEditingScenario.tags,
             actions: orderedActions,
-            assertions: orderedAssertions
+            assertions: orderedAssertions,
+            steps: unifiedSteps
         };
-        
+
         console.log('?? Sending to backend:');
         console.log('   Actions:', orderedActions.length);
         console.log('   Assertions:', orderedAssertions.length);
         console.log('   Assertions payload:', JSON.stringify(orderedAssertions, null, 2));
-        
+
         showLoading('Saving changes...');
-        
+
         // Save via API
         const response = await fetch(`${API_BASE_URL}/scenarios/${currentEditingScenario.module}/${currentEditingScenario.name}`, {
             method: 'PUT',
@@ -837,17 +866,17 @@ async function saveScenarioChanges() {
             },
             body: JSON.stringify(updatedScenario)
         });
-        
+
         hideLoading();
-        
+
         const data = await response.json();
-        
+
         console.log('?? Backend response:', data);
-        
+
         if (data.success) {
             showSuccess('Scenario updated successfully! Assertions will now execute at the correct steps.');
             closeModal();
-            
+
             // Reload the current view
             if (currentView === 'scenarios') {
                 loadScenariosView();

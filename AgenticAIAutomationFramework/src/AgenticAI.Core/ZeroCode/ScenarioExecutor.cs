@@ -54,10 +54,10 @@ namespace AgenticAI.Core.ZeroCode
                 // Check if scenario uses new unified Steps model
                 if (scenario.Steps != null && scenario.Steps.Count > 0)
                 {
-                    // NEW APPROACH: Execute unified steps in order
+                    // NEW APPROACH: Execute unified steps in order they appear in the array
                     Logger.TestInfo(scenario.Name, $"Executing {scenario.Steps.Count} steps in sequence (unified model)");
                     
-                    var orderedSteps = scenario.Steps.OrderBy(s => s.Order).ToList();
+                    var orderedSteps = scenario.Steps.ToList();
                     
                     foreach (var step in orderedSteps)
                     {

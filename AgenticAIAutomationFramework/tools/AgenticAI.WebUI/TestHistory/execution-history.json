@@ -1,5 +1,93 @@
 [
   {
+    "ExecutionId": "025a232c-9cfc-4391-a509-2fa8eff2eca8",
+    "ScenarioName": "Assertion_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-23T06:26:22.5118917\u002B05:30",
+    "Duration": 11,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-23_06-26-14_156.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-23_06-26-14_582.png"
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait on ejfdkfkgdfklgjd",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Wait_2026-02-23_06-26-19_877.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click username field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-23_06-26-20_258.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter locked out username",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-23_06-26-20_585.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click password field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-23_06-26-20_984.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Enter password",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-23_06-26-21_293.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click login button - this will show error message",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-23_06-26-21_677.png"
+      },
+      {
+        "StepName": "Verify",
+        "Description": "Verify TextContains",
+        "Status": "Failed",
+        "Error": "Text does not contain expected value. Expected text to contain: \u0027This will not match the actual error message\u0027, but actual text was: \u0027Epic sadface: Sorry, this user has been locked out.\u0027",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Verify_FAILED_2026-02-23_06-26-21_940.png"
+      }
+    ],
+    "Error": "Text does not contain expected value. Expected text to contain: \u0027This will not match the actual error message\u0027, but actual text was: \u0027Epic sadface: Sorry, this user has been locked out.\u0027",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-23_06-26-14_156.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Navigate_2026-02-23_06-26-14_582.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Wait_2026-02-23_06-26-19_877.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-23_06-26-20_258.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-23_06-26-20_585.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-23_06-26-20_984.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Type_2026-02-23_06-26-21_293.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Click_2026-02-23_06-26-21_677.png",
+      "TestResults/Screenshots\\ErrorVerification\\Assertion_Failure_Test_Verify_FAILED_2026-02-23_06-26-21_940.png"
+    ]
+  },
+  {
     "ExecutionId": "155b4e0a-abaa-4802-b483-e8867a801285",
     "ScenarioName": "login9",
     "Module": "authentication",

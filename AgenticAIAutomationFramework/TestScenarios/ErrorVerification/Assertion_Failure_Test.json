@@ -1,5 +1,5 @@
 {
-  "ScenarioId": "9876fedc-ba09-8765-4321-fedcba098765",
+  "ScenarioId": "c4f63cca-44ec-42f3-a315-49f0826126ee",
   "Name": "Assertion_Failure_Test",
   "Description": "This test intentionally fails due to assertion mismatch - expects wrong text",
   "Module": "ErrorVerification",
@@ -15,6 +15,14 @@
       "Locator": "https://www.saucedemo.com",
       "Value": null,
       "Description": "Navigate to SauceDemo",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Wait",
+      "Locator": "ejfdkfkgdfklgjd",
+      "Value": "",
+      "Description": null,
       "Metadata": {},
       "Timestamp": 0
     },
@@ -64,9 +72,115 @@
       "Type": "TextContains",
       "Locator": "[data-test='error']",
       "ExpectedValue": "This will not match the actual error message",
-      "Description": "INTENTIONAL FAILURE: Assert wrong error message text"
+      "Description": null,
+      "ExecuteAfterActionIndex": null
     }
   ],
-  "CreatedAt": "2026-02-22T10:00:00.0000000+05:30",
-  "ModifiedAt": "2026-02-22T10:00:00.0000000+05:30"
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://www.saucedemo.com",
+        "Value": null,
+        "Description": "Navigate to SauceDemo",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Wait",
+        "Locator": "ejfdkfkgdfklgjd",
+        "Value": "",
+        "Description": null,
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#user-name",
+        "Value": null,
+        "Description": "Click username field",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#user-name",
+        "Value": "locked_out_user",
+        "Description": "Enter locked out username",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#password",
+        "Value": null,
+        "Description": "Click password field",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#password",
+        "Value": "secret_sauce",
+        "Description": "Enter password",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#login-button",
+        "Value": null,
+        "Description": "Click login button - this will show error message",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 7,
+      "Action": null,
+      "Assertion": {
+        "Type": "TextContains",
+        "Locator": "[data-test='error']",
+        "ExpectedValue": "This will not match the actual error message",
+        "Description": null,
+        "ExecuteAfterActionIndex": null
+      }
+    }
+  ],
+  "CreatedAt": "2026-02-23T06:25:55.1855852+05:30",
+  "ModifiedAt": "2026-02-23T06:25:55.1977337+05:30"
 }
