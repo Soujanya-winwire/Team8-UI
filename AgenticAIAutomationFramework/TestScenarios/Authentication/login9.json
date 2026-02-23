@@ -1,5 +1,5 @@
 {
-  "ScenarioId": "b06d79e1-af0c-4aca-ac41-2f8f1910384f",
+  "ScenarioId": "68bd3fa5-38f4-4e16-bea3-0fcd1fda4e81",
   "Name": "login9",
   "Description": "",
   "Module": "authentication",
@@ -39,6 +39,14 @@
       "Description": "Type \"secret\" into [data-test=\"password\"]",
       "Metadata": {},
       "Timestamp": 3
+    },
+    {
+      "ActionType": "Wait",
+      "Locator": "test",
+      "Value": "",
+      "Description": null,
+      "Metadata": {},
+      "Timestamp": 0
     },
     {
       "ActionType": "Type",
@@ -131,6 +139,19 @@
       "StepType": "Action",
       "Order": 4,
       "Action": {
+        "ActionType": "Wait",
+        "Locator": "test",
+        "Value": "",
+        "Description": null,
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
         "ActionType": "Type",
         "Locator": "[data-test=\"password\"]",
         "Value": "secret_sauce",
@@ -142,7 +163,7 @@
     },
     {
       "StepType": "Action",
-      "Order": 5,
+      "Order": 6,
       "Action": {
         "ActionType": "Click",
         "Locator": "[data-test=\"login-button\"]",
@@ -155,7 +176,7 @@
     },
     {
       "StepType": "Action",
-      "Order": 6,
+      "Order": 7,
       "Action": {
         "ActionType": "Click",
         "Locator": "[data-test=\"secondary-header\"]",
@@ -168,7 +189,7 @@
     },
     {
       "StepType": "Action",
-      "Order": 7,
+      "Order": 8,
       "Action": {
         "ActionType": "Click",
         "Locator": "[data-test=\"item-4-title-link\"]",
@@ -180,6 +201,6 @@
       "Assertion": null
     }
   ],
-  "CreatedAt": "2026-02-23T05:57:10.3904613+05:30",
-  "ModifiedAt": "2026-02-23T05:57:10.3916503+05:30"
+  "CreatedAt": "2026-02-23T06:16:11.7427829+05:30",
+  "ModifiedAt": "2026-02-23T06:16:11.744408+05:30"
 }

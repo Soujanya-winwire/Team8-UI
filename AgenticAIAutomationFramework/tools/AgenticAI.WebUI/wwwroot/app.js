@@ -438,29 +438,47 @@ function displayAllScenarios(scenariosList) {
         // Action buttons
         const actionsCell = document.createElement('td');
 
-        // Execute button
+        const actionsWrapper = document.createElement('div');
+        actionsWrapper.style.display = 'flex';
+        actionsWrapper.style.gap = '8px';
+        actionsWrapper.style.alignItems = 'center';
+        actionsWrapper.style.flexWrap = 'nowrap';
+        actionsWrapper.style.justifyContent = 'flex-start';
+
+        // Base styling for modern, premium minimalist icon buttons
+        const baseIconStyle = 'width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 13px; background: transparent;';
+
+        // Execute button (Green)
         const executeBtn = document.createElement('button');
-        executeBtn.className = 'btn btn-success btn-icon';
-        executeBtn.title = 'Execute';
+        executeBtn.title = 'Execute Scenario';
+        executeBtn.style.cssText = baseIconStyle + 'color: #10b981;';
+        executeBtn.onmouseover = () => { executeBtn.style.background = '#d1fae5'; };
+        executeBtn.onmouseout = () => { executeBtn.style.background = 'transparent'; };
         executeBtn.innerHTML = '<i class="fas fa-play"></i>';
         executeBtn.onclick = () => executeScenario(scenario.module, scenario.name);
-        actionsCell.appendChild(executeBtn);
+        actionsWrapper.appendChild(executeBtn);
 
-        // View button
+        // View button (Gray/Blue)
         const viewBtn = document.createElement('button');
-        viewBtn.className = 'btn btn-secondary btn-icon';
         viewBtn.title = 'View Details';
+        viewBtn.style.cssText = baseIconStyle + 'color: #64748b;';
+        viewBtn.onmouseover = () => { viewBtn.style.background = '#f1f5f9'; viewBtn.style.color = '#334155'; };
+        viewBtn.onmouseout = () => { viewBtn.style.background = 'transparent'; viewBtn.style.color = '#64748b'; };
         viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
         viewBtn.onclick = () => viewScenario(scenario.module, scenario.name);
-        actionsCell.appendChild(viewBtn);
+        actionsWrapper.appendChild(viewBtn);
 
-        // Delete button
+        // Delete button (Red)
         const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-danger btn-icon';
-        deleteBtn.title = 'Delete';
+        deleteBtn.title = 'Delete Scenario';
+        deleteBtn.style.cssText = baseIconStyle + 'color: #ef4444;';
+        deleteBtn.onmouseover = () => { deleteBtn.style.background = '#fee2e2'; };
+        deleteBtn.onmouseout = () => { deleteBtn.style.background = 'transparent'; };
         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
         deleteBtn.onclick = () => deleteScenario(scenario.module, scenario.name);
-        actionsCell.appendChild(deleteBtn);
+        actionsWrapper.appendChild(deleteBtn);
+
+        actionsCell.appendChild(actionsWrapper);
 
         row.appendChild(actionsCell);
         tbody.appendChild(row);

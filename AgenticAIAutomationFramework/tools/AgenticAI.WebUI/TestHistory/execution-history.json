@@ -1,5 +1,141 @@
 [
   {
+    "ExecutionId": "155b4e0a-abaa-4802-b483-e8867a801285",
+    "ScenarioName": "login9",
+    "Module": "authentication",
+    "ExecutedAt": "2026-02-23T06:16:38.1954229\u002B05:30",
+    "Duration": 12,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Navigate_2026-02-23_06-16-28_329.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-28_906.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022problem_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Type_2026-02-23_06-16-29_309.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-29_684.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Type_2026-02-23_06-16-29_967.png"
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait on test",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Wait_2026-02-23_06-16-35_253.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Type_2026-02-23_06-16-35_621.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-36_513.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022ProductsName (A to Z)Name (A to Z)Name (Z to A)Pri\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-37_006.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on \u0022Sauce Labs Backpack\u0022",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-37_537.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\authentication\\login9_Navigate_2026-02-23_06-16-28_329.png",
+      "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-28_906.png",
+      "TestResults/Screenshots\\authentication\\login9_Type_2026-02-23_06-16-29_309.png",
+      "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-29_684.png",
+      "TestResults/Screenshots\\authentication\\login9_Type_2026-02-23_06-16-29_967.png",
+      "TestResults/Screenshots\\authentication\\login9_Wait_2026-02-23_06-16-35_253.png",
+      "TestResults/Screenshots\\authentication\\login9_Type_2026-02-23_06-16-35_621.png",
+      "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-36_513.png",
+      "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-37_006.png",
+      "TestResults/Screenshots\\authentication\\login9_Click_2026-02-23_06-16-37_537.png"
+    ]
+  },
+  {
+    "ExecutionId": "48f57aa6-54f6-4fb5-92c6-62abba1703e2",
+    "ScenarioName": "Wrong_Locator_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-02-23T06:14:56.4297552\u002B05:30",
+    "Duration": 34,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-23_06-14-18_000.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-23_06-14-18_470.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "INTENTIONAL FAILURE: Click on wrong username field locator",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#wrong-username-field-id\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Click_FAILED_2026-02-23_06-14-48_974.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#wrong-username-field-id\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-23_06-14-18_000.png",
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Navigate_2026-02-23_06-14-18_470.png",
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Click_FAILED_2026-02-23_06-14-48_974.png"
+    ]
+  },
+  {
     "ExecutionId": "0ea89d16-fa38-4013-ba6b-93d6a13e5809",
     "ScenarioName": "User_Login_Test",
     "Module": "Authentication",
