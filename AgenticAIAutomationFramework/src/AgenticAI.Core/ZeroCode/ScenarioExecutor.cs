@@ -351,6 +351,15 @@ namespace AgenticAI.Core.ZeroCode
                         }
                         break;
 
+                    case "elementnotvisible":
+                        var elementNotVisible = await _driver.FindElementAsync(assertion.Locator);
+                        var isStillVisible = await elementNotVisible.IsVisibleAsync();
+                        if (isStillVisible)
+                        {
+                            throw new Exception($"Element is still visible (expected it to be hidden): {assertion.Locator}");
+                        }
+                        break;
+
                     case "textequals":
                         var actualText = await _driver.GetTextAsync(assertion.Locator);
                         if (actualText != assertion.ExpectedValue)
@@ -369,6 +378,14 @@ namespace AgenticAI.Core.ZeroCode
                         Logger.Info($"Text contains assertion passed. Expected to contain: '{assertion.ExpectedValue}', Actual text: '{text}'");
                         break;
 
+                    case "textnotcontains":
+                        var textNotContains = await _driver.GetTextAsync(assertion.Locator);
+                        if (textNotContains.Contains(assertion.ExpectedValue ?? ""))
+                        {
+                            throw new Exception($"Text contains unexpected value. Expected text to NOT contain: '{assertion.ExpectedValue}', but actual text was: '{textNotContains}'");
+                        }
+                        break;
+
                     case "urlcontains":
                         var currentUrl = await _driver.GetCurrentUrlAsync();
                         if (!currentUrl.Contains(assertion.ExpectedValue ?? ""))
@@ -382,6 +399,38 @@ namespace AgenticAI.Core.ZeroCode
                         if (title != assertion.ExpectedValue)
                         {
                             throw new Exception($"Title mismatch. Expected: {assertion.ExpectedValue}, Actual: {title}");
+                        }
+                        break;
+
+                    case "titlecontains":
+                        var titleContains = await _driver.GetTitleAsync();
+                        if (!titleContains.Contains(assertion.ExpectedValue ?? ""))
+                        {
+                            throw new Exception($"Title does not contain expected value. Expected: {assertion.ExpectedValue}, Actual title: {titleContains}");
+                        }
+                        break;
+
+                    case "elementexists":
+                        var elements = await _driver.FindElementsAsync(assertion.Locator);
+                        if (elements == null || elements.Count == 0)
+                        {
+                            throw new Exception($"Element does not exist in the DOM: {assertion.Locator}");
+                        }
+                        break;
+
+                    case "elementnotexists":
+                        var elementsNotExist = await _driver.FindElementsAsync(assertion.Locator);
+                        if (elementsNotExist != null && elementsNotExist.Count > 0)
+                        {
+                            throw new Exception($"Element exists in the DOM but was expected to be absent: {assertion.Locator}");
+                        }
+                        break;
+
+                    case "valueequals":
+                        var domValue = await _driver.GetAttributeAsync(assertion.Locator, "value");
+                        if (domValue != assertion.ExpectedValue)
+                        {
+                            throw new Exception($"Value mismatch. Expected: '{assertion.ExpectedValue}', Actual: '{domValue}'");
                         }
                         break;
 

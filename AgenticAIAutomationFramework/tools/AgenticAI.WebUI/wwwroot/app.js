@@ -594,11 +594,32 @@ function loadCreateView() {
                             <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('ElementVisible')">
                                 <i class="fas fa-eye"></i> Visible
                             </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('ElementNotVisible')">
+                                <i class="fas fa-eye-slash"></i> Not Visible
+                            </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('ElementExists')">
+                                <i class="fas fa-plus-square"></i> Exists
+                            </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('ElementNotExists')">
+                                <i class="fas fa-minus-square"></i> Not Exists
+                            </button>
                             <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('TextEquals')">
                                 <i class="fas fa-equals"></i> Text Equals
                             </button>
                             <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('TextContains')">
                                 <i class="fas fa-font"></i> Contains
+                            </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('TextNotContains')">
+                                <i class="fas fa-strikethrough"></i> Not Contains
+                            </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('ValueEquals')">
+                                <i class="fas fa-keyboard"></i> Value Equals
+                            </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('TitleEquals')">
+                                <i class="fas fa-window-maximize"></i> Title Equals
+                            </button>
+                            <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('TitleContains')">
+                                <i class="fas fa-window-restore"></i> Title Contains
                             </button>
                             <button type="button" class="btn btn-success btn-icon" onclick="addAssertion('UrlContains')">
                                 <i class="fas fa-link"></i> URL Contains
@@ -623,6 +644,138 @@ function loadCreateView() {
     window.currentActions = [];
     window.currentAssertions = [];
 }
+
+function addAction(type) {
+    if (!window.currentActions) window.currentActions = [];
+    window.currentActions.push({
+        actionType: type,
+        locator: '',
+        value: ''
+    });
+    renderActions();
+}
+
+function addAssertion(type) {
+    if (!window.currentAssertions) window.currentAssertions = [];
+    window.currentAssertions.push({
+        type: type,
+        locator: '',
+        expectedValue: '',
+        description: ''
+    });
+    renderAssertions();
+}
+
+function renderActions() {
+    const list = document.getElementById('actions-list');
+    if (!list) return;
+    list.innerHTML = window.currentActions.map((action, index) => `
+        <div class="action-item" style="margin-bottom: 10px; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px;">
+            <div style="flex: 1;">
+                <div class="action-type" style="font-weight: 600; color: var(--primary-color); margin-bottom: 8px;">${action.actionType}</div>
+                <div class="grid-2">
+                    <input type="text" class="form-control" placeholder="Locator (ID, XPath, CSS)" value="${action.locator || ''}" 
+                           onchange="window.currentActions[${index}].locator = this.value">
+                    <input type="text" class="form-control" placeholder="Value (optional)" value="${action.value || ''}" 
+                           onchange="window.currentActions[${index}].value = this.value">
+                </div>
+            </div>
+            <button type="button" class="btn btn-danger btn-icon" style="margin-left: 15px;" onclick="removeAction(${index})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+function renderAssertions() {
+    const list = document.getElementById('assertions-list');
+    if (!list) return;
+    list.innerHTML = window.currentAssertions.map((assertion, index) => `
+        <div class="action-item" style="margin-bottom: 10px; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px;">
+            <div style="flex: 1;">
+                <div class="action-type" style="font-weight: 600; color: var(--success-color); margin-bottom: 8px;">${assertion.type}</div>
+                <div class="grid-3">
+                    <input type="text" class="form-control" placeholder="Locator" value="${assertion.locator || ''}" 
+                           onchange="window.currentAssertions[${index}].locator = this.value">
+                    <input type="text" class="form-control" placeholder="Expected Value" value="${assertion.expectedValue || ''}" 
+                           onchange="window.currentAssertions[${index}].expectedValue = this.value">
+                    <input type="text" class="form-control" placeholder="Description" value="${assertion.description || ''}" 
+                           onchange="window.currentAssertions[${index}].description = this.value">
+                </div>
+            </div>
+            <button type="button" class="btn btn-danger btn-icon" style="margin-left: 15px;" onclick="removeAssertion(${index})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+function removeAction(index) {
+    window.currentActions.splice(index, 1);
+    renderActions();
+}
+
+function removeAssertion(index) {
+    window.currentAssertions.splice(index, 1);
+    renderAssertions();
+}
+
+async function saveScenario(event) {
+    if (event) event.preventDefault();
+
+    const name = document.getElementById('scenario-name').value;
+    const module = document.getElementById('scenario-module').value;
+    const description = document.getElementById('scenario-description').value;
+    const startUrl = document.getElementById('scenario-url').value;
+    const tagsStr = document.getElementById('scenario-tags').value;
+    const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+
+    if (!name || !module || !startUrl) {
+        showError('Please fill in all required fields');
+        return;
+    }
+
+    const scenario = {
+        name,
+        module,
+        description,
+        startUrl,
+        tags,
+        actions: window.currentActions,
+        assertions: window.currentAssertions
+    };
+
+    try {
+        showLoading('Saving scenario...');
+        const response = await fetch(`${API_BASE_URL}/scenarios`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scenario)
+        });
+        const data = await response.json();
+        hideLoading();
+
+        if (data.success) {
+            showSuccess('Scenario saved successfully!');
+            showView('scenarios');
+        } else {
+            showError(data.error || 'Failed to save scenario');
+        }
+    } catch (error) {
+        hideLoading();
+        showError('Error saving scenario: ' + error.message);
+    }
+}
+
+function clearCreateForm() {
+    const form = document.getElementById('create-scenario-form');
+    if (form) form.reset();
+    window.currentActions = [];
+    window.currentAssertions = [];
+    renderActions();
+    renderAssertions();
+}
+
 
 let currentActions = [];
 let currentAssertions = [];
