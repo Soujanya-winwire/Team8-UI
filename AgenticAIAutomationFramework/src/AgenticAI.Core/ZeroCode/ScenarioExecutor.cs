@@ -219,6 +219,22 @@ namespace AgenticAI.Core.ZeroCode
                 // Normalize action type
                 var actionType = (action.ActionType ?? string.Empty).ToLower().Trim();
 
+                // Implicit Wait (Selenium IDE style) - Wait for element to be ready before action
+                if (!string.IsNullOrEmpty(action.Locator) && 
+                    actionType != "navigate" && 
+                    actionType != "wait" && 
+                    actionType != "waitforelement")
+                {
+                    try
+                    {
+                        await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
+                    }
+                    catch (Exception waitEx)
+                    {
+                        Logger.Debug($"Implicit wait failed or timed out: {waitEx.Message}. Proceeding with action...");
+                    }
+                }
+
                 switch (actionType)
                 {
                     case "click":
@@ -243,8 +259,46 @@ namespace AgenticAI.Core.ZeroCode
                     case "select":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await _driver.TypeAsync(action.Locator, action.Value!);
+                            await _driver.SelectOptionAsync(action.Locator, action.Value!);
                         }
+                        break;
+
+                    case "check":
+                    {
+                        // If value is set and locator is a name-based selector, build a specific locator
+                        // to avoid strict mode violations when multiple inputs share the same name (e.g. radio groups)
+                        var checkLocator = action.Locator;
+                        if (!string.IsNullOrEmpty(action.Value) &&
+                            !string.IsNullOrEmpty(action.Locator) &&
+                            action.Locator.Contains("[name="))
+                        {
+                            // Combine name + value to create a unique CSS selector
+                            checkLocator = $"{action.Locator}[value=\"{action.Value}\"]"; 
+                        }
+                        await _driver.CheckAsync(checkLocator);
+                        break;
+                    }
+
+                    case "uncheck":
+                    {
+                        var uncheckLocator = action.Locator;
+                        if (!string.IsNullOrEmpty(action.Value) &&
+                            !string.IsNullOrEmpty(action.Locator) &&
+                            action.Locator.Contains("[name="))
+                        {
+                            uncheckLocator = $"{action.Locator}[value=\"{action.Value}\"]"; 
+                        }
+                        await _driver.UncheckAsync(uncheckLocator);
+                        break;
+                    }
+
+                    case "hover":
+                    case "mousemove":
+                        await _driver.HoverAsync(action.Locator);
+                        break;
+
+                    case "scroll":
+                        await _driver.ScrollToAsync(action.Locator);
                         break;
 
                     case "wait":

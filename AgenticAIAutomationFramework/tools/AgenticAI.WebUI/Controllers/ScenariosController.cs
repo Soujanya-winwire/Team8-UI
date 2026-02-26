@@ -37,7 +37,7 @@ namespace AgenticAI.WebUI.Controllers
                 {
                     success = true,
                     count = scenarios.Count,
-                    scenarios = scenarios.Select(s => new
+                    scenarios = scenarios.OrderByDescending(s => s.CreatedAt).Select(s => new
                     {
                         s.ScenarioId,
                         s.Name,

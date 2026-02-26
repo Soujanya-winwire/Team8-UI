@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '/api';
 
 // SignalR Connection
 let connection = null;
@@ -26,9 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 // SignalR Initialization
 async function initializeSignalR() {
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5000/testExecutionHub")
+        .withUrl("/testExecutionHub")
         .withAutomaticReconnect()
         .build();
+
+    connection.on("ReceiveRecordedAction", (action) => {
+        console.log("?? Recorded Action Captured:", action);
+        updateRecordingTable(action);
+    });
 
     connection.on("ReceiveTestUpdate", (testName, status, message) => {
         addConsoleLog(message, status);
@@ -582,6 +587,21 @@ function loadCreateView() {
                             <button type="button" class="btn btn-primary btn-icon" onclick="addAction('Wait')">
                                 <i class="fas fa-clock"></i> Wait
                             </button>
+                            <button type="button" class="btn btn-primary btn-icon" onclick="addAction('Check')">
+                                <i class="fas fa-check-square"></i> Check
+                            </button>
+                            <button type="button" class="btn btn-primary btn-icon" onclick="addAction('Uncheck')">
+                                <i class="fas fa-square"></i> Uncheck
+                            </button>
+                            <button type="button" class="btn btn-primary btn-icon" onclick="addAction('Hover')">
+                                <i class="fas fa-hand-pointer"></i> Hover
+                            </button>
+                            <button type="button" class="btn btn-primary btn-icon" onclick="addAction('Scroll')">
+                                <i class="fas fa-arrows-alt-v"></i> Scroll
+                            </button>
+                            <button type="button" class="btn btn-primary btn-icon" onclick="addAction('Select')">
+                                <i class="fas fa-list-ul"></i> Select
+                            </button>
                         </div>
                     </div>
                     <div id="actions-list"></div>
@@ -669,22 +689,30 @@ function addAssertion(type) {
 function renderActions() {
     const list = document.getElementById('actions-list');
     if (!list) return;
-    list.innerHTML = window.currentActions.map((action, index) => `
-        <div class="action-item" style="margin-bottom: 10px; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px;">
-            <div style="flex: 1;">
-                <div class="action-type" style="font-weight: 600; color: var(--primary-color); margin-bottom: 8px;">${action.actionType}</div>
-                <div class="grid-2">
-                    <input type="text" class="form-control" placeholder="Locator (ID, XPath, CSS)" value="${action.locator || ''}" 
-                           onchange="window.currentActions[${index}].locator = this.value">
-                    <input type="text" class="form-control" placeholder="Value (optional)" value="${action.value || ''}" 
-                           onchange="window.currentActions[${index}].value = this.value">
+    list.innerHTML = window.currentActions.map((action, index) => {
+        const noValueActions = ['Hover', 'Scroll', 'Click'];
+        const isNoValue = noValueActions.includes(action.actionType);
+        const placeholder = action.actionType === 'Select' ? 'Option text or value' : 'Value (optional)';
+
+        return `
+            <div class="action-item" style="margin-bottom: 10px; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px;">
+                <div style="flex: 1;">
+                    <div class="action-type" style="font-weight: 600; color: var(--primary-color); margin-bottom: 8px;">${action.actionType}</div>
+                    <div class="${isNoValue ? 'grid-1' : 'grid-2'}">
+                        <input type="text" class="form-control" placeholder="Locator (ID, XPath, CSS)" value="${action.locator || ''}" 
+                               onchange="window.currentActions[${index}].locator = this.value">
+                        ${!isNoValue ? `
+                            <input type="text" class="form-control" placeholder="${placeholder}" value="${action.value || ''}" 
+                                   onchange="window.currentActions[${index}].value = this.value">
+                        ` : ''}
+                    </div>
                 </div>
+                <button type="button" class="btn btn-danger btn-icon" style="margin-left: 15px;" onclick="removeAction(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-            <button type="button" class="btn btn-danger btn-icon" style="margin-left: 15px;" onclick="removeAction(${index})">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderAssertions() {
@@ -963,8 +991,63 @@ async function loadRecordView() {
                     </div>
                 </div>
             </div>
+            <div id="recording-live-actions" class="hidden mt-20">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-list"></i> Recorded Actions (Live)</div>
+                        <span class="badge badge-primary" id="live-action-count">0 steps</span>
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Action</th>
+                                    <th>Locator</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="live-actions-body">
+                                <!-- Actions will be added here in real-time -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
+
+    // Reset live actions
+    window.recordedActions = [];
+}
+
+let recordedActions = [];
+
+function updateRecordingTable(action) {
+    if (!window.recordedActions) window.recordedActions = [];
+    window.recordedActions.push(action);
+
+    const container = document.getElementById('recording-live-actions');
+    if (container) container.classList.remove('hidden');
+
+    const countEl = document.getElementById('live-action-count');
+    if (countEl) countEl.textContent = `${window.recordedActions.length} steps`;
+
+    const body = document.getElementById('live-actions-body');
+    if (body) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${window.recordedActions.length}</td>
+            <td><span class="badge badge-info">${action.actionType}</span></td>
+            <td style="font-family: monospace; font-size: 0.85em; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${action.locator}">${action.locator}</td>
+            <td>${action.value || '-'}</td>
+        `;
+        body.appendChild(row);
+
+        // Auto-scroll to bottom
+        const scrollContainer = body.parentElement.parentElement;
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
 }
 
 async function startAssistedRecording(event) {
@@ -1001,6 +1084,14 @@ async function startAssistedRecording(event) {
             document.getElementById('start-recording-btn').disabled = true;
             document.getElementById('stop-recording-btn').disabled = false;
             document.getElementById('recording-status').classList.remove('hidden');
+            document.getElementById('recording-live-actions').classList.remove('hidden');
+
+            // Clear previous actions
+            window.recordedActions = [];
+            const body = document.getElementById('live-actions-body');
+            if (body) body.innerHTML = '';
+            const countEl = document.getElementById('live-action-count');
+            if (countEl) countEl.textContent = '0 steps';
 
             // Try to add console log if available
             try {
@@ -1326,7 +1417,7 @@ async function executeScenario(module, name) {
 
         showInfo(`Executing test scenario: ${name}...`);
 
-        const response = await fetch(`${API_BASE_URL}/scenarios/execute/${module}/${name}`, {
+        const response = await fetch(`${API_BASE_URL}/scenarios/execute/${encodeURIComponent(module)}/${encodeURIComponent(name)}`, {
             method: 'POST'
         });
 
@@ -1385,7 +1476,7 @@ async function executeModule() {
         updateExecutionStatus('running', `Executing module: ${module}...`);
         addConsoleLog(`Starting module execution: ${module}`, 'info');
 
-        const response = await fetch(`${API_BASE_URL}/scenarios/execute/module/${module}`, {
+        const response = await fetch(`${API_BASE_URL}/scenarios/execute/module/${encodeURIComponent(module)}`, {
             method: 'POST'
         });
 
@@ -2812,7 +2903,7 @@ async function deleteScenario(module, name) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/scenarios/${module}/${name}`, {
+        const response = await fetch(`${API_BASE_URL}/scenarios/${encodeURIComponent(module)}/${encodeURIComponent(name)}`, {
             method: 'DELETE'
         });
 

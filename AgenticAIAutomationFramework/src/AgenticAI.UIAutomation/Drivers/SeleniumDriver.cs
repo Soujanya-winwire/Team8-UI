@@ -122,6 +122,61 @@ namespace AgenticAI.UIAutomation.Drivers
             return Task.CompletedTask;
         }
 
+        public Task CheckAsync(string locator)
+        {
+            var by = GetBy(locator, "auto");
+            var element = _wait!.Until(ExpectedConditions.ElementToBeClickable(by));
+            if (!element.Selected)
+            {
+                element.Click();
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task UncheckAsync(string locator)
+        {
+            var by = GetBy(locator, "auto");
+            var element = _wait!.Until(ExpectedConditions.ElementToBeClickable(by));
+            if (element.Selected)
+            {
+                element.Click();
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task SelectOptionAsync(string locator, string value)
+        {
+            var by = GetBy(locator, "auto");
+            var element = _wait!.Until(ExpectedConditions.ElementIsVisible(by));
+            var select = new SelectElement(element);
+            try
+            {
+                select.SelectByValue(value);
+            }
+            catch
+            {
+                select.SelectByText(value);
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task HoverAsync(string locator)
+        {
+            var by = GetBy(locator, "auto");
+            var element = _wait!.Until(ExpectedConditions.ElementIsVisible(by));
+            var actions = new OpenQA.Selenium.Interactions.Actions(_driver!);
+            actions.MoveToElement(element).Perform();
+            return Task.CompletedTask;
+        }
+
+        public Task ScrollToAsync(string locator)
+        {
+            var by = GetBy(locator, "auto");
+            var element = _wait!.Until(ExpectedConditions.ElementExists(by));
+            ((IJavaScriptExecutor)_driver!).ExecuteScript("arguments[0].scrollIntoView(true);", element);
+            return Task.CompletedTask;
+        }
+
         public Task TypeAsync(string locator, string text)
         {
             var by = GetBy(locator, "auto");

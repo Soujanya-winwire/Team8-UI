@@ -53,6 +53,12 @@ namespace AgenticAI.WebUI.Controllers
                 {
                     try
                     {
+                        // Subscribe to real-time action capture
+                        _activeRecorder.OnActionCaptured += (action) =>
+                        {
+                            _hubContext.Clients.All.SendAsync("ReceiveRecordedAction", action).Wait();
+                        };
+
                         await _activeRecorder.StartRecordingAsync(request.StartUrl);
                     }
                     catch (Exception ex)
@@ -362,6 +368,50 @@ namespace AgenticAI.WebUI.Controllers
             catch (Exception ex)
             {
                 Logger.Error($"Failed to save Codegen test: {ex.Message}");
+                return BadRequest(new { success = false, error = ex.Message });
+            }
+        }
+        
+        /// <summary>
+        /// Self-test endpoint - runs an automated recording session to verify the capture pipeline
+        /// </summary>
+        [HttpPost("selftest")]
+        public async Task<IActionResult> SelfTest()
+        {
+            try
+            {
+                Logger.Info("Starting recorder self-test...");
+                
+                var capturedActions = new List<RecordedAction>();
+                var recorder = new TestRecorder("SelfTest_Recording", "AutoVerification");
+                
+                recorder.OnActionCaptured += (action) =>
+                {
+                    capturedActions.Add(action);
+                    Logger.Info($"Self-test captured: {action.ActionType} on {action.Locator}");
+                };
+                
+                // Start recording (opens browser, navigates, captures Navigate action automatically)
+                await recorder.StartRecordingAsync("https://rahulshettyacademy.com/AutomationPractice/");
+                
+                // Wait for initial page load
+                await Task.Delay(3000);
+                
+                // Stop recording
+                var scenario = await recorder.StopRecordingAsync();
+                
+                return Ok(new
+                {
+                    success = true,
+                    message = "Self-test completed",
+                    capturedCount = capturedActions.Count,
+                    scenarioActionCount = scenario.Actions?.Count ?? 0,
+                    actions = capturedActions.Select(a => new { a.ActionType, a.Locator, a.Value, a.Description })
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Self-test error: {ex.Message}");
                 return BadRequest(new { success = false, error = ex.Message });
             }
         }

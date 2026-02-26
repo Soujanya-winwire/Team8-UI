@@ -11,7 +11,7 @@ let currentEditingScenario = null;
  */
 async function viewScenario(module, name) {
     try {
-        const response = await fetch(`${API_BASE_URL}/scenarios/${module}/${name}`);
+        const response = await fetch(`${API_BASE_URL}/scenarios/${encodeURIComponent(module)}/${encodeURIComponent(name)}`);
         const data = await response.json();
 
         if (data.success) {
@@ -195,6 +195,11 @@ function renderStepItem(item, index, type) {
             case 'Type': icon = 'fa-keyboard'; break;
             case 'Navigate': icon = 'fa-compass'; break;
             case 'Wait': icon = 'fa-clock'; break;
+            case 'Select': icon = 'fa-list-ul'; break;
+            case 'Check': icon = 'fa-check-square'; break;
+            case 'Uncheck': icon = 'fa-square'; break;
+            case 'Hover': icon = 'fa-hand-pointer'; break;
+            case 'Scroll': icon = 'fa-arrows-alt-v'; break;
             default: icon = 'fa-bolt';
         }
     } else {
@@ -313,6 +318,10 @@ function addNewStep(position, type) {
                             <option value="Navigate">Navigate to URL</option>
                             <option value="Wait">Wait for Element</option>
                             <option value="Select">Select from Dropdown</option>
+                            <option value="Check">Check Checkbox/Radio</option>
+                            <option value="Uncheck">Uncheck Checkbox/Radio</option>
+                            <option value="Hover">Hover Over Element</option>
+                            <option value="Scroll">Scroll Into View</option>
                         ` : `
                             <option value="ElementVisible">Element is Visible</option>
                             <option value="ElementNotVisible">Element is NOT Visible</option>
@@ -369,6 +378,10 @@ function updateStepTypeOptions(category) {
             <option value="Navigate">Navigate to URL</option>
             <option value="Wait">Wait for Element</option>
             <option value="Select">Select from Dropdown</option>
+            <option value="Check">Check Checkbox/Radio</option>
+            <option value="Uncheck">Uncheck Checkbox/Radio</option>
+            <option value="Hover">Hover Over Element</option>
+            <option value="Scroll">Scroll Into View</option>
         `;
     } else {
         typeSelect.innerHTML = `
@@ -395,19 +408,28 @@ function handleStepTypeChange(stepType, isAction) {
     const container = document.getElementById('value-field-container');
     if (!container) return;
 
-    const actionTypes = ['Click', 'Type', 'Navigate', 'Wait', 'Select'];
-    const needsValue = actionTypes.includes(stepType)
-        ? (stepType === 'Type' || stepType === 'Select')
-        : (stepType === 'TextEquals' || stepType === 'TextContains' || stepType === 'TextNotContains' ||
-            stepType === 'TitleEquals' || stepType === 'TitleContains' || stepType === 'ValueEquals');
+    const noValueActions = ['Hover', 'Scroll', 'Click'];
+    const isNoValue = isAction && noValueActions.includes(stepType);
 
-    if (needsValue) {
-        const label = isAction
-            ? (stepType === 'Type' ? 'Text to Type' : 'Option to Select')
-            : 'Expected Value';
-        const placeholder = isAction
-            ? (stepType === 'Type' ? 'Enter the text to type' : 'Select option text or value')
-            : 'Enter expected text value';
+    if (!isNoValue) {
+        let label = 'Expected Value';
+        let placeholder = 'Enter expected text value';
+
+        if (isAction) {
+            if (stepType === 'Type') {
+                label = 'Text to Type';
+                placeholder = 'Enter the text to type';
+            } else if (stepType === 'Select') {
+                label = 'Option to Select';
+                placeholder = 'Select option text or value';
+            } else if (stepType === 'Wait') {
+                label = 'Seconds to Wait';
+                placeholder = 'Enter wait time in seconds';
+            } else {
+                label = 'Value (optional)';
+                placeholder = 'Optional parameters';
+            }
+        }
 
         container.innerHTML = `
             <div class="form-group">
@@ -483,6 +505,10 @@ function editStep(index, type) {
                             <option value="Navigate" ${step.actionType === 'Navigate' ? 'selected' : ''}>Navigate to URL</option>
                             <option value="Wait" ${step.actionType === 'Wait' ? 'selected' : ''}>Wait for Element</option>
                             <option value="Select" ${step.actionType === 'Select' ? 'selected' : ''}>Select from Dropdown</option>
+                            <option value="Check" ${step.actionType === 'Check' ? 'selected' : ''}>Check Checkbox/Radio</option>
+                            <option value="Uncheck" ${step.actionType === 'Uncheck' ? 'selected' : ''}>Uncheck Checkbox/Radio</option>
+                            <option value="Hover" ${step.actionType === 'Hover' ? 'selected' : ''}>Hover Over Element</option>
+                            <option value="Scroll" ${step.actionType === 'Scroll' ? 'selected' : ''}>Scroll Into View</option>
                         ` : `
                             <option value="ElementVisible" ${step.type === 'ElementVisible' ? 'selected' : ''}>Element is Visible</option>
                             <option value="ElementNotVisible" ${step.type === 'ElementNotVisible' ? 'selected' : ''}>Element is NOT Visible</option>
@@ -547,6 +573,10 @@ function updateEditStepTypeOptions(category, index) {
             <option value="Navigate">Navigate to URL</option>
             <option value="Wait">Wait for Element</option>
             <option value="Select">Select from Dropdown</option>
+            <option value="Check">Check Checkbox/Radio</option>
+            <option value="Uncheck">Uncheck Checkbox/Radio</option>
+            <option value="Hover">Hover Over Element</option>
+            <option value="Scroll">Scroll Into View</option>
         `;
     } else {
         typeSelect.innerHTML = `
@@ -731,7 +761,7 @@ async function saveScenarioChanges() {
         };
 
         showLoading('Saving changes...');
-        const response = await fetch(`${API_BASE_URL}/scenarios/${currentEditingScenario.module}/${currentEditingScenario.name}`, {
+        const response = await fetch(`${API_BASE_URL}/scenarios/${encodeURIComponent(currentEditingScenario.module)}/${encodeURIComponent(currentEditingScenario.name)}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedScenario)

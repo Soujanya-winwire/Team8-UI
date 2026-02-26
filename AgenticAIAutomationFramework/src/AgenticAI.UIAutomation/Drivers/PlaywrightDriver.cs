@@ -1,5 +1,6 @@
 using AgenticAI.Core.Configuration;
 using AgenticAI.Core.Enums;
+using AgenticAI.Core.Logging;
 using AgenticAI.UIAutomation.Interfaces;
 using Microsoft.Playwright;
 using CoreBrowserType = AgenticAI.Core.Enums.BrowserType;
@@ -98,6 +99,122 @@ namespace AgenticAI.UIAutomation.Drivers
         {
             var selector = GetSelector(locator, "auto");
             await _page!.ClickAsync(selector);
+        }
+
+        public async Task CheckAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            var locatorEl = _page!.Locator(selector);
+
+            // If multiple elements match (e.g., radio group sharing same name),
+            // use the first visible one rather than throwing a strict-mode violation
+            int count = await locatorEl.CountAsync();
+            if (count > 1)
+            {
+                // For radio groups: find the first visible element and use it
+                // (the preceding Click action should have already selected the right one)
+                locatorEl = locatorEl.First;
+                Logger.Debug($"Check: locator '{selector}' matched {count} elements, using .First()");
+            }
+
+            await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            // Radio buttons must be clicked; checkboxes use CheckAsync
+            var inputType = await locatorEl.EvaluateAsync<string>("el => el.type ? el.type.toLowerCase() : ''");
+            if (inputType == "radio")
+            {
+                // Radio button: click to select (only if not already selected)
+                var isChecked = await locatorEl.IsCheckedAsync();
+                if (!isChecked)
+                {
+                    await locatorEl.ClickAsync();
+                }
+            }
+            else
+            {
+                // Checkbox: use Playwright's CheckAsync
+                var isChecked = await locatorEl.IsCheckedAsync();
+                if (!isChecked)
+                {
+                    await locatorEl.CheckAsync();
+                }
+            }
+        }
+
+        public async Task UncheckAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            var locatorEl = _page!.Locator(selector);
+
+            int count = await locatorEl.CountAsync();
+            if (count > 1)
+            {
+                locatorEl = locatorEl.First;
+                Logger.Debug($"Uncheck: locator '{selector}' matched {count} elements, using .First()");
+            }
+
+            await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+
+            var inputType = await locatorEl.EvaluateAsync<string>("el => el.type ? el.type.toLowerCase() : ''");
+            if (inputType == "radio")
+            {
+                // Radio buttons cannot be unchecked; skip
+                Logger.Debug("Uncheck called on radio button — skipping (radio buttons cannot be unchecked)");
+                return;
+            }
+            else
+            {
+                var isChecked = await locatorEl.IsCheckedAsync();
+                if (isChecked)
+                {
+                    await locatorEl.UncheckAsync();
+                }
+            }
+        }
+
+        public async Task SelectOptionAsync(string locator, string value)
+        {
+            var selector = GetSelector(locator, "auto");
+            var locatorEl = _page!.Locator(selector);
+            await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            await locatorEl.ScrollIntoViewIfNeededAsync();
+
+            // Try by value attribute first, then by visible text (label), then by index
+            try
+            {
+                await locatorEl.SelectOptionAsync(new SelectOptionValue { Value = value });
+                return;
+            }
+            catch { /* fall through */ }
+
+            try
+            {
+                await locatorEl.SelectOptionAsync(new SelectOptionValue { Label = value });
+                return;
+            }
+            catch { /* fall through */ }
+
+            // Last resort: try index if numeric
+            if (int.TryParse(value, out var index))
+            {
+                await locatorEl.SelectOptionAsync(new SelectOptionValue { Index = index });
+            }
+            else
+            {
+                throw new Exception($"Could not select option '{value}' by value or label in element '{locator}'");
+            }
+        }
+
+        public async Task HoverAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            await _page!.HoverAsync(selector);
+        }
+
+        public async Task ScrollToAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            await _page!.Locator(selector).ScrollIntoViewIfNeededAsync();
         }
 
         public async Task TypeAsync(string locator, string text)

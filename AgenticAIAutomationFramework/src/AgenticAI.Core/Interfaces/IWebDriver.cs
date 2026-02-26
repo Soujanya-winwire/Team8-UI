@@ -9,6 +9,11 @@ namespace AgenticAI.Core.Interfaces
         Task<IWebElement> FindElementAsync(string locator, string strategy = "auto");
         Task<IList<IWebElement>> FindElementsAsync(string locator, string strategy = "auto");
         Task ClickAsync(string locator);
+        Task CheckAsync(string locator);
+        Task UncheckAsync(string locator);
+        Task SelectOptionAsync(string locator, string value);
+        Task HoverAsync(string locator);
+        Task ScrollToAsync(string locator);
         Task TypeAsync(string locator, string text);
         Task<string> GetTextAsync(string locator);
         Task<string> GetAttributeAsync(string locator, string attribute);

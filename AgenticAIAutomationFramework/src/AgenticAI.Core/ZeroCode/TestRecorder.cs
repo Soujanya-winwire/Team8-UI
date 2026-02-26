@@ -20,6 +20,11 @@ namespace AgenticAI.Core.ZeroCode
         private IBrowser? _browser;
         private IPage? _page;
         private readonly FrameworkConfiguration _config;
+        
+        /// <summary>
+        /// Event fired when a new action is captured
+        /// </summary>
+        public event Action<RecordedAction>? OnActionCaptured;
 
         public TestRecorder(string scenarioName, string module = "Default")
         {
@@ -39,6 +44,11 @@ namespace AgenticAI.Core.ZeroCode
             };
             _config = ConfigurationManager.Instance.FrameworkConfig;
         }
+        
+        /// <summary>
+        /// Returns the number of currently recorded actions
+        /// </summary>
+        public int GetRecordedActionCount() => _recordedActions.Count;
 
         /// <summary>
         /// Start recording user actions on the application
@@ -78,6 +88,15 @@ namespace AgenticAI.Core.ZeroCode
             // Set up action listeners for comprehensive recording
             await SetupActionListeners();
 
+            // Capture console logs from the browser for debugging
+            _page.Console += (sender, msg) =>
+            {
+                if (msg.Text.Contains("??")) 
+                    Logger.Debug($"[BROWSER] {msg.Text}");
+                else if (msg.Type == "error")
+                    Logger.Error($"[BROWSER ERROR] {msg.Text}");
+            };
+
             // Navigate to start URL
             await _page.GotoAsync(startUrl, new PageGotoOptions 
             { 
@@ -88,6 +107,19 @@ namespace AgenticAI.Core.ZeroCode
             Logger.Info("✅ Browser opened and ready for recording!");
             Logger.Info("🎬 Perform your test actions - clicks, typing, selections will be captured automatically.");
             Logger.Info("✋ Click 'Stop Recording' when done.");
+            
+            // Automatically capture the initial navigation as the first action
+            var navigateAction = new RecordedAction
+            {
+                ActionType = "Navigate",
+                Locator = startUrl,
+                Value = startUrl,
+                Description = $"Navigate to {startUrl}",
+                Timestamp = 0
+            };
+            _recordedActions.Add(navigateAction);
+            Logger.Info($"📌 Captured Navigate: {startUrl}");
+            OnActionCaptured?.Invoke(navigateAction);
         }
 
         private async Task SetupActionListeners()
@@ -95,44 +127,65 @@ namespace AgenticAI.Core.ZeroCode
             if (_page == null) return;
 
             // Expose a function in the browser to call when actions occur
-            await _page.ExposeFunctionAsync("__playwrightRecordAction", async (object eventData) =>
+            await _page.ExposeFunctionAsync("__playwrightRecordAction", (JsonElement eventData) =>
             {
                 try
                 {
-                    var json = System.Text.Json.JsonSerializer.Serialize(eventData);
-                    var doc = System.Text.Json.JsonDocument.Parse(json);
-                    var root = doc.RootElement;
+                    string type = eventData.GetProperty("type").GetString() ?? "";
+                    string selector = eventData.GetProperty("selector").GetString() ?? "";
                     
-                    var type = root.GetProperty("type").GetString() ?? "";
-                    var selector = root.GetProperty("selector").GetString() ?? "";
+                    RecordedAction action = new RecordedAction
+                    {
+                        ActionType = "Click",
+                        Locator = selector,
+                        Timestamp = _recordedActions.Count
+                    };
+
+                    switch (type.ToLower())
+                    {
+                        case "click":
+                            action.ActionType = "Click";
+                            string text = eventData.TryGetProperty("text", out var t) ? t.GetString() : "";
+                            action.Description = $"Click on {selector}" + (string.IsNullOrEmpty(text) ? "" : $" (\"{text}\")");
+                            break;
+                        case "fill":
+                            action.ActionType = "Type";
+                            action.Value = eventData.GetProperty("value").GetString();
+                            action.Description = $"Type \"{action.Value}\" into {selector}";
+                            break;
+                        case "select":
+                            action.ActionType = "Select";
+                            action.Value = eventData.GetProperty("value").GetString();
+                            string optionText = eventData.TryGetProperty("text", out var ot) ? ot.GetString() : "";
+                            action.Description = $"Select \"{optionText}\" from {selector}";
+                            break;
+                        case "check":
+                            action.ActionType = "Check";
+                            action.Description = $"Check {selector}";
+                            break;
+                        case "uncheck":
+                            action.ActionType = "Uncheck";
+                            action.Description = $"Uncheck {selector}";
+                            break;
+                    }
+
+                    // Deduplicate rapid "fill" events for the same selector
+                    if (type == "fill" && _recordedActions.Count > 0)
+                    {
+                        var last = _recordedActions.Last();
+                        if (last.ActionType == "Type" && last.Locator == selector)
+                        {
+                            last.Value = action.Value;
+                            last.Description = action.Description;
+                            return Task.CompletedTask;
+                        }
+                    }
+
+                    _recordedActions.Add(action);
+                    Logger.Info($"?? Captured {action.ActionType}: {selector}");
                     
-                    if (type == "click")
-                    {
-                        var text = root.TryGetProperty("text", out var t) ? t.GetString() : "";
-                        var action = new RecordedAction
-                        {
-                            ActionType = "Click",
-                            Locator = selector,
-                            Description = $"Click on \"{text}\"",
-                            Timestamp = _recordedActions.Count
-                        };
-                        _recordedActions.Add(action);
-                        Logger.Info($"🖱 Click recorded: {selector}");
-                    }
-                    else if (type == "fill")
-                    {
-                        var value = root.GetProperty("value").GetString() ?? "";
-                        var action = new RecordedAction
-                        {
-                            ActionType = "Type",
-                            Locator = selector,
-                            Value = value,
-                            Description = $"Type \"{value}\" into {selector}",
-                            Timestamp = _recordedActions.Count
-                        };
-                        _recordedActions.Add(action);
-                        Logger.Info($"⌨ Type recorded: {selector} = {value}");
-                    }
+                    // Trigger event for real-time updates
+                    OnActionCaptured?.Invoke(action);
                 }
                 catch (Exception ex)
                 {
@@ -143,95 +196,111 @@ namespace AgenticAI.Core.ZeroCode
             });
 
             // Use AddInitScript to inject tracking on EVERY page load/navigation
-            // This is the KEY - it runs before ANY page code, on EVERY navigation
+            // This runs before ANY page code, on EVERY navigation
             await _page.AddInitScriptAsync(@"
 (function() {
-    // Mark as injected
-    if (window.__recorderReady) return;
-    window.__recorderReady = true;
+    // Remove the __recorderReady guard so re-navigation re-registers listeners
     
-    console.log('?? Recorder Active - Ready to capture actions');
-    
-    // Helper to generate selector
     window.__getSelector = function(el) {
         if (!el) return '';
         
-        // Priority 1: data-test attributes
-        const testAttrs = ['data-testid', 'data-test-id', 'data-test', 'data-qa'];
-        for (let attr of testAttrs) {
-            const val = el.getAttribute(attr);
-            if (val) return `[${attr}=""${val}""]`;
+        var testAttrs = ['data-testid', 'data-test-id', 'data-test', 'data-qa'];
+        for (var i = 0; i < testAttrs.length; i++) {
+            var val = el.getAttribute(testAttrs[i]);
+            if (val) return '[' + testAttrs[i] + '=""' + val + '""]';
         }
         
-        // Priority 2: ID
-        if (el.id) return '#' + el.id;
+        if (el.id && !el.id.match(/\d{4,}/)) return '#' + el.id;
+        if (el.name) return '[name=""' + el.name + '""]';
+        if (el.placeholder) return '[placeholder=""' + el.placeholder + '""]';
         
-        // Priority 3: name
-        if (el.name) return `[name=""${el.name}""]`;
+        var ariaLabel = el.getAttribute('aria-label');
+        if (ariaLabel) return '[aria-label=""' + ariaLabel + '""]';
         
-        // Priority 4: placeholder
-        if (el.placeholder) return `[placeholder=""${el.placeholder}""]`;
-        
-        // Priority 5: aria-label
-        const ariaLabel = el.getAttribute('aria-label');
-        if (ariaLabel) return `[aria-label=""${ariaLabel}""]`;
-        
-        // Fallback: tag with classes
-        let selector = el.tagName.toLowerCase();
+        if ((el.tagName === 'BUTTON' || el.tagName === 'A') && el.innerText && el.innerText.trim()) {
+            var txt = el.innerText.trim();
+            if (txt.length > 0 && txt.length < 50) return 'text=""' + txt + '""';
+        }
+
+        var selector = el.tagName.toLowerCase();
         if (el.className && typeof el.className === 'string') {
-            const classes = el.className.trim().split(/\s+/).filter(c => c && !c.match(/^ng-|mat-|_/));
-            if (classes.length > 0 && classes.length < 4) {
-                selector += '.' + classes.join('.');
-            }
+            var classes = el.className.split(/\s+/).filter(function(c) { return c && !c.match(/^(ng-|mat-|css-|_)/); });
+            if (classes.length > 0) selector += '.' + classes[0];
         }
         
         return selector;
     };
     
-    // Track all clicks
-    document.addEventListener('mousedown', function(e) {
-        setTimeout(function() {
-            const el = e.target.closest('button, a, input[type=submit], input[type=button], [role=button]') || e.target;
-            const selector = window.__getSelector(el);
-            const text = el.textContent?.trim().substring(0, 50) || '';
-            
-            // Send to Playwright
-            if (window.__playwrightRecordAction) {
-                window.__playwrightRecordAction({
-                    type: 'click',
-                    selector: selector,
-                    text: text,
-                    timestamp: Date.now()
-                });
-                console.log('?? Click recorded:', selector);
-            }
-        }, 100);
+    document.addEventListener('click', function(e) {
+        var el = (e.target.closest ? e.target.closest('button, a, input[type=submit], input[type=button], [role=button]') : null) || e.target;
+        if (!el) return;
+        
+        var selector = window.__getSelector(el);
+        var text = (el.innerText ? el.innerText.trim().substring(0, 30) : '') || '';
+        
+        if (typeof window.__playwrightRecordAction === 'function') {
+            window.__playwrightRecordAction({
+                type: 'click',
+                selector: selector,
+                text: text,
+                tagName: el.tagName
+            });
+            console.log('RECORDER: Click captured on ' + selector);
+        } else {
+            console.error('RECORDER: __playwrightRecordAction not found!');
+        }
     }, true);
     
-    // Track all input changes
-    let inputTimers = {};
     document.addEventListener('input', function(e) {
-        const el = e.target;
+        var el = e.target;
         if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') return;
+        if (el.type === 'checkbox' || el.type === 'radio') return;
         
-        const selector = window.__getSelector(el);
-        const value = el.value;
+        var selector = window.__getSelector(el);
+        if (typeof window.__playwrightRecordAction === 'function') {
+            window.__playwrightRecordAction({
+                type: 'fill',
+                selector: selector,
+                value: el.value
+            });
+        }
+    }, true);
+
+    document.addEventListener('change', function(e) {
+        var el = e.target;
+        var selector = window.__getSelector(el);
         
-        clearTimeout(inputTimers[selector]);
-        inputTimers[selector] = setTimeout(function() {
-            if (window.__playwrightRecordAction) {
+        if (el.tagName === 'SELECT') {
+            var option = el.options[el.selectedIndex];
+            if (typeof window.__playwrightRecordAction === 'function') {
                 window.__playwrightRecordAction({
-                    type: 'fill',
+                    type: 'select',
                     selector: selector,
-                    value: value,
-                    timestamp: Date.now()
+                    value: option.value,
+                    text: option.text
                 });
-                console.log('?? Type recorded:', selector, '=', value);
+                console.log('RECORDER: Select captured on ' + selector + ' = ' + option.value);
             }
-        }, 1000);
+        } else if (el.tagName === 'INPUT' && (el.type === 'checkbox' || el.type === 'radio')) {
+            if (typeof window.__playwrightRecordAction === 'function') {
+                // Build a value-specific selector to avoid strict mode violations on duplicate name attributes
+                var specificSelector = selector;
+                if (el.name && el.value) {
+                    specificSelector = '[name=' + el.name + '][value=' + el.value + ']';
+                } else if (el.id) {
+                    specificSelector = '#' + el.id;
+                }
+                window.__playwrightRecordAction({
+                    type: el.checked ? 'check' : 'uncheck',
+                    selector: specificSelector,
+                    value: el.value
+                });
+                console.log('RECORDER: ' + (el.checked ? 'Check' : 'Uncheck') + ' captured on ' + specificSelector);
+            }
+        }
     }, true);
     
-    console.log('? Recorder script initialized - perform actions now');
+    console.log('RECORDER: Init script loaded, listeners attached');
 })();
 ");
 
@@ -244,74 +313,6 @@ namespace AgenticAI.Core.ZeroCode
         public async Task<TestScenario> StopRecordingAsync()
         {
             Logger.Info("Stopping test recording...");
-            
-            // Collect JavaScript-recorded actions
-            if (_page != null)
-            {
-                try
-                {
-                    var recordedActionsJson = await _page.EvaluateAsync<string>(@"
-                        JSON.stringify(window.recordedActions || [])
-                    ");
-                    
-                    if (!string.IsNullOrEmpty(recordedActionsJson))
-                    {
-                        var jsActions = JsonConvert.DeserializeObject<List<JsRecordedAction>>(recordedActionsJson);
-                        
-                        if (jsActions != null && jsActions.Count > 0)
-                        {
-                            Logger.Info($"Retrieved {jsActions.Count} actions from JavaScript recorder");
-                            
-                            // Deduplicate and convert JS actions to RecordedAction
-                            var lastInput = new Dictionary<string, (string value, long timestamp)>();
-                            
-                            foreach (var jsAction in jsActions)
-                            {
-                                // For Type actions, only keep the final value for each input
-                                if (jsAction.Type == "Type")
-                                {
-                                    var key = jsAction.Selector;
-                                    if (!lastInput.ContainsKey(key) || jsAction.Timestamp > lastInput[key].timestamp)
-                                    {
-                                        lastInput[key] = (jsAction.Value, jsAction.Timestamp);
-                                    }
-                                    continue;
-                                }
-                                
-                                // Add other actions directly
-                                _recordedActions.Add(new RecordedAction
-                                {
-                                    ActionType = jsAction.Type,
-                                    Locator = jsAction.Selector,
-                                    Value = jsAction.Value,
-                                    Description = GenerateActionDescription(jsAction),
-                                    Timestamp = _recordedActions.Count
-                                });
-                            }
-                            
-                            // Add final input values
-                            foreach (var kvp in lastInput)
-                            {
-                                _recordedActions.Add(new RecordedAction
-                                {
-                                    ActionType = "Type",
-                                    Locator = kvp.Key,
-                                    Value = kvp.Value.value,
-                                    Description = $"Type '{kvp.Value.value}' into {kvp.Key}",
-                                    Timestamp = _recordedActions.Count
-                                });
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warning($"Failed to retrieve JavaScript-recorded actions: {ex.Message}");
-                }
-            }
-            
-            // Copy recorded actions to scenario
-            _scenario.Actions = new List<RecordedAction>(_recordedActions);
             
             // Ensure all collections are initialized
             if (_scenario.Assertions == null)
@@ -354,6 +355,9 @@ namespace AgenticAI.Core.ZeroCode
             _playwright?.Dispose();
 
             Logger.Info($"Recording completed. Captured {_recordedActions.Count} actions.");
+            
+            // Sync actions to scenario before returning
+            _scenario.Actions = _recordedActions;
             
             return _scenario;
         }

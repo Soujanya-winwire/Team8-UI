@@ -1,7 +1,11 @@
 using AgenticAI.WebUI.Hubs;
 using Microsoft.Extensions.FileProviders;
+using AgenticAI.Core.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Initialize logging
+Logger.Initialize();
 
 // Add services to the container
 builder.Services.AddControllers()
