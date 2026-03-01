@@ -3,8 +3,8 @@
   "Browser": "Chrome",
   "OperatingSystem": "Windows",
   "Environment": "QA",
-  "ExecutionMode": "Sequential",
-  "BaseUrl": "https://www.saucedemo.com",
+  "ExecutionMode": "Parallel",
+  "BaseUrl": "",
   "Headless": false,
   "EnableVideo": true,
   "EnableScreenshots": true,
@@ -13,6 +13,12 @@
   "TimeoutInSeconds": 30,
   "ParallelWorkers": 4,
   "EnableSelfHealing": true,
+  "CrossBrowserParallelExecution": false,
+  "ParallelBrowsers": [
+    "Chrome",
+    "Firefox",
+    "Edge"
+  ],
   "EnableAccessibilityTesting": false,
   "EnableVisualRegression": false,
   "EnablePerformanceMetrics": true,

@@ -140,14 +140,28 @@ namespace AgenticAI.Core.ZeroCode
                 await _driver.NavigateAsync(url);
                 step.Status = TestStatus.Passed;
                 Logger.StepInfo("Navigate", $"Successfully navigated to {url}");
+            }
+            catch (Exception ex)
+            {
+                step.Status = TestStatus.Failed;
+                step.ErrorMessage = ex.Message;
+                Logger.Error($"Navigation failed: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                step.EndTime = DateTime.Now;
                 
-                // Capture screenshot after successful navigation
+                // Capture ONE screenshot per navigation step (either success or failure)
                 if (_config.EnableScreenshots)
                 {
                     try
                     {
+                        await Task.Delay(150); // Brief delay to ensure page has loaded
+                        
                         var screenshot = await _driver.TakeScreenshotAsync();
-                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var statusSuffix = step.Status == TestStatus.Failed ? "_FAILED" : "";
+                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate{statusSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
                         var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
                         
                         var directory = Path.GetDirectoryName(screenshotPath);
@@ -165,42 +179,7 @@ namespace AgenticAI.Core.ZeroCode
                         Logger.Warning($"Failed to capture screenshot: {screenshotEx.Message}");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                step.Status = TestStatus.Failed;
-                step.ErrorMessage = ex.Message;
-                Logger.Error($"Navigation failed: {ex.Message}");
                 
-                // Capture screenshot on failure
-                if (_config.EnableScreenshots)
-                {
-                    try
-                    {
-                        var screenshot = await _driver.TakeScreenshotAsync();
-                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate_FAILED_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
-                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
-                        
-                        var directory = Path.GetDirectoryName(screenshotPath);
-                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
-                        
-                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
-                        step.ScreenshotPath = screenshotPath;
-                        Logger.Warning($"Failure screenshot saved: {screenshotPath}");
-                    }
-                    catch (Exception screenshotEx)
-                    {
-                        Logger.Warning($"Failed to capture failure screenshot: {screenshotEx.Message}");
-                    }
-                }
-                throw;
-            }
-            finally
-            {
-                step.EndTime = DateTime.Now;
                 testResult.Steps.Add(step);
             }
         }
@@ -219,7 +198,8 @@ namespace AgenticAI.Core.ZeroCode
                 // Normalize action type
                 var actionType = (action.ActionType ?? string.Empty).ToLower().Trim();
 
-                // Implicit Wait (Selenium IDE style) - Wait for element to be ready before action
+                // Smart wait - only wait if element is not immediately available
+                // This prevents unnecessary delays while ensuring element is ready
                 if (!string.IsNullOrEmpty(action.Locator) && 
                     actionType != "navigate" && 
                     actionType != "wait" && 
@@ -227,11 +207,13 @@ namespace AgenticAI.Core.ZeroCode
                 {
                     try
                     {
-                        await _driver.WaitForElementAsync(action.Locator, _config.TimeoutInSeconds);
+                        // Quick check first - if element is immediately available, don't wait
+                        // Otherwise wait up to 2 seconds (much faster than previous 5 seconds)
+                        await _driver.WaitForElementAsync(action.Locator, 2);
                     }
                     catch (Exception waitEx)
                     {
-                        Logger.Debug($"Implicit wait failed or timed out: {waitEx.Message}. Proceeding with action...");
+                        Logger.Debug($"Quick wait skipped: {waitEx.Message}. Element may already be ready.");
                     }
                 }
 
@@ -318,14 +300,28 @@ namespace AgenticAI.Core.ZeroCode
 
                 step.Status = TestStatus.Passed;
                 Logger.StepInfo(action.ActionType, $"Action executed successfully");
+            }
+            catch (Exception ex)
+            {
+                step.Status = TestStatus.Failed;
+                step.ErrorMessage = ex.Message;
+                Logger.Error($"Action execution failed: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                step.EndTime = DateTime.Now;
                 
-                // Capture screenshot after successful action
+                // Capture ONE screenshot per step (either success or failure)
                 if (_config.EnableScreenshots)
                 {
                     try
                     {
+                        await Task.Delay(150); // Brief delay to ensure UI has settled
+                        
                         var screenshot = await _driver.TakeScreenshotAsync();
-                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var statusSuffix = step.Status == TestStatus.Failed ? "_FAILED" : "";
+                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}{statusSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
                         var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
                         
                         var directory = Path.GetDirectoryName(screenshotPath);
@@ -343,42 +339,7 @@ namespace AgenticAI.Core.ZeroCode
                         Logger.Warning($"Failed to capture screenshot: {screenshotEx.Message}");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                step.Status = TestStatus.Failed;
-                step.ErrorMessage = ex.Message;
-                Logger.Error($"Action execution failed: {ex.Message}");
                 
-                // Capture screenshot on failure
-                if (_config.EnableScreenshots)
-                {
-                    try
-                    {
-                        var screenshot = await _driver.TakeScreenshotAsync();
-                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}_FAILED_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
-                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
-                        
-                        var directory = Path.GetDirectoryName(screenshotPath);
-                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
-                        
-                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
-                        step.ScreenshotPath = screenshotPath;
-                        Logger.Info($"Failure screenshot saved: {screenshotPath}");
-                    }
-                    catch (Exception screenshotEx)
-                    {
-                        Logger.Warning($"Failed to capture failure screenshot: {screenshotEx.Message}");
-                    }
-                }
-                throw;
-            }
-            finally
-            {
-                step.EndTime = DateTime.Now;
                 testResult.Steps.Add(step);
             }
         }
@@ -495,14 +456,26 @@ namespace AgenticAI.Core.ZeroCode
 
                 step.Status = TestStatus.Passed;
                 Logger.StepInfo("Verify", $"Assertion passed: {assertion.Type}");
+            }
+            catch (Exception ex)
+            {
+                step.Status = TestStatus.Failed;
+                step.ErrorMessage = ex.Message;
+                Logger.Error($"Assertion failed: {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                step.EndTime = DateTime.Now;
                 
-                // Capture screenshot after successful assertion
+                // Capture ONE screenshot per assertion step (either success or failure)
                 if (_config.EnableScreenshots)
                 {
                     try
                     {
                         var screenshot = await _driver.TakeScreenshotAsync();
-                        var screenshotFileName = $"{testResult.TestCaseName}_Verify_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var statusSuffix = step.Status == TestStatus.Failed ? "_FAILED" : "";
+                        var screenshotFileName = $"{testResult.TestCaseName}_Verify{statusSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
                         var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
                         
                         var directory = Path.GetDirectoryName(screenshotPath);
@@ -520,42 +493,7 @@ namespace AgenticAI.Core.ZeroCode
                         Logger.Warning($"Failed to capture screenshot: {screenshotEx.Message}");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                step.Status = TestStatus.Failed;
-                step.ErrorMessage = ex.Message;
-                Logger.Error($"Assertion failed: {ex.Message}");
                 
-                // Capture screenshot on failure
-                if (_config.EnableScreenshots)
-                {
-                    try
-                    {
-                        var screenshot = await _driver.TakeScreenshotAsync();
-                        var screenshotFileName = $"{testResult.TestCaseName}_Verify_FAILED_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
-                        var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
-                        
-                        var directory = Path.GetDirectoryName(screenshotPath);
-                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
-                        
-                        await File.WriteAllBytesAsync(screenshotPath, screenshot);
-                        step.ScreenshotPath = screenshotPath;
-                        Logger.Warning($"Failure screenshot saved: {screenshotPath}");
-                    }
-                    catch (Exception screenshotEx)
-                    {
-                        Logger.Warning($"Failed to capture failure screenshot: {screenshotEx.Message}");
-                    }
-                }
-                throw;
-            }
-            finally
-            {
-                step.EndTime = DateTime.Now;
                 testResult.Steps.Add(step);
             }
         }

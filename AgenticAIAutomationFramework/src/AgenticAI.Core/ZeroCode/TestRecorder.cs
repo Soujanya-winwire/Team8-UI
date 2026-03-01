@@ -73,13 +73,13 @@ namespace AgenticAI.Core.ZeroCode
             _browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
             {
                 Headless = false,
-                SlowMo = 1000, // Slow down significantly for recording
-                Args = new[] { "--start-maximized" }
+                SlowMo = 50,
+                Args = new[] { "--start-maximized", "--disable-blink-features=AutomationControlled" }
             });
 
             var context = await _browser.NewContextAsync(new BrowserNewContextOptions
             {
-                ViewportSize = new ViewportSize { Width = 1920, Height = 1080 },
+                ViewportSize = ViewportSize.NoViewport,
                 RecordVideoDir = _config.VideoPath
             });
 
@@ -184,6 +184,16 @@ namespace AgenticAI.Core.ZeroCode
                     _recordedActions.Add(action);
                     Logger.Info($"?? Captured {action.ActionType}: {selector}");
                     
+                    // Update action count in browser overlay
+                    try
+                    {
+                        if (_page != null)
+                        {
+                            _ = _page.EvaluateAsync($"if (window.__updateRecorderCount) window.__updateRecorderCount({_recordedActions.Count});");
+                        }
+                    }
+                    catch { /* Ignore if page is closed or function doesn't exist */ }
+                    
                     // Trigger event for real-time updates
                     OnActionCaptured?.Invoke(action);
                 }
@@ -195,6 +205,15 @@ namespace AgenticAI.Core.ZeroCode
                 return Task.CompletedTask;
             });
 
+            // Load recorder control panel overlay
+            var overlayScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ZeroCode", "Resources", "RecorderOverlay.js");
+            if (File.Exists(overlayScriptPath))
+            {
+                var overlayScript = await File.ReadAllTextAsync(overlayScriptPath);
+                await _page.AddInitScriptAsync(overlayScript);
+                Logger.Info("✓ Recorder control panel loaded in browser");
+            }
+            
             // Use AddInitScript to inject tracking on EVERY page load/navigation
             // This runs before ANY page code, on EVERY navigation
             await _page.AddInitScriptAsync(@"

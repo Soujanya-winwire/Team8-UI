@@ -113,6 +113,9 @@ function showView(viewName) {
         case 'configuration':
             loadConfigurationView();
             break;
+        case 'cicd':
+            loadCICDView();
+            break;
         case 'documentation':
             loadDocumentationView();
             break;
@@ -144,26 +147,38 @@ async function loadDashboard() {
         if (data.success) {
             scenarios = data.scenarios;
 
-            // Update stats
-            document.getElementById('total-scenarios').textContent = data.count;
+            // Safely update stats only if elements exist
+            const totalScenariosEl = document.getElementById('total-scenarios');
+            if (totalScenariosEl) {
+                totalScenariosEl.textContent = data.count;
+            }
 
             // Get modules
             const modules = [...new Set(scenarios.map(s => s.module))];
-            document.getElementById('total-modules').textContent = modules.length;
+            const totalModulesEl = document.getElementById('total-modules');
+            if (totalModulesEl) {
+                totalModulesEl.textContent = modules.length;
+            }
 
             // Calculate execution statistics from history
             const history = historyData.history || [];
-            const totalExecutions = history.length;
             const passedTests = history.filter(h => h.status === 'Passed').length;
             const failedTests = history.filter(h => h.status === 'Failed').length;
             const skippedTests = history.filter(h => h.status === 'Skipped').length;
 
-            // Update execution stats - these IDs match the dashboard HTML
-            document.getElementById('total-passed').textContent = passedTests;
-            document.getElementById('total-failed').textContent = failedTests;
+            // Update execution stats
+            const totalPassedEl = document.getElementById('total-passed');
+            if (totalPassedEl) {
+                totalPassedEl.textContent = passedTests;
+            }
+            
+            const totalFailedEl = document.getElementById('total-failed');
+            if (totalFailedEl) {
+                totalFailedEl.textContent = failedTests;
+            }
 
-            // Display recent scenarios
-            displayRecentScenarios(scenarios.slice(0, 5));
+            // Display pie chart with test results
+            displayTestResultsPieChart({ passed: passedTests, failed: failedTests, skipped: skippedTests });
         }
     } catch (error) {
         hideLoading();
@@ -172,60 +187,123 @@ async function loadDashboard() {
     }
 }
 
-function displayRecentScenarios(recentScenarios) {
-    const container = document.getElementById('recent-scenarios');
+// Display pie chart with test results
+let testResultsChart = null;
 
-    if (recentScenarios.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <h3>No test scenarios found</h3>
-                <p>Create your first test scenario to get started!</p>
-                <button class="btn btn-primary mt-20" onclick="showView('create')">
-                    <i class="fas fa-plus"></i> Create Test
-                </button>
-            </div>
-        `;
+function displayTestResultsPieChart(stats) {
+    const canvas = document.getElementById('testResultsChart');
+    if (!canvas) {
+        console.warn('Chart canvas not found, skipping chart render');
         return;
     }
-
-    const html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Module</th>
-                    <th>Tags</th>
-                    <th>Actions</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${recentScenarios.map(scenario => `
-                    <tr>
-                        <td><strong>${scenario.name}</strong></td>
-                        <td><span class="badge badge-primary">${scenario.module}</span></td>
-                        <td>
-                            ${scenario.tags.slice(0, 3).map(tag =>
-        `<span class="badge badge-info">${tag}</span>`
-    ).join(' ')}
-                        </td>
-                        <td>${scenario.actionCount} steps</td>
-                        <td>
-                            <button class="btn btn-success btn-icon" onclick="executeScenario('${scenario.module}', '${scenario.name}')">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn btn-secondary btn-icon" onclick="viewScenario('${scenario.module}', '${scenario.name}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-    `;
-
-    container.innerHTML = html;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (testResultsChart) {
+        testResultsChart.destroy();
+    }
+    
+    // Calculate total
+    const total = stats.passed + stats.failed + stats.skipped;
+    
+    // Safely update legend with counts
+    const legendPassedEl = document.getElementById('legend-passed');
+    if (legendPassedEl) {
+        legendPassedEl.textContent = stats.passed;
+    }
+    
+    const legendFailedEl = document.getElementById('legend-failed');
+    if (legendFailedEl) {
+        legendFailedEl.textContent = stats.failed;
+    }
+    
+    const legendSkippedEl = document.getElementById('legend-skipped');
+    if (legendSkippedEl) {
+        legendSkippedEl.textContent = stats.skipped;
+    }
+    
+    // Hide skipped legend if no skipped tests
+    const skippedContainer = document.getElementById('legend-skipped-container');
+    if (skippedContainer) {
+        skippedContainer.style.display = stats.skipped === 0 ? 'none' : 'flex';
+    }
+    
+    // If no data, show empty state
+    if (total === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '13px Segoe UI';
+        ctx.fillStyle = '#94a3b8';
+        ctx.textAlign = 'center';
+        ctx.fillText('No test data available', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    // Prepare chart data - only include non-zero values
+    const labels = [];
+    const chartData = [];
+    const colors = [];
+    
+    if (stats.passed > 0) {
+        labels.push('Passed');
+        chartData.push(stats.passed);
+        colors.push('#10b981');
+    }
+    
+    if (stats.failed > 0) {
+        labels.push('Failed');
+        chartData.push(stats.failed);
+        colors.push('#ef4444');
+    }
+    
+    if (stats.skipped > 0) {
+        labels.push('Skipped');
+        chartData.push(stats.skipped);
+        colors.push('#f59e0b');
+    }
+    
+    // Create pie chart
+    testResultsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: chartData,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    },
+                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                    titleFont: { size: 11, weight: '600' },
+                    bodyFont: { size: 10 },
+                    padding: 8,
+                    cornerRadius: 6
+                }
+            },
+            cutout: '65%',
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
 }
 
 function displayExecutionHistory(historyList) {
@@ -283,6 +361,12 @@ function displayExecutionHistory(historyList) {
 }
 
 
+// Global variables for scenarios pagination
+let allScenarios = [];
+let filteredScenarios = [];
+let currentScenariosPage = 1;
+const scenariosPerPage = 10;
+
 // Scenarios View
 async function loadScenariosView() {
     const view = document.getElementById('scenarios-view');
@@ -339,6 +423,8 @@ async function loadScenariosView() {
 
         if (data.success) {
             scenarios = data.scenarios;
+            allScenarios = data.scenarios;
+            filteredScenarios = data.scenarios;
 
             // Populate filters
             const modules = [...new Set(scenarios.map(s => s.module))];
@@ -350,20 +436,11 @@ async function loadScenariosView() {
             document.getElementById('filter-tag').innerHTML +=
                 tags.map(t => `<option value="${t}">${t}</option>`).join('');
 
-            // Load execution history to show last run logs per scenario
-            let historyList = [];
-            try {
-                const historyResponse = await fetch(`${API_BASE_URL}/history`);
-                const historyData = await historyResponse.json();
-                if (historyData.success) {
-                    historyList = historyData.history || [];
-                }
-            } catch (e) {
-                console.warn('Could not load history for scenarios view', e);
-            }
+            // Reset to page 1
+            currentScenariosPage = 1;
 
-            // Display scenarios with history
-            displayAllScenarios(scenarios, historyList);
+            // Display scenarios with pagination
+            displayAllScenarios(filteredScenarios);
         }
     } catch (error) {
         console.error('Error loading scenarios:', error);
@@ -385,6 +462,13 @@ function displayAllScenarios(scenariosList) {
         return;
     }
 
+    // Calculate pagination
+    const totalRecords = scenariosList.length;
+    const totalPages = Math.ceil(totalRecords / scenariosPerPage);
+    const startIndex = (currentScenariosPage - 1) * scenariosPerPage;
+    const endIndex = startIndex + scenariosPerPage;
+    const paginatedScenarios = scenariosList.slice(startIndex, endIndex);
+
     // Create table
     const table = document.createElement('table');
     table.innerHTML = `
@@ -405,7 +489,7 @@ function displayAllScenarios(scenariosList) {
     const tbody = table.querySelector('tbody');
 
     // Add each scenario row
-    scenariosList.forEach(scenario => {
+    paginatedScenarios.forEach(scenario => {
         const row = document.createElement('tr');
 
         // Name
@@ -489,8 +573,87 @@ function displayAllScenarios(scenariosList) {
         tbody.appendChild(row);
     });
 
+    // Create pagination controls
+    const paginationHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+            <div style="color: #6b7280; font-size: 14px;">
+                Showing ${paginatedScenarios.length} of ${totalRecords} records
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <button onclick="goToScenariosPage(1)" 
+                        ${currentScenariosPage === 1 ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentScenariosPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
+                <button onclick="goToScenariosPage(${currentScenariosPage - 1})" 
+                        ${currentScenariosPage === 1 ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentScenariosPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-angle-left"></i> Previous
+                </button>
+                
+                ${generateScenariosPageButtons(currentScenariosPage, totalPages)}
+                
+                <button onclick="goToScenariosPage(${currentScenariosPage + 1})" 
+                        ${currentScenariosPage === totalPages ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentScenariosPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    Next <i class="fas fa-angle-right"></i>
+                </button>
+                <button onclick="goToScenariosPage(${totalPages})" 
+                        ${currentScenariosPage === totalPages ? 'disabled' : ''}
+                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentScenariosPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                    <i class="fas fa-angle-double-right"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
     container.innerHTML = '';
     container.appendChild(table);
+    
+    // Add pagination controls
+    const paginationDiv = document.createElement('div');
+    paginationDiv.innerHTML = paginationHTML;
+    container.appendChild(paginationDiv);
+}
+
+// Generate page number buttons for scenarios
+function generateScenariosPageButtons(currentPage, totalPages) {
+    let buttons = '';
+    const maxButtons = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+
+    // Adjust start if we're near the end
+    if (endPage - startPage < maxButtons - 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        buttons += `
+            <button onclick="goToScenariosPage(${i})" 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#3b82f6' : '#d1d5db'}; 
+                           background: ${isActive ? '#3b82f6' : 'white'}; 
+                           color: ${isActive ? 'white' : '#374151'};
+                           border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
+                ${i}
+            </button>
+        `;
+    }
+
+    return buttons;
+}
+
+// Navigate to specific scenarios page
+function goToScenariosPage(page) {
+    const totalPages = Math.ceil(filteredScenarios.length / scenariosPerPage);
+
+    if (page < 1 || page > totalPages) {
+        return;
+    }
+
+    currentScenariosPage = page;
+    displayAllScenarios(filteredScenarios);
 }
 
 // Helper function to escape HTML
@@ -505,7 +668,7 @@ function filterScenarios() {
     const tagFilter = document.getElementById('filter-tag').value;
     const searchText = document.getElementById('search-scenarios').value.toLowerCase();
 
-    let filtered = scenarios;
+    let filtered = allScenarios;
 
     if (moduleFilter) {
         filtered = filtered.filter(s => s.module === moduleFilter);
@@ -521,6 +684,11 @@ function filterScenarios() {
             (s.description && s.description.toLowerCase().includes(searchText))
         );
     }
+
+    filteredScenarios = filtered;
+    
+    // Reset to page 1 when filters change
+    currentScenariosPage = 1;
 
     displayAllScenarios(filtered);
 }
@@ -883,7 +1051,7 @@ async function loadRecordView() {
                 <div class="form-group">
                     <label>Start URL *</label>
                     <input type="url" class="form-control" id="record-url" 
-                           placeholder="https://www.saucedemo.com" required>
+                           placeholder="https://your-application-url.com" required>
                 </div>
                 
                 <div class="form-group">
@@ -1303,7 +1471,7 @@ async function loadExecuteView() {
                     </div>
                 </div>
                 <div class="form-group"><label>Data (paste CSV/JSON or upload a file)</label>
-                    <textarea class="form-control" id="dd-data" rows="6" placeholder="username,password&#10;standard_user,secret_sauce&#10;locked_out_user,secret_sauce"></textarea>
+                    <textarea class="form-control" id="dd-data" rows="6" placeholder="username,password&#10;user1,pass1&#10;user2,pass2"></textarea>
                 </div>
                 <div id="dd-preview-area" class="hidden" style="margin-bottom:16px;padding:14px;background:#f0f9ff;border-radius:8px;border-left:4px solid var(--info-color);">
                     <div style="font-weight:600;color:var(--info-color);margin-bottom:8px;"><i class="fas fa-columns"></i> Preview</div>
@@ -1589,11 +1757,27 @@ async function loadConfigurationView() {
     view.innerHTML = '<div class="spinner"></div>';
 
     try {
+        // Always fetch latest from server to ensure we have current saved state
         const response = await fetch(`${API_BASE_URL}/configuration`);
         const data = await response.json();
 
+        console.log('🔍 Load Configuration Debug:');
+        console.log('📥 Server response:', data);
+
         if (data.success) {
             configuration = data.configuration;
+            
+            console.log('✅ Loaded configuration:', configuration);
+            console.log('✅ Parallel Browsers:', configuration.parallelBrowsers);
+            console.log('✅ Cross-Browser Enabled:', configuration.crossBrowserParallelExecution);
+            console.log('✅ Execution Mode:', configuration.executionMode);
+            
+            // Update cache
+            try {
+                localStorage.setItem('agenticai-config', JSON.stringify(configuration));
+            } catch (e) {
+                console.warn('Could not update cache:', e);
+            }
 
             view.innerHTML = `
         <div class="header">
@@ -1612,12 +1796,12 @@ async function loadConfigurationView() {
                     
                     <form id="config-form">
                         <div class="form-group">
-                            <label>?? Base URL (Application Under Test)</label>
+                            <label>Base URL (Application Under Test)</label>
                             <input type="url" class="form-control" id="config-base-url" 
-                                   value="${configuration.baseUrl || 'https://www.saucedemo.com'}" 
-                                   placeholder="https://your-app.com">
+                                   value="${configuration.baseUrl || ''}" 
+                                   placeholder="https://your-application-url.com">
                             <small style="color: #6b7280; display: block; margin-top: 5px;">
-                                The default URL for your test scenarios. Tests can override this with their own Start URL.
+                                The default URL for your test scenarios. Tests can override this with their own Start URL. Leave empty if not needed.
                             </small>
                         </div>
 
@@ -1650,7 +1834,7 @@ async function loadConfigurationView() {
                             </div>
                             <div class="form-group">
                                 <label>Execution Mode</label>
-                                <select class="form-control" id="config-execution-mode">
+                                <select class="form-control" id="config-execution-mode" onchange="toggleCrossBrowserOptions()">
                                     <option value="Sequential" ${configuration.executionMode === 'Sequential' ? 'selected' : ''}>Sequential</option>
                                     <option value="Parallel" ${configuration.executionMode === 'Parallel' ? 'selected' : ''}>Parallel</option>
                                 </select>
@@ -1664,6 +1848,62 @@ async function loadConfigurationView() {
                                 <label>Max Retry Count</label>
                                 <input type="number" class="form-control" id="config-retry" 
                                        value="${configuration.maxRetryCount}" min="0" max="5">
+                            </div>
+                        </div>
+
+                        <!-- Cross-Browser Parallel Execution Options -->
+                        <div id="cross-browser-options" class="${configuration.executionMode === 'Parallel' ? '' : 'hidden'}" style="margin-top: 20px;">
+                            <div class="card" style="border: 2px solid #3b82f6; background: rgba(59, 130, 246, 0.05);">
+                                <div class="card-header" style="background: rgba(59, 130, 246, 0.1);">
+                                    <div class="card-title">
+                                        <i class="fas fa-globe"></i> Cross-Browser Parallel Execution
+                                    </div>
+                                </div>
+                                <div style="padding: 20px;">
+                                    <div class="form-group">
+                                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                            <input type="checkbox" id="config-cross-browser" ${configuration.crossBrowserParallelExecution ? 'checked' : ''}> 
+                                            <span>Enable Cross-Browser Parallel Execution</span>
+                                        </label>
+                                        <small style="color: #6b7280; display: block; margin-top: 5px;">
+                                            Distribute tests across multiple browsers simultaneously (e.g., Test 1→Chrome, Test 2→Firefox, Test 3→Edge)
+                                        </small>
+                                    </div>
+
+                                    <div id="browser-selection" style="margin-top: 20px;">
+                                        <label style="font-weight: 600; margin-bottom: 10px; display: block;">
+                                            Select Browsers for Parallel Execution:
+                                        </label>
+                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
+                                                <input type="checkbox" class="browser-checkbox" value="Chrome" ${(configuration.parallelBrowsers?.includes('Chrome') || configuration.parallelBrowsers?.includes(0)) ? 'checked' : ''}> 
+                                                <i class="fab fa-chrome" style="color: #4285F4; font-size: 1.2em;"></i>
+                                                <span>Chrome</span>
+                                            </label>
+                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
+                                                <input type="checkbox" class="browser-checkbox" value="Firefox" ${(configuration.parallelBrowsers?.includes('Firefox') || configuration.parallelBrowsers?.includes(1)) ? 'checked' : ''}> 
+                                                <i class="fab fa-firefox" style="color: #FF7139; font-size: 1.2em;"></i>
+                                                <span>Firefox</span>
+                                            </label>
+                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
+                                                <input type="checkbox" class="browser-checkbox" value="Edge" ${(configuration.parallelBrowsers?.includes('Edge') || configuration.parallelBrowsers?.includes(2)) ? 'checked' : ''}> 
+                                                <i class="fab fa-edge" style="color: #0078D7; font-size: 1.2em;"></i>
+                                                <span>Edge</span>
+                                            </label>
+                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
+                                                <input type="checkbox" class="browser-checkbox" value="Safari" ${(configuration.parallelBrowsers?.includes('Safari') || configuration.parallelBrowsers?.includes(3)) ? 'checked' : ''}> 
+                                                <i class="fab fa-safari" style="color: #006CFF; font-size: 1.2em;"></i>
+                                                <span>Safari</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info" style="margin-top: 20px; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px;">
+                                        <strong><i class="fas fa-info-circle"></i> How it works:</strong><br>
+                                        Tests will be distributed across selected browsers in round-robin fashion.<br>
+                                        <strong>Example:</strong> Test1→Chrome, Test2→Firefox, Test3→Edge, Test4→Chrome...
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1712,11 +1952,23 @@ async function loadConfigurationView() {
 }
 
 async function saveConfiguration() {
+    const executionMode = document.getElementById('config-execution-mode').value;
+    const crossBrowserEnabled = document.getElementById('config-cross-browser')?.checked || false;
+    
+    // Get selected browsers
+    const browserCheckboxes = document.querySelectorAll('.browser-checkbox:checked');
+    const selectedBrowsers = Array.from(browserCheckboxes).map(cb => cb.value);
+    
+    console.log('🔍 Save Configuration Debug:');
+    console.log('- Execution Mode:', executionMode);
+    console.log('- Cross-Browser Enabled:', crossBrowserEnabled);
+    console.log('- Selected Browsers:', selectedBrowsers);
+    
     const updatedConfig = {
         automationFramework: document.getElementById('config-framework').value,
         browser: document.getElementById('config-browser').value,
         environment: document.getElementById('config-environment').value,
-        executionMode: document.getElementById('config-execution-mode').value,
+        executionMode: executionMode,
         baseUrl: document.getElementById('config-base-url').value,
         timeoutInSeconds: parseInt(document.getElementById('config-timeout').value),
         maxRetryCount: parseInt(document.getElementById('config-retry').value),
@@ -1724,11 +1976,27 @@ async function saveConfiguration() {
         enableVideo: document.getElementById('config-video').checked,
         enableScreenshots: document.getElementById('config-screenshots').checked,
         enableSelfHealing: document.getElementById('config-self-healing').checked,
+        // Cross-browser settings
+        crossBrowserParallelExecution: executionMode === 'Parallel' && crossBrowserEnabled,
+        parallelBrowsers: selectedBrowsers.length > 0 ? selectedBrowsers : ['Chrome'],
         // Keep other settings from original config
-        ...configuration
+        operatingSystem: configuration.operatingSystem || 'Windows',
+        reportPath: configuration.reportPath || 'TestReports',
+        screenshotPath: configuration.screenshotPath || 'Screenshots',
+        videoPath: configuration.videoPath || 'Videos',
+        logPath: configuration.logPath || 'Logs',
+        parallelWorkers: configuration.parallelWorkers || 4,
+        enableTracing: configuration.enableTracing || false,
+        enableAccessibilityTesting: configuration.enableAccessibilityTesting || false,
+        enableVisualRegression: configuration.enableVisualRegression || false,
+        enablePerformanceMetrics: configuration.enablePerformanceMetrics || false
     };
 
+    console.log('📤 Sending configuration to server:', updatedConfig);
+
     try {
+        showLoading('Saving configuration...');
+        
         const response = await fetch(`${API_BASE_URL}/configuration`, {
             method: 'PUT',
             headers: {
@@ -1738,15 +2006,63 @@ async function saveConfiguration() {
         });
 
         const data = await response.json();
+        
+        console.log('📥 Server response:', data);
+        console.log('📥 Returned configuration:', data.configuration);
+        
+        hideLoading();
 
         if (data.success) {
-            showSuccess('Configuration saved successfully!');
+            // Update global configuration variable
             configuration = data.configuration;
+            
+            console.log('✅ Updated global configuration:', configuration);
+            console.log('✅ Parallel Browsers in config:', configuration.parallelBrowsers);
+            console.log('✅ Cross-Browser Enabled:', configuration.crossBrowserParallelExecution);
+            
+            // Store in localStorage for persistence
+            try {
+                localStorage.setItem('agenticai-config', JSON.stringify(configuration));
+                console.log('✅ Saved to localStorage');
+            } catch (e) {
+                console.warn('Could not save to localStorage:', e);
+            }
+            
+            showSuccess('✅ Configuration saved! Changes will apply to all test executions.');
+            
+            // Add visual feedback
+            const saveBtn = document.querySelector('.header-actions .btn-success');
+            if (saveBtn) {
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                saveBtn.style.background = '#10b981';
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '';
+                }, 2000);
+            }
         } else {
-            showError(data.error);
+            console.error('❌ Save failed:', data.error);
+            showError('❌ Failed to save: ' + data.error);
         }
     } catch (error) {
-        showError('Failed to save configuration: ' + error.message);
+        console.error('❌ Exception during save:', error);
+        hideLoading();
+        showError('❌ Failed to save configuration: ' + error.message);
+    }
+}
+
+// Toggle cross-browser options visibility
+function toggleCrossBrowserOptions() {
+    const executionMode = document.getElementById('config-execution-mode')?.value;
+    const crossBrowserDiv = document.getElementById('cross-browser-options');
+    
+    if (crossBrowserDiv) {
+        if (executionMode === 'Parallel') {
+            crossBrowserDiv.classList.remove('hidden');
+        } else {
+            crossBrowserDiv.classList.add('hidden');
+        }
     }
 }
 
@@ -3104,12 +3420,12 @@ function loadSampleData() {
     if (fmt === 'JSON') {
         document.getElementById('dd-data').value =
             JSON.stringify([
-                { username: 'standard_user', password: 'secret_sauce', expectedResult: 'success' },
-                { username: 'locked_out_user', password: 'secret_sauce', expectedResult: 'failure' }
+                { username: 'user1', password: 'pass1', expectedResult: 'success' },
+                { username: 'user2', password: 'pass2', expectedResult: 'failure' }
             ], null, 2);
     } else {
         document.getElementById('dd-data').value =
-            'username,password,expectedResult\nstandard_user,secret_sauce,success\nlocked_out_user,secret_sauce,failure';
+            'username,password,expectedResult\nuser1,pass1,success\nuser2,pass2,failure';
     }
 }
 

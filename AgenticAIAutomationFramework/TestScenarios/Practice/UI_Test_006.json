@@ -1,0 +1,204 @@
+{
+  "ScenarioId": "c05ac44a-85f5-46c7-97c3-4729ef27faee",
+  "Name": "UI_Test_006",
+  "Description": "",
+  "Module": "Practice",
+  "Tags": [],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "label",
+      "Value": null,
+      "Description": "Click on label (\"Option1\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#checkBoxOption1",
+      "Value": null,
+      "Description": "Click on #checkBoxOption1",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=checkBoxOption1][value=option1]",
+      "Value": null,
+      "Description": "Check [name=checkBoxOption1][value=option1]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "#dropdown-class-example",
+      "Value": "option2",
+      "Description": "Select \"Option2\" from #dropdown-class-example",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[name=\"radioButton\"]",
+      "Value": null,
+      "Description": "Click on [name=\"radioButton\"]",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=radioButton][value=radio2]",
+      "Value": null,
+      "Description": "Check [name=radioButton][value=radio2]",
+      "Metadata": {},
+      "Timestamp": 8
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "label",
+        "Value": null,
+        "Description": "Click on label (\"Option1\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#checkBoxOption1",
+        "Value": null,
+        "Description": "Click on #checkBoxOption1",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=checkBoxOption1][value=option1]",
+        "Value": null,
+        "Description": "Check [name=checkBoxOption1][value=option1]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "#dropdown-class-example",
+        "Value": "option2",
+        "Description": "Select \"Option2\" from #dropdown-class-example",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[name=\"radioButton\"]",
+        "Value": null,
+        "Description": "Click on [name=\"radioButton\"]",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=radioButton][value=radio2]",
+        "Value": null,
+        "Description": "Check [name=radioButton][value=radio2]",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-01T00:03:50.7335444+05:30",
+  "ModifiedAt": "2026-03-01T00:03:50.7347182+05:30"
+}
