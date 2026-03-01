@@ -57,6 +57,8 @@ namespace AgenticAI.WebUI.Controllers
                     c.EnableAccessibilityTesting = config.EnableAccessibilityTesting;
                     c.EnableVisualRegression = config.EnableVisualRegression;
                     c.EnablePerformanceMetrics = config.EnablePerformanceMetrics;
+                    c.CrossBrowserParallelExecution = config.CrossBrowserParallelExecution;
+                    c.ParallelBrowsers = config.ParallelBrowsers ?? new List<BrowserType> { BrowserType.Chrome };
                 });
                 
                 return Ok(new

@@ -1,0 +1,164 @@
+{
+  "ScenarioId": "cb543bcc-f16d-4ef8-a801-f1bae8b79b6c",
+  "Name": "UI_Test_002",
+  "Description": "",
+  "Module": "Practice",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "#dropdown-class-example",
+      "Value": "option3",
+      "Description": "Select \"Option3\" from #dropdown-class-example",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#checkBoxOption3",
+      "Value": null,
+      "Description": "Click on #checkBoxOption3",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=checkBoxOption3][value=option3]",
+      "Value": null,
+      "Description": "Check [name=checkBoxOption3][value=option3]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#openwindow",
+      "Value": null,
+      "Description": "Click on #openwindow (\"Open Window\")",
+      "Metadata": {},
+      "Timestamp": 6
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "#dropdown-class-example",
+        "Value": "option3",
+        "Description": "Select \"Option3\" from #dropdown-class-example",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#checkBoxOption3",
+        "Value": null,
+        "Description": "Click on #checkBoxOption3",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=checkBoxOption3][value=option3]",
+        "Value": null,
+        "Description": "Check [name=checkBoxOption3][value=option3]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#openwindow",
+        "Value": null,
+        "Description": "Click on #openwindow (\"Open Window\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-02-28T23:06:16.1903525+05:30",
+  "ModifiedAt": "2026-02-28T23:06:16.1911433+05:30"
+}

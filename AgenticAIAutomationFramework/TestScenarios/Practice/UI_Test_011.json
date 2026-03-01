@@ -1,0 +1,103 @@
+{
+  "ScenarioId": "0a6a82cd-e33b-46bb-ab54-5ca16f74f0e8",
+  "Name": "UI_Test_011",
+  "Description": "Scroll check",
+  "Module": "Practice",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "#dropdown-class-example",
+      "Value": "option1",
+      "Description": "Select \"Option1\" from #dropdown-class-example",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 3
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "#dropdown-class-example",
+        "Value": "option1",
+        "Description": "Select \"Option1\" from #dropdown-class-example",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-01T22:06:30.6541235+05:30",
+  "ModifiedAt": "2026-03-01T22:06:30.6551339+05:30"
+}

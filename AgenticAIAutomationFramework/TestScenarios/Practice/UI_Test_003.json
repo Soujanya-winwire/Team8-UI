@@ -1,0 +1,59 @@
+{
+  "ScenarioId": "7990d40c-90aa-4022-b7d8-28eea8de0441",
+  "Name": "UI_Test_003",
+  "Description": "Testing",
+  "Module": "Practice",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#openwindow",
+      "Value": null,
+      "Description": "Click on #openwindow (\"Open Window\")",
+      "Metadata": {},
+      "Timestamp": 1
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#openwindow",
+        "Value": null,
+        "Description": "Click on #openwindow (\"Open Window\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-02-28T23:09:33.7095756+05:30",
+  "ModifiedAt": "2026-02-28T23:09:33.7106108+05:30"
+}

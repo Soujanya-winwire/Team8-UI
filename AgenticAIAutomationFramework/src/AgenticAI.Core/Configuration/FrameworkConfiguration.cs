@@ -24,8 +24,8 @@ namespace AgenticAI.Core.Configuration
         [JsonConverter(typeof(StringEnumConverter))]
         public ExecutionMode ExecutionMode { get; set; } = ExecutionMode.Sequential;
 
-        // Base URL for testing
-        public string BaseUrl { get; set; } = "https://www.saucedemo.com";
+        // Base URL for testing - Optional, can be overridden by individual test scenarios
+        public string BaseUrl { get; set; } = string.Empty;
 
         public bool Headless { get; set; } = false;
         public bool EnableVideo { get; set; } = true;
@@ -35,6 +35,17 @@ namespace AgenticAI.Core.Configuration
         public int TimeoutInSeconds { get; set; } = 30;
         public int ParallelWorkers { get; set; } = 4;
         public bool EnableSelfHealing { get; set; } = true;
+        
+        // Cross-browser parallel execution
+        public bool CrossBrowserParallelExecution { get; set; } = false;
+        
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
+        public List<BrowserType> ParallelBrowsers { get; set; } = new List<BrowserType> 
+        { 
+            BrowserType.Chrome, 
+            BrowserType.Firefox, 
+            BrowserType.Edge 
+        };
         public bool EnableAccessibilityTesting { get; set; } = false;
         public bool EnableVisualRegression { get; set; } = false;
         public bool EnablePerformanceMetrics { get; set; } = true;

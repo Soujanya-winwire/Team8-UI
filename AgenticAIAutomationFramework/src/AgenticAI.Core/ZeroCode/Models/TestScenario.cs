@@ -13,6 +13,16 @@ namespace AgenticAI.Core.ZeroCode.Models
         public string StartUrl { get; set; } = "";
         
         /// <summary>
+        /// If true, this scenario will be skipped during execution
+        /// </summary>
+        public bool IsSkipped { get; set; } = false;
+        
+        /// <summary>
+        /// Reason for skipping (optional)
+        /// </summary>
+        public string? SkipReason { get; set; }
+        
+        /// <summary>
         /// Legacy: Kept for backward compatibility with existing test scenarios
         /// New scenarios should use Steps instead
         /// </summary>

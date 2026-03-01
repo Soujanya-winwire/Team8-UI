@@ -14,6 +14,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 builder.Services.AddEndpointsApiExplorer();
+
+// Add HttpClient for CI/CD API calls
+builder.Services.AddHttpClient();
+
 builder.Services.AddSignalR()
     .AddJsonProtocol(options =>
     {

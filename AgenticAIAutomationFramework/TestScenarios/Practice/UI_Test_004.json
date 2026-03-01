@@ -1,0 +1,227 @@
+{
+  "ScenarioId": "fa81d1d4-2e4b-4679-a993-646e1de31f5d",
+  "Name": "UI_Test_004",
+  "Description": "Test",
+  "Module": "Practice",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#autocomplete",
+      "Value": null,
+      "Description": "Click on #autocomplete",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#autocomplete",
+      "Value": "India",
+      "Description": "Type \"India\" into #autocomplete",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#ui-id-3",
+      "Value": null,
+      "Description": "Click on #ui-id-3 (\"India\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "#dropdown-class-example",
+      "Value": "option1",
+      "Description": "Select \"Option1\" from #dropdown-class-example",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#checkBoxOption1",
+      "Value": null,
+      "Description": "Click on #checkBoxOption1",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=checkBoxOption1][value=option1]",
+      "Value": null,
+      "Description": "Check [name=checkBoxOption1][value=option1]",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#opentab",
+      "Value": null,
+      "Description": "Click on #opentab (\"Open Tab\")",
+      "Metadata": {},
+      "Timestamp": 9
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#autocomplete",
+        "Value": null,
+        "Description": "Click on #autocomplete",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#autocomplete",
+        "Value": "India",
+        "Description": "Type \"India\" into #autocomplete",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#ui-id-3",
+        "Value": null,
+        "Description": "Click on #ui-id-3 (\"India\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "#dropdown-class-example",
+        "Value": "option1",
+        "Description": "Select \"Option1\" from #dropdown-class-example",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#checkBoxOption1",
+        "Value": null,
+        "Description": "Click on #checkBoxOption1",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=checkBoxOption1][value=option1]",
+        "Value": null,
+        "Description": "Check [name=checkBoxOption1][value=option1]",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#opentab",
+        "Value": null,
+        "Description": "Click on #opentab (\"Open Tab\")",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-02-28T23:32:18.9503742+05:30",
+  "ModifiedAt": "2026-02-28T23:32:18.9514277+05:30"
+}

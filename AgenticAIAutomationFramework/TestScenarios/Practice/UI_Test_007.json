@@ -1,0 +1,185 @@
+{
+  "ScenarioId": "3ea1ae76-0b55-4ef6-ad4b-0463c5109539",
+  "Name": "UI_Test_007",
+  "Description": "new",
+  "Module": "Practice",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "Actions": [
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "#dropdown-class-example",
+      "Value": "option1",
+      "Description": "Select \"Option1\" from #dropdown-class-example",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#checkBoxOption1",
+      "Value": null,
+      "Description": "Click on #checkBoxOption1",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=checkBoxOption1][value=option1]",
+      "Value": null,
+      "Description": "Check [name=checkBoxOption1][value=option1]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[name=\"radioButton\"]",
+      "Value": null,
+      "Description": "Click on [name=\"radioButton\"]",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=radioButton][value=radio2]",
+      "Value": null,
+      "Description": "Check [name=radioButton][value=radio2]",
+      "Metadata": {},
+      "Timestamp": 7
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "#dropdown-class-example",
+        "Value": "option1",
+        "Description": "Select \"Option1\" from #dropdown-class-example",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#checkBoxOption1",
+        "Value": null,
+        "Description": "Click on #checkBoxOption1",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=checkBoxOption1][value=option1]",
+        "Value": null,
+        "Description": "Check [name=checkBoxOption1][value=option1]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[name=\"radioButton\"]",
+        "Value": null,
+        "Description": "Click on [name=\"radioButton\"]",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=radioButton][value=radio2]",
+        "Value": null,
+        "Description": "Check [name=radioButton][value=radio2]",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-01T00:12:46.0258125+05:30",
+  "ModifiedAt": "2026-03-01T00:12:46.0268753+05:30"
+}

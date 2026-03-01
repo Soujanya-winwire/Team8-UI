@@ -1,0 +1,122 @@
+{
+  "ScenarioId": "cf347357-f3b7-432d-b061-43cc743252bb",
+  "Name": "UI_Test_005",
+  "Description": "",
+  "Module": "Practice",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#checkBoxOption1",
+      "Value": null,
+      "Description": "Click on #checkBoxOption1",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=checkBoxOption1][value=option1]",
+      "Value": null,
+      "Description": "Check [name=checkBoxOption1][value=option1]",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[name=\"radioButton\"]",
+      "Value": null,
+      "Description": "Click on [name=\"radioButton\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=radioButton][value=radio2]",
+      "Value": null,
+      "Description": "Check [name=radioButton][value=radio2]",
+      "Metadata": {},
+      "Timestamp": 4
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#checkBoxOption1",
+        "Value": null,
+        "Description": "Click on #checkBoxOption1",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=checkBoxOption1][value=option1]",
+        "Value": null,
+        "Description": "Check [name=checkBoxOption1][value=option1]",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[name=\"radioButton\"]",
+        "Value": null,
+        "Description": "Click on [name=\"radioButton\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=radioButton][value=radio2]",
+        "Value": null,
+        "Description": "Check [name=radioButton][value=radio2]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-02-28T23:46:56.5261159+05:30",
+  "ModifiedAt": "2026-02-28T23:46:56.5279206+05:30"
+}

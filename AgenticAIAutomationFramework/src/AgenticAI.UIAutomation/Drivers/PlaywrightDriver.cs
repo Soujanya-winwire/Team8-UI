@@ -29,8 +29,7 @@ namespace AgenticAI.UIAutomation.Drivers
 
             var launchOptions = new BrowserTypeLaunchOptions
             {
-                Headless = _config.Headless,
-                SlowMo = 100
+                Headless = _config.Headless
             };
 
             _browser = _config.Browser switch
@@ -66,7 +65,6 @@ namespace AgenticAI.UIAutomation.Drivers
             }
 
             _page = await _context.NewPageAsync();
-            _page.SetDefaultTimeout(_config.TimeoutInSeconds * 1000);
         }
 
         public async Task NavigateAsync(string url)
@@ -75,7 +73,7 @@ namespace AgenticAI.UIAutomation.Drivers
             {
                 await InitializeAsync();
             }
-            await _page!.GotoAsync(url, new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+            await _page!.GotoAsync(url);
         }
 
         public async Task<Core.Interfaces.IWebElement> FindElementAsync(string locator, string strategy = "auto")
@@ -177,7 +175,7 @@ namespace AgenticAI.UIAutomation.Drivers
             var selector = GetSelector(locator, "auto");
             var locatorEl = _page!.Locator(selector);
             await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
-            await locatorEl.ScrollIntoViewIfNeededAsync();
+            // Removed ScrollIntoViewIfNeeded - Playwright auto-scrolls when needed
 
             // Try by value attribute first, then by visible text (label), then by index
             try
@@ -214,7 +212,8 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task ScrollToAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            await _page!.Locator(selector).ScrollIntoViewIfNeededAsync();
+            var locatorEl = _page!.Locator(selector);
+            await locatorEl.ScrollIntoViewIfNeededAsync();
         }
 
         public async Task TypeAsync(string locator, string text)
@@ -246,10 +245,7 @@ namespace AgenticAI.UIAutomation.Drivers
 
         public async Task<byte[]> TakeScreenshotAsync()
         {
-            return await _page!.ScreenshotAsync(new PageScreenshotOptions
-            {
-                FullPage = true
-            });
+            return await _page!.ScreenshotAsync();
         }
 
         public async Task<string> GetTitleAsync()

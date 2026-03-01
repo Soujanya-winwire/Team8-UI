@@ -91,6 +91,9 @@ namespace AgenticAI.WebUI.Controllers
 
                 var results = await runner.RunAsync(scenario, dataSet);
 
+                // Save each result to history
+                await SaveDataDrivenResultsToHistory(results, scenario, request);
+
                 // Build serializable response
                 var resultDtos = results.Select(r => new
                 {
@@ -110,7 +113,8 @@ namespace AgenticAI.WebUI.Controllers
                         stepName = s.StepName,
                         description = s.Description,
                         status = s.Status.ToString(),
-                        errorMessage = s.ErrorMessage
+                        errorMessage = s.ErrorMessage,
+                        screenshotPath = s.ScreenshotPath
                     }).ToList()
                 }).ToList();
 
@@ -133,6 +137,149 @@ namespace AgenticAI.WebUI.Controllers
                 Log.Error(ex, "DataDriven execute error");
                 return BadRequest(new { success = false, error = ex.Message });
             }
+        }
+
+        /// <summary>
+        /// Save each data-driven test result to execution history
+        /// </summary>
+        private async Task SaveDataDrivenResultsToHistory(
+            List<DataDrivenResult> results, 
+            Core.ZeroCode.Models.TestScenario scenario,
+            DataDrivenExecuteRequest request)
+        {
+            var historyDir = Path.Combine(Directory.GetCurrentDirectory(), "TestHistory");
+            if (!Directory.Exists(historyDir))
+            {
+                Directory.CreateDirectory(historyDir);
+            }
+            var historyFilePath = Path.Combine(historyDir, "execution-history.json");
+            
+            try
+            {
+                // Load existing history
+                List<TestExecutionHistory> history;
+                if (System.IO.File.Exists(historyFilePath))
+                {
+                    var json = await System.IO.File.ReadAllTextAsync(historyFilePath);
+                    history = System.Text.Json.JsonSerializer.Deserialize<List<TestExecutionHistory>>(json, 
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }) 
+                        ?? new List<TestExecutionHistory>();
+                }
+                else
+                {
+                    history = new List<TestExecutionHistory>();
+                }
+                
+                var browser = GetBrowserFromConfig();
+                var environment = GetEnvironmentFromConfig();
+                
+                foreach (var result in results)
+                {
+                    // Format the test name to include row number and data
+                    var dataInfo = string.Join(", ", result.DataRow.Take(2).Select(kv => $"{kv.Key}={kv.Value}"));
+                    var testName = $"{scenario.Name} [Row {result.RowIndex + 1}: {dataInfo}]";
+                    
+                    // Calculate duration
+                    var durationSeconds = 0.0;
+                    if (result.Result.EndTime != default && result.Result.StartTime != default)
+                    {
+                        durationSeconds = (result.Result.EndTime - result.Result.StartTime).TotalSeconds;
+                    }
+                    
+                    // Create history entry
+                    var historyEntry = new TestExecutionHistory
+                    {
+                        ExecutionId = Guid.NewGuid().ToString(),
+                        ScenarioName = testName,
+                        Module = scenario.Module,
+                        ExecutedAt = DateTime.Now.ToString("o"),
+                        Duration = (int)durationSeconds,
+                        Status = result.Result.Status.ToString(),
+                        Browser = browser,
+                        Environment = environment,
+                        Steps = result.Result.Steps.Select(s => new StepResult
+                        {
+                            StepName = s.StepName,
+                            Description = s.Description,
+                            Status = s.Status.ToString(),
+                            Error = s.ErrorMessage,
+                            ScreenshotPath = s.ScreenshotPath
+                        }).ToList(),
+                        Error = result.Result.ErrorMessage,
+                        Screenshots = result.Result.Steps
+                            .Where(s => !string.IsNullOrEmpty(s.ScreenshotPath))
+                            .Select(s => s.ScreenshotPath)
+                            .ToList()
+                    };
+                    
+                    // Add to beginning of list (most recent first)
+                    history.Insert(0, historyEntry);
+                }
+                
+                // Clean up old records (keep last 365 days)
+                var oneYearAgo = DateTime.Now.AddDays(-365);
+                history = history
+                    .Where(h => DateTime.Parse(h.ExecutedAt) >= oneYearAgo)
+                    .ToList();
+                
+                // Save updated history
+                var updatedJson = System.Text.Json.JsonSerializer.Serialize(history, 
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                await System.IO.File.WriteAllTextAsync(historyFilePath, updatedJson);
+                
+                Log.Information("✅ Saved {Count} data-driven results to history", results.Count);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("⚠️ Failed to save data-driven results to history: {Message}", ex.Message);
+                // Don't fail the entire execution if history save fails
+            }
+        }
+
+        /// <summary>
+        /// Get browser from configuration
+        /// </summary>
+        private string GetBrowserFromConfig()
+        {
+            try
+            {
+                var configPath = Path.Combine(Directory.GetCurrentDirectory(), "Configuration", "framework-config.json");
+                if (System.IO.File.Exists(configPath))
+                {
+                    var json = System.IO.File.ReadAllText(configPath);
+                    var config = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    if (config != null && config.ContainsKey("Browser"))
+                    {
+                        return config["Browser"]?.ToString() ?? "Chrome";
+                    }
+                }
+            }
+            catch { }
+            
+            return "Chrome";
+        }
+
+        /// <summary>
+        /// Get environment from configuration
+        /// </summary>
+        private string GetEnvironmentFromConfig()
+        {
+            try
+            {
+                var configPath = Path.Combine(Directory.GetCurrentDirectory(), "Configuration", "framework-config.json");
+                if (System.IO.File.Exists(configPath))
+                {
+                    var json = System.IO.File.ReadAllText(configPath);
+                    var config = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                    if (config != null && config.ContainsKey("Environment"))
+                    {
+                        return config["Environment"]?.ToString() ?? "QA";
+                    }
+                }
+            }
+            catch { }
+            
+            return "QA";
         }
 
         // ──────────────────────────────────────────────

@@ -350,11 +350,43 @@ namespace AgenticAI.WebUI.Controllers
             {
                 await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", module, "running", "Starting module execution...");
                 
-                var runner = new ZeroCodeTestRunner(async () =>
-                {
-                    var driver = await WebDriverFactory.CreateDriverAsync();
-                    return (IWebDriver)driver;
-                });
+                // Create runner with browser-specific factory for cross-browser support
+                var runner = new ZeroCodeTestRunner(
+                    driverFactory: async () =>
+                    {
+                        var driver = await WebDriverFactory.CreateDriverAsync();
+                        return (IWebDriver)driver;
+                    },
+                    browserSpecificDriverFactory: async (browserType) =>
+                    {
+                        // Create a custom config with the specific browser
+                        var config = FrameworkConfigManager.Instance.FrameworkConfig;
+                        var customConfig = new AgenticAI.Core.Configuration.FrameworkConfiguration
+                        {
+                            AutomationFramework = config.AutomationFramework,
+                            Browser = browserType, // Override with specific browser
+                            OperatingSystem = config.OperatingSystem,
+                            Environment = config.Environment,
+                            ExecutionMode = config.ExecutionMode,
+                            BaseUrl = config.BaseUrl,
+                            Headless = config.Headless,
+                            EnableVideo = config.EnableVideo,
+                            EnableScreenshots = config.EnableScreenshots,
+                            EnableTracing = config.EnableTracing,
+                            MaxRetryCount = config.MaxRetryCount,
+                            TimeoutInSeconds = config.TimeoutInSeconds,
+                            ParallelWorkers = config.ParallelWorkers,
+                            EnableSelfHealing = config.EnableSelfHealing,
+                            ScreenshotPath = config.ScreenshotPath,
+                            VideoPath = config.VideoPath,
+                            ReportPath = config.ReportPath,
+                            LogPath = config.LogPath
+                        };
+                        
+                        var driver = await WebDriverFactory.CreateDriverAsync(customConfig);
+                        return (IWebDriver)driver;
+                    }
+                );
                 
                 var results = await runner.ExecuteModuleAsync(module);
                 
@@ -429,11 +461,42 @@ namespace AgenticAI.WebUI.Controllers
             {
                 await _hubContext.Clients.All.SendAsync("ReceiveTestUpdate", tag, "running", "Starting tagged tests execution...");
                 
-                var runner = new ZeroCodeTestRunner(async () =>
-                {
-                    var driver = await WebDriverFactory.CreateDriverAsync();
-                    return (IWebDriver)driver;
-                });
+                // Create runner with browser-specific factory for cross-browser support
+                var runner = new ZeroCodeTestRunner(
+                    driverFactory: async () =>
+                    {
+                        var driver = await WebDriverFactory.CreateDriverAsync();
+                        return (IWebDriver)driver;
+                    },
+                    browserSpecificDriverFactory: async (browserType) =>
+                    {
+                        var config = FrameworkConfigManager.Instance.FrameworkConfig;
+                        var customConfig = new AgenticAI.Core.Configuration.FrameworkConfiguration
+                        {
+                            AutomationFramework = config.AutomationFramework,
+                            Browser = browserType,
+                            OperatingSystem = config.OperatingSystem,
+                            Environment = config.Environment,
+                            ExecutionMode = config.ExecutionMode,
+                            BaseUrl = config.BaseUrl,
+                            Headless = config.Headless,
+                            EnableVideo = config.EnableVideo,
+                            EnableScreenshots = config.EnableScreenshots,
+                            EnableTracing = config.EnableTracing,
+                            MaxRetryCount = config.MaxRetryCount,
+                            TimeoutInSeconds = config.TimeoutInSeconds,
+                            ParallelWorkers = config.ParallelWorkers,
+                            EnableSelfHealing = config.EnableSelfHealing,
+                            ScreenshotPath = config.ScreenshotPath,
+                            VideoPath = config.VideoPath,
+                            ReportPath = config.ReportPath,
+                            LogPath = config.LogPath
+                        };
+                        
+                        var driver = await WebDriverFactory.CreateDriverAsync(customConfig);
+                        return (IWebDriver)driver;
+                    }
+                );
                 
                 var results = await runner.ExecuteByTagAsync(tag);
                 
