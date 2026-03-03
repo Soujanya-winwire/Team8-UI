@@ -1,5 +1,221 @@
 [
   {
+    "ExecutionId": "cc95c79d-166d-40ed-8ace-f5bc4b97f028",
+    "ScenarioName": "Sample-API-Demo1",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-03T15:38:27.5608897\u002B05:30",
+    "Duration": 43,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Navigate_2026-03-03_15-37-47_910.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_2026-03-03_15-37-48_640.png"
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check [name=radioButton][value=radio1]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Check_2026-03-03_15-37-49_256.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Navigate_2026-03-03_15-37-52_019.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\nOption1\nOption2\nOption3\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_2026-03-03_15-37-52_663.png"
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option1\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Select_2026-03-03_15-37-53_241.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\nOption1\nOption2\nOption3\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_2026-03-03_15-37-53_882.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Courses\u0022 (\u0022Courses\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022text=\\\u0022Courses\\\u0022\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_FAILED_2026-03-03_15-38-26_477.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022text=\\\u0022Courses\\\u0022\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Navigate_2026-03-03_15-37-47_910.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_2026-03-03_15-37-48_640.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Check_2026-03-03_15-37-49_256.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Navigate_2026-03-03_15-37-52_019.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_2026-03-03_15-37-52_663.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Select_2026-03-03_15-37-53_241.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_2026-03-03_15-37-53_882.png",
+      "TestResults/Screenshots\\Test\\Sample-API-Demo1_Click_FAILED_2026-03-03_15-38-26_477.png"
+    ]
+  },
+  {
+    "ExecutionId": "23ad00d1-9e2b-40d8-b4d7-babcff2494ed",
+    "ScenarioName": "Sample-API-Demo",
+    "Module": "Rel",
+    "ExecutedAt": "2026-03-03T15:26:40.0281542\u002B05:30",
+    "Duration": 82,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Navigate_2026-03-03_15-25-25_162.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Navigate_2026-03-03_15-25-29_314.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_email",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-30_026.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022ganesh@relativity.com\u0022 into #_email",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Type_2026-03-03_15-25-30_688.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #continue (\u0022Continue\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-31_393.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_password__password_TextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-32_093.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test1234!\u0022 into #_password__password_TextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Type_2026-03-03_15-25-32_723.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_login (\u0022Login\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-46_890.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-49_860.png"
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022smoke workspace-rtf automation\u0022 into #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Type_2026-03-03_15-25-50_300.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Smoke WorkSpace-RTF Automation\u0022 (\u0022Smoke WorkSpace-RTF Automation\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-54_361.png"
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: #_ListPage",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_SwitchToFrame_2026-03-03_15-25-55_360.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button.icon-document-preview-panel-wgt",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-26-00_082.png"
+      },
+      {
+        "StepName": "SwitchToDefaultContent",
+        "Description": "Switch to default content",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_SwitchToDefaultContent_2026-03-03_15-26-00_531.png"
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #os-header_home_button_link",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#os-header_home_button_link\u0022)\n  -   locator resolved to 2 elements. Proceeding with the first one: \u003Ca type=\u0022image\u0022 title=\u0022Home\u0022 alt=\u0022Relativity\u0022 class\u2026\u003E\u2026\u003C/a\u003E\n  - attempting click action\n  -   waiting for element to be visible, enabled and stable\n  -     element is not visible - waiting...",
+        "ScreenshotPath": "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_FAILED_2026-03-03_15-26-33_078.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#os-header_home_button_link\u0022)\n  -   locator resolved to 2 elements. Proceeding with the first one: \u003Ca type=\u0022image\u0022 title=\u0022Home\u0022 alt=\u0022Relativity\u0022 class\u2026\u003E\u2026\u003C/a\u003E\n  - attempting click action\n  -   waiting for element to be visible, enabled and stable\n  -     element is not visible - waiting...",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Navigate_2026-03-03_15-25-25_162.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Navigate_2026-03-03_15-25-29_314.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-30_026.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Type_2026-03-03_15-25-30_688.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-31_393.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-32_093.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Type_2026-03-03_15-25-32_723.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-46_890.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-49_860.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Type_2026-03-03_15-25-50_300.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-25-54_361.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_SwitchToFrame_2026-03-03_15-25-55_360.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_2026-03-03_15-26-00_082.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_SwitchToDefaultContent_2026-03-03_15-26-00_531.png",
+      "TestResults/Screenshots\\Rel\\Sample-API-Demo_Click_FAILED_2026-03-03_15-26-33_078.png"
+    ]
+  },
+  {
     "ExecutionId": "8d5a7d23-6427-4908-9127-972fe0e7540a",
     "ScenarioName": "UI_Test_013",
     "Module": "Practice",

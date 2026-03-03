@@ -293,6 +293,34 @@ namespace AgenticAI.Core.ZeroCode
                         await _driver.WaitForElementAsync(action.Locator, timeout);
                         break;
 
+                    // IFrame handling actions
+                    case "switchtoframe":
+                        await _driver.SwitchToFrameAsync(action.Locator);
+                        Logger.Info($"Switched to iframe: {action.Locator}");
+                        
+                        // Add a small wait to ensure frame content is loaded
+                        await Task.Delay(500);
+                        break;
+
+                    case "switchtoframebyindex":
+                        var frameIndex = int.TryParse(action.Value, out var idx) ? idx : 0;
+                        await _driver.SwitchToFrameByIndexAsync(frameIndex);
+                        Logger.Info($"Switched to iframe by index: {frameIndex}");
+                        
+                        // Add a small wait to ensure frame content is loaded
+                        await Task.Delay(500);
+                        break;
+
+                    case "switchtodefaultcontent":
+                        await _driver.SwitchToDefaultContentAsync();
+                        Logger.Info("Switched to default content (main frame)");
+                        break;
+
+                    case "switchtoparentframe":
+                        await _driver.SwitchToParentFrameAsync();
+                        Logger.Info("Switched to parent frame");
+                        break;
+
                     default:
                         Logger.Warning($"Unknown action type: {action.ActionType}");
                         break;

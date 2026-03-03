@@ -23,6 +23,12 @@ namespace AgenticAI.Core.Interfaces
         Task<string> GetCurrentUrlAsync();
         Task CloseAsync();
         Task DisposeAsync();
+        
+        // IFrame handling methods
+        Task SwitchToFrameAsync(string frameLocator);
+        Task SwitchToFrameByIndexAsync(int index);
+        Task SwitchToDefaultContentAsync();
+        Task SwitchToParentFrameAsync();
     }
 
     /// <summary>
