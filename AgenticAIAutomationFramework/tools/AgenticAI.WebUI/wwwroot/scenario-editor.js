@@ -52,69 +52,233 @@ async function viewScenario(module, name) {
 }
 
 /**
- * Render the editable scenario modal with premium UI
+ * Render the editable scenario modal with compact layout
  */
 function renderScenarioModal() {
     const scenario = currentEditingScenario;
 
     showModal('Scenario Details', `
-        <div style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
-            <!-- Basic Info - Premium Display -->
-            <div class="glass-card mb-20">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+        <div style="display: flex; flex-direction: column; max-height: calc(90vh - 140px);">
+            <!-- Compact Metadata Section (Grid Layout) -->
+            <div style="background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 14px;">
                     <div>
-                        <label class="premium-form-label">Name</label> 
-                        <div style="color: #1e293b; font-weight: 500;">${escapeHtml(scenario.name)}</div>
+                        <strong style="color: #6b7280; font-size: 12px; text-transform: uppercase;">Name</strong>
+                        <div style="color: #1f2937; font-weight: 600; margin-top: 4px;">${escapeHtml(scenario.name)}</div>
                     </div>
                     <div>
-                        <label class="premium-form-label">Module</label> 
-                        <div><span class="step-type-badge action" style="padding: 4px 10px;">${escapeHtml(scenario.module)}</span></div>
+                        <strong style="color: #6b7280; font-size: 12px; text-transform: uppercase;">Module</strong>
+                        <div style="margin-top: 4px;"><span class="badge badge-primary">${escapeHtml(scenario.module)}</span></div>
                     </div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label class="premium-form-label">Description</label>
-                    <div style="color: #475569; font-size: 14px;">${escapeHtml(scenario.description) || 'No description provided'}</div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <label class="premium-form-label">Start URL</label>
-                    <div style="color: #475569; font-size: 14px; word-break: break-all;"><code>${escapeHtml(scenario.startUrl)}</code></div>
-                </div>
-                <div>
-                    <label class="premium-form-label">Tags</label>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px;">
-                        ${scenario.tags.map(tag => `<span class="badge badge-info" style="border-radius: 6px; font-weight: 500;">${escapeHtml(tag)}</span>`).join('') || '<span style="color: #94a3b8; font-size: 12px;">No tags</span>'}
+                    <div style="grid-column: 1 / -1;">
+                        <strong style="color: #6b7280; font-size: 12px; text-transform: uppercase;">Start URL</strong>
+                        <div style="color: #1f2937; margin-top: 4px; word-break: break-all; font-size: 13px;">${escapeHtml(scenario.startUrl)}</div>
+                    </div>
+                    <div>
+                        <strong style="color: #6b7280; font-size: 12px; text-transform: uppercase;">Tags</strong>
+                        <div style="margin-top: 4px; display: flex; gap: 4px; flex-wrap: wrap;">
+                            ${scenario.tags.map(t => `<span class="badge badge-info" style="margin-right: 4px; font-size: 11px;">${escapeHtml(t)}</span>`).join('') || '<span style="color: #6b7280; font-size: 12px;">No tags</span>'}
+                        </div>
+                    </div>
+                    <div>
+                        <strong style="color: #6b7280; font-size: 12px; text-transform: uppercase;">Description</strong>
+                        <div style="color: #1f2937; margin-top: 4px; font-size: 13px;">${escapeHtml(scenario.description) || 'No description'}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Test Steps Timeline -->
-            <div style="margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h4 style="margin: 0; color: #1e293b; font-weight: 700; font-size: 1.1em;">
-                        <i class="fas fa-stream" style="color: var(--primary-color); margin-right: 8px;"></i> Test Scenario Flow
-                    </h4>
-                </div>
-                <div id="steps-list-container">
-                    ${renderStepsList()}
-                </div>
+            <!-- Scrollable Content Area (Compact Table for Steps) -->
+            <div style="flex: 1; overflow-y: auto; margin-bottom: 16px;">
+                ${renderCompactStepsList()}
             </div>
-        </div>
 
-        <!-- Action Footer -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-            <button class="btn btn-success" onclick="executeScenarioFromModal()" style="box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
-                <i class="fas fa-play"></i> Execute Scenario
-            </button>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-secondary" onclick="closeModal()" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0;">
-                    Cancel
+            <!-- Sticky Action Buttons at Bottom -->
+            <div style="display: flex; gap: 12px; padding-top: 16px; border-top: 2px solid #e5e7eb; background: white; justify-content: space-between;">
+                <button class="btn btn-success" onclick="executeScenarioFromModal()" style="flex: 1; max-width: 200px;">
+                    <i class="fas fa-play"></i> Execute Scenario
                 </button>
-                <button class="btn btn-primary" onclick="saveScenarioChanges()" style="box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="closeModal();">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn btn-primary" onclick="saveScenarioChanges()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     `);
+}
+
+/**
+ * Render steps in a compact table layout
+ */
+function renderCompactStepsList() {
+    const actions = currentEditingScenario.actions || [];
+    const assertions = currentEditingScenario.assertions || [];
+
+    if (actions.length === 0 && assertions.length === 0) {
+        return `
+            <div style="text-align: center; padding: 40px 20px; background: white; border-radius: 8px; border: 1px dashed #e5e7eb;">
+                <i class="fas fa-magic" style="font-size: 2.5em; color: var(--primary-color); margin-bottom: 15px; opacity: 0.3;"></i>
+                <h3 style="color: var(--dark); margin-bottom: 10px; font-size: 1.1em;">No Steps Defined</h3>
+                <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Add actions or assertions to define your test scenario</p>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="btn btn-primary btn-sm" onclick="addNewStep(0, 'action')">
+                        <i class="fas fa-plus"></i> Add Action
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="addNewStep(0, 'assertion')">
+                        <i class="fas fa-check"></i> Add Assertion
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    let html = '<div style="margin-bottom: 20px;">';
+    
+    // Actions Table
+    if (actions.length > 0) {
+        html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h4 style="margin: 0; color: #1f2937; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-list-ol" style="color: var(--primary-color);"></i>
+                    Scenario Flow (${actions.length} steps)
+                </h4>
+                <button class="btn btn-primary btn-sm" onclick="addNewStep(${actions.length}, 'action')" title="Add Step at End">
+                    <i class="fas fa-plus"></i> Add Step
+                </button>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; table-layout: fixed;">
+                <thead>
+                    <tr style="background: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+                        <th style="padding: 10px 12px; text-align: left; width: 50px; color: #6b7280; font-weight: 600;">#</th>
+                        <th style="padding: 10px 12px; text-align: left; width: 100px; color: #6b7280; font-weight: 600;">Action</th>
+                        <th style="padding: 10px 12px; text-align: left; width: 150px; color: #6b7280; font-weight: 600;">Locator</th>
+                        <th style="padding: 10px 12px; text-align: left; width: 120px; color: #6b7280; font-weight: 600;">Value</th>
+                        <th style="padding: 10px 12px; text-align: center; width: 200px; color: #6b7280; font-weight: 600;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        actions.forEach((action, idx) => {
+            const canMoveUp = idx > 0;
+            const canMoveDown = idx < actions.length - 1;
+            
+            html += `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 10px 12px; color: #3b82f6; font-weight: 600;">${idx + 1}</td>
+                    <td style="padding: 10px 12px;">
+                        <span class="badge badge-primary" style="font-size: 11px;">${escapeHtml(action.actionType)}</span>
+                    </td>
+                    <td style="padding: 10px 12px; color: #374151; font-family: monospace; font-size: 11px; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.4;">
+                        ${escapeHtml(action.locator)}
+                    </td>
+                    <td style="padding: 10px 12px; color: #6b7280; font-size: 11px; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.4;">
+                        ${action.value ? escapeHtml(action.value) : '-'}
+                    </td>
+                    <td style="padding: 10px 12px; text-align: center;">
+                        <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #f0f9ff; color: #0284c7; border: none; cursor: pointer; ${!canMoveUp ? 'opacity: 0.3; cursor: not-allowed;' : ''}" 
+                                    onclick="moveStepUp(${idx})" title="Move Up" ${!canMoveUp ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #f0f9ff; color: #0284c7; border: none; cursor: pointer; ${!canMoveDown ? 'opacity: 0.3; cursor: not-allowed;' : ''}" 
+                                    onclick="moveStepDown(${idx})" title="Move Down" ${!canMoveDown ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #ecfdf5; color: #059669; border: none; cursor: pointer;" 
+                                    onclick="addNewStep(${idx + 1}, 'action')" title="Add Step Below">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #f1f5f9; color: var(--primary-color); border: none; cursor: pointer;" 
+                                    onclick="editStep(${idx}, 'action')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #fef2f2; color: var(--danger-color); border: none; cursor: pointer;" 
+                                    onclick="deleteStep(${idx})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+        `;
+    }
+    
+    // Assertions Table
+    const unassignedAssertions = assertions.filter(a => 
+        a.afterActionIndex === undefined || a.afterActionIndex === null || a.afterActionIndex < 0
+    );
+    
+    if (unassignedAssertions.length > 0) {
+        html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 20px;">
+                <h4 style="margin: 0; color: #1f2937; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                    Assertions (${unassignedAssertions.length})
+                </h4>
+                <button class="btn btn-success btn-sm" onclick="addNewStep(${actions.length}, 'assertion')" title="Add Assertion">
+                    <i class="fas fa-plus"></i> Add Assertion
+                </button>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed;">
+                <thead>
+                    <tr style="background: #f0fdf4; border-bottom: 2px solid #d1fae5;">
+                        <th style="padding: 10px 12px; text-align: left; width: 50px; color: #059669; font-weight: 600;">#</th>
+                        <th style="padding: 10px 12px; text-align: left; width: 120px; color: #059669; font-weight: 600;">Type</th>
+                        <th style="padding: 10px 12px; text-align: left; width: 150px; color: #059669; font-weight: 600;">Locator</th>
+                        <th style="padding: 10px 12px; text-align: left; width: 150px; color: #059669; font-weight: 600;">Expected Value</th>
+                        <th style="padding: 10px 12px; text-align: center; width: 150px; color: #059669; font-weight: 600;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        unassignedAssertions.forEach((assertion, idx) => {
+            const globalIndex = assertions.indexOf(assertion);
+            html += `
+                <tr style="border-bottom: 1px solid #d1fae5;">
+                    <td style="padding: 10px 12px; color: #10b981; font-weight: 600;">${idx + 1}</td>
+                    <td style="padding: 10px 12px;">
+                        <span class="badge badge-success" style="font-size: 11px;">${escapeHtml(assertion.type)}</span>
+                    </td>
+                    <td style="padding: 10px 12px; color: #374151; font-family: monospace; font-size: 11px; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.4;">
+                        ${escapeHtml(assertion.locator)}
+                    </td>
+                    <td style="padding: 10px 12px; color: #6b7280; font-size: 11px; word-wrap: break-word; word-break: break-all; overflow-wrap: break-word; line-height: 1.4;">
+                        ${assertion.expectedValue ? escapeHtml(assertion.expectedValue) : '-'}
+                    </td>
+                    <td style="padding: 10px 12px; text-align: center;">
+                        <div style="display: flex; gap: 4px; justify-content: center;">
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #f1f5f9; color: var(--primary-color); border: none; cursor: pointer;" 
+                                    onclick="editStep(${globalIndex}, 'assertion')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm" style="padding: 4px 8px; background: #fef2f2; color: var(--danger-color); border: none; cursor: pointer;" 
+                                    onclick="deleteAssertion(${globalIndex})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+        `;
+    }
+    
+    html += '</div>';
+    return html;
 }
 
 /**
@@ -535,7 +699,7 @@ function editStep(index, type) {
                 <div id="value-field-container"></div>
             </div>
             
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px;">
+            <div style="display: flex; justify-content: flex-end, gap: 12px; margin-top: 25px;">
                 <button class="btn btn-secondary" onclick="closeModal()" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
                     Cancel
                 </button>

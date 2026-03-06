@@ -1,0 +1,313 @@
+{
+  "ScenarioId": "a734effb-7e05-4539-bae8-f690961f8f67",
+  "Name": "Add-Cart-Get",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://www.saucedemo.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com/",
+      "Value": "https://www.saucedemo.com/",
+      "Description": "Navigate to https://www.saucedemo.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"username\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_user",
+      "Description": "Type \"standard_user\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"password\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "secret_sauce",
+      "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"login-button\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"login-button\"]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"item-4-title-link\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"item-4-title-link\"] (\"Sauce Labs Backpack\")",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"add-to-cart\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"add-to-cart\"] (\"Add to cart\")",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"back-to-products\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"back-to-products\"] (\"Back to products\")",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"item-0-title-link\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"item-0-title-link\"] (\"Sauce Labs Bike Light\")",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"add-to-cart\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"add-to-cart\"] (\"Add to cart\")",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"back-to-products\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"back-to-products\"] (\"Back to products\")",
+      "Metadata": {},
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#react-burger-menu-btn",
+      "Value": null,
+      "Description": "Click on #react-burger-menu-btn (\"Open Menu\")",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"logout-sidebar-link\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"logout-sidebar-link\"] (\"Logout\")",
+      "Metadata": {},
+      "Timestamp": 13
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://www.saucedemo.com/",
+        "Value": "https://www.saucedemo.com/",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"username\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"username\"]",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"username\"]",
+        "Value": "standard_user",
+        "Description": "Type \"standard_user\" into [data-test=\"username\"]",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"password\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"password\"]",
+        "Value": "secret_sauce",
+        "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"login-button\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"login-button\"]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"item-4-title-link\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"item-4-title-link\"] (\"Sauce Labs Backpack\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"add-to-cart\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"add-to-cart\"] (\"Add to cart\")",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"back-to-products\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"back-to-products\"] (\"Back to products\")",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"item-0-title-link\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"item-0-title-link\"] (\"Sauce Labs Bike Light\")",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"add-to-cart\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"add-to-cart\"] (\"Add to cart\")",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"back-to-products\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"back-to-products\"] (\"Back to products\")",
+        "Metadata": {},
+        "Timestamp": 11
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#react-burger-menu-btn",
+        "Value": null,
+        "Description": "Click on #react-burger-menu-btn (\"Open Menu\")",
+        "Metadata": {},
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"logout-sidebar-link\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"logout-sidebar-link\"] (\"Logout\")",
+        "Metadata": {},
+        "Timestamp": 13
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-06T19:32:31.6742367+05:30",
+  "ModifiedAt": "2026-03-06T19:32:31.6771191+05:30"
+}

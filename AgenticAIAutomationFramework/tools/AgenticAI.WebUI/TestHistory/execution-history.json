@@ -1,5 +1,134 @@
 [
   {
+    "ExecutionId": "b0b2000d-e7da-44e1-96a7-8f8df6f57e07",
+    "ScenarioName": "Verify_Rel-Iframe",
+    "Module": "Login",
+    "ExecutedAt": "2026-03-06T21:55:13.6994965\u002B05:30",
+    "Duration": 29,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://h-54e9a8f46e7b421f950a5b33619ccf24.relativityhopper.com/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_email",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022relativity.admin@kcura.com\u0022 into #_email",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #continue (\u0022Continue\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_password__password_TextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test1234!\u0022 into #_password__password_TextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_login (\u0022Login\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022sample workspace\u0022 into #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Sample Workspace\u0022 (\u0022Sample Workspace\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: #_ListPage",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button.icon-document-preview-panel-wgt",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToDefaultContent",
+        "Description": "Switch to default content",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022workspaces\u0022 into #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Workspaces\u0022 (\u0022Workspaces\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Login\\Verify_Rel-Iframe_Click_LAST_2026-03-06_21-55-12_873.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Login\\Verify_Rel-Iframe_Click_LAST_2026-03-06_21-55-12_873.png"
+    ]
+  },
+  {
     "ExecutionId": "6bc08160-d4bd-4865-a9ec-4b48abd95783",
     "ScenarioName": "Verify_Iframe-SS_Test",
     "Module": "Test",
