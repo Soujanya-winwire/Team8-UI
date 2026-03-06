@@ -1,5 +1,246 @@
 [
   {
+    "ExecutionId": "6bc08160-d4bd-4865-a9ec-4b48abd95783",
+    "ScenarioName": "Verify_Iframe-SS_Test",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-06T16:23:47.7421638\u002B05:30",
+    "Duration": 85,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://h-54e9a8f46e7b421f950a5b33619ccf24.relativityhopper.com/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_email",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022relativity.admin@kcura.com\u0022 into #_email",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #continue (\u0022Continue\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_password__password_TextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test1234!\u0022 into #_password__password_TextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_login (\u0022Login\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022sample workspace\u0022 into #qnTextBox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Sample Workspace\u0022 (\u0022Sample Workspace\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022text=\\\u0022Sample Workspace\\\u0022\u0022)\n  -   locator resolved to \u003Cspan class=\u0022os__text--highlighted\u0022\u003ESample Workspace\u003C/span\u003E\n  - attempting click action\n  -   waiting for element to be visible, enabled and stable\n  -   element is visible, enabled and stable\n  -   scrolling into view if needed\n  -   done scrolling\n  -   performing click action",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Verify_Iframe-SS_Test_Click_FAILED_2026-03-06_16-23-39_640.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022text=\\\u0022Sample Workspace\\\u0022\u0022)\n  -   locator resolved to \u003Cspan class=\u0022os__text--highlighted\u0022\u003ESample Workspace\u003C/span\u003E\n  - attempting click action\n  -   waiting for element to be visible, enabled and stable\n  -   element is visible, enabled and stable\n  -   scrolling into view if needed\n  -   done scrolling\n  -   performing click action",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Verify_Iframe-SS_Test_Click_FAILED_2026-03-06_16-23-39_640.png"
+    ]
+  },
+  {
+    "ExecutionId": "ec9763de-b500-4d72-8669-d0efcce3a9e9",
+    "ScenarioName": "Sample-IFrame-Demo",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-06T15:32:28.6594946\u002B05:30",
+    "Duration": 32,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_email",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#_email\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-IFrame-Demo_Click_FAILED_2026-03-06_15-32-25_859.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#_email\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Sample-IFrame-Demo_Click_FAILED_2026-03-06_15-32-25_859.png"
+    ]
+  },
+  {
+    "ExecutionId": "d3c7d787-ea17-4c0d-b010-cf413d36f24c",
+    "ScenarioName": "Demo_Test",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-06T15:31:23.6952390\u002B05:30",
+    "Duration": 4,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-03-06_15-31-23_280.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-03-06_15-31-23_280.png"
+    ]
+  },
+  {
+    "ExecutionId": "4047aca7-f7ab-4af6-96da-8a7c0606a204",
+    "ScenarioName": "Sample-IFrame-Demo",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-06T15:25:11.5547945\u002B05:30",
+    "Duration": 32,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-IFrame-Demo_Navigate_2026-03-06_15-24-37_605.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #_email",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#_email\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Sample-IFrame-Demo_Click_FAILED_2026-03-06_15-25-10_083.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#_email\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Sample-IFrame-Demo_Navigate_2026-03-06_15-24-37_605.png",
+      "TestResults/Screenshots\\Test\\Sample-IFrame-Demo_Click_FAILED_2026-03-06_15-25-10_083.png"
+    ]
+  },
+  {
+    "ExecutionId": "10cb9ccc-e7f3-4663-8a49-b92291423025",
+    "ScenarioName": "Demo_Test",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-06T15:23:54.6797858\u002B05:30",
+    "Duration": 5,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Navigate_2026-03-06_15-23-51_720.png"
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-03-06_15-23-53_945.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Navigate_2026-03-06_15-23-51_720.png",
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-03-06_15-23-53_945.png"
+    ]
+  },
+  {
     "ExecutionId": "cc95c79d-166d-40ed-8ace-f5bc4b97f028",
     "ScenarioName": "Sample-API-Demo1",
     "Module": "Test",

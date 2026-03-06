@@ -1,0 +1,355 @@
+{
+  "ScenarioId": "f0bceb02-683d-44e6-ad18-fd4cf8c217c3",
+  "Name": "Sample-IFrame-Demo",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://p-dv-vm-few4rum/Relativity/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://p-dv-vm-few4rum/Relativity/",
+      "Value": "https://p-dv-vm-few4rum/Relativity/",
+      "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#_email",
+      "Value": null,
+      "Description": "Click on #_email",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#_email",
+      "Value": "relativity.admin@kcura.com",
+      "Description": "Type \"relativity.admin@kcura.com\" into #_email",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#continue",
+      "Value": null,
+      "Description": "Click on #continue (\"Continue\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#_password__password_TextBox",
+      "Value": null,
+      "Description": "Click on #_password__password_TextBox",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#_password__password_TextBox",
+      "Value": "Test1234!",
+      "Description": "Type \"Test1234!\" into #_password__password_TextBox",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#_login",
+      "Value": null,
+      "Description": "Click on #_login (\"Login\")",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#qnTextBox",
+      "Value": null,
+      "Description": "Click on #qnTextBox",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#qnTextBox",
+      "Value": "smoke workspace-rtf automation",
+      "Description": "Type \"smoke workspace-rtf automation\" into #qnTextBox",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "text=\"Smoke WorkSpace-RTF Automation\"",
+      "Value": null,
+      "Description": "Click on text=\"Smoke WorkSpace-RTF Automation\" (\"Smoke WorkSpace-RTF Automation\")",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "SwitchToFrame",
+      "Locator": "#_ListPage",
+      "Value": null,
+      "Description": "Switch to iframe: #_ListPage",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "button.icon-document-preview-panel-wgt",
+      "Value": null,
+      "Description": "Click on button.icon-document-preview-panel-wgt",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "SwitchToDefaultContent",
+      "Locator": "",
+      "Value": null,
+      "Description": "Switch to default content",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#qnTextBox",
+      "Value": null,
+      "Description": "Click on #qnTextBox",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#qnTextBox",
+      "Value": "workspaces",
+      "Description": "Type \"workspaces\" into #qnTextBox",
+      "Metadata": {},
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "text=\"Workspaces\"",
+      "Value": null,
+      "Description": "Click on text=\"Workspaces\" (\"Workspaces\")",
+      "Metadata": {},
+      "Timestamp": 15
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://p-dv-vm-few4rum/Relativity/",
+        "Value": "https://p-dv-vm-few4rum/Relativity/",
+        "Description": "Navigate to https://p-dv-vm-few4rum/Relativity/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#_email",
+        "Value": null,
+        "Description": "Click on #_email",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#_email",
+        "Value": "relativity.admin@kcura.com",
+        "Description": "Type \"relativity.admin@kcura.com\" into #_email",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#continue",
+        "Value": null,
+        "Description": "Click on #continue (\"Continue\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#_password__password_TextBox",
+        "Value": null,
+        "Description": "Click on #_password__password_TextBox",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#_password__password_TextBox",
+        "Value": "Test1234!",
+        "Description": "Type \"Test1234!\" into #_password__password_TextBox",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#_login",
+        "Value": null,
+        "Description": "Click on #_login (\"Login\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#qnTextBox",
+        "Value": null,
+        "Description": "Click on #qnTextBox",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#qnTextBox",
+        "Value": "smoke workspace-rtf automation",
+        "Description": "Type \"smoke workspace-rtf automation\" into #qnTextBox",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "text=\"Smoke WorkSpace-RTF Automation\"",
+        "Value": null,
+        "Description": "Click on text=\"Smoke WorkSpace-RTF Automation\" (\"Smoke WorkSpace-RTF Automation\")",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "SwitchToFrame",
+        "Locator": "#_ListPage",
+        "Value": null,
+        "Description": "Switch to iframe: #_ListPage",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "button.icon-document-preview-panel-wgt",
+        "Value": null,
+        "Description": "Click on button.icon-document-preview-panel-wgt",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "SwitchToDefaultContent",
+        "Locator": "",
+        "Value": null,
+        "Description": "Switch to default content",
+        "Metadata": {},
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#qnTextBox",
+        "Value": null,
+        "Description": "Click on #qnTextBox",
+        "Metadata": {},
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 14,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#qnTextBox",
+        "Value": "workspaces",
+        "Description": "Type \"workspaces\" into #qnTextBox",
+        "Metadata": {},
+        "Timestamp": 14
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 15,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "text=\"Workspaces\"",
+        "Value": null,
+        "Description": "Click on text=\"Workspaces\" (\"Workspaces\")",
+        "Metadata": {},
+        "Timestamp": 15
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-03T22:55:37.4668609+05:30",
+  "ModifiedAt": "2026-03-03T22:55:37.4675402+05:30"
+}
