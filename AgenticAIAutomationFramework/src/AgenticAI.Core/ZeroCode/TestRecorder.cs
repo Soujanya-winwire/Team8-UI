@@ -21,6 +21,10 @@ namespace AgenticAI.Core.ZeroCode
         private IPage? _page;
         private readonly FrameworkConfiguration _config;
         
+        // IFrame context tracking
+        private readonly IFrameContext _frameContext;
+        private IFrameDetector? _frameDetector;
+        
         /// <summary>
         /// Event fired when a new action is captured
         /// </summary>
@@ -29,6 +33,7 @@ namespace AgenticAI.Core.ZeroCode
         public TestRecorder(string scenarioName, string module = "Default")
         {
             _recordedActions = new List<RecordedAction>();
+            _frameContext = new IFrameContext();
             _scenario = new TestScenario
             {
                 ScenarioId = Guid.NewGuid().ToString(),
@@ -85,6 +90,9 @@ namespace AgenticAI.Core.ZeroCode
 
             _page = await context.NewPageAsync();
 
+            // Initialize iframe detector
+            _frameDetector = new IFrameDetector(_frameContext);
+
             // Set up action listeners for comprehensive recording
             await SetupActionListeners();
 
@@ -133,6 +141,8 @@ namespace AgenticAI.Core.ZeroCode
                 {
                     string type = eventData.GetProperty("type").GetString() ?? "";
                     string selector = eventData.GetProperty("selector").GetString() ?? "";
+                    bool inIFrame = eventData.TryGetProperty("inIFrame", out var iframeFlag) && iframeFlag.GetBoolean();
+                    string? iframeSelector = eventData.TryGetProperty("iframeSelector", out var iframeSel) ? iframeSel.GetString() : null;
                     
                     RecordedAction action = new RecordedAction
                     {
@@ -140,6 +150,42 @@ namespace AgenticAI.Core.ZeroCode
                         Locator = selector,
                         Timestamp = _recordedActions.Count
                     };
+
+                    // Handle iframe context
+                    if (inIFrame && !string.IsNullOrEmpty(iframeSelector))
+                    {
+                        // Check if we need to add iframe switch action
+                        if (!_frameContext.IsInSameFrame(iframeSelector))
+                        {
+                            // Add switch to iframe action
+                            var switchAction = new RecordedAction
+                            {
+                                ActionType = "SwitchToFrame",
+                                Locator = iframeSelector,
+                                Description = $"Switch to iframe: {iframeSelector}",
+                                Timestamp = _recordedActions.Count
+                            };
+                            _recordedActions.Add(switchAction);
+                            _frameContext.EnterFrame(iframeSelector, iframeSelector);
+                            Logger.Info($"🔄 Auto-added iframe switch: {iframeSelector}");
+                            OnActionCaptured?.Invoke(switchAction);
+                        }
+                    }
+                    else if (!inIFrame && _frameContext.IsInFrame)
+                    {
+                        // Element is in main content but we're in iframe - switch out
+                        var defaultAction = new RecordedAction
+                        {
+                            ActionType = "SwitchToDefaultContent",
+                            Locator = "",
+                            Description = "Switch to default content",
+                            Timestamp = _recordedActions.Count
+                        };
+                        _recordedActions.Add(defaultAction);
+                        _frameContext.SwitchToDefaultContent();
+                        Logger.Info("🔄 Auto-added switch to default content");
+                        OnActionCaptured?.Invoke(defaultAction);
+                    }
 
                     switch (type.ToLower())
                     {
@@ -182,7 +228,8 @@ namespace AgenticAI.Core.ZeroCode
                     }
 
                     _recordedActions.Add(action);
-                    Logger.Info($"?? Captured {action.ActionType}: {selector}");
+                    var contextInfo = _frameContext.IsInFrame ? $" [in iframe: {_frameContext.CurrentFrame?.Selector}]" : "";
+                    Logger.Info($"📌 Captured {action.ActionType}: {selector}{contextInfo}");
                     
                     // Update action count in browser overlay
                     try
@@ -218,8 +265,6 @@ namespace AgenticAI.Core.ZeroCode
             // This runs before ANY page code, on EVERY navigation
             await _page.AddInitScriptAsync(@"
 (function() {
-    // Remove the __recorderReady guard so re-navigation re-registers listeners
-    
     window.__getSelector = function(el) {
         if (!el) return '';
         
@@ -249,6 +294,37 @@ namespace AgenticAI.Core.ZeroCode
         
         return selector;
     };
+
+    window.__isInIFrame = function() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    };
+
+    window.__getIFrameSelector = function() {
+        if (!window.__isInIFrame()) return null;
+        
+        try {
+            var iframes = window.parent.document.querySelectorAll('iframe, frame');
+            for (var i = 0; i < iframes.length; i++) {
+                if (iframes[i].contentWindow === window.self) {
+                    var iframe = iframes[i];
+                    if (iframe.id) return '#' + iframe.id;
+                    if (iframe.name) return 'iframe[name=""' + iframe.name + '""]';
+                    if (iframe.src) {
+                        var srcPart = iframe.src.substring(iframe.src.lastIndexOf('/') + 1).split('?')[0];
+                        return 'iframe[src*=""' + srcPart + '""]';
+                    }
+                    return 'iframe:nth-of-type(' + (i + 1) + ')';
+                }
+            }
+        } catch (e) {
+            // Cross-origin restriction
+        }
+        return null;
+    };
     
     document.addEventListener('click', function(e) {
         var el = (e.target.closest ? e.target.closest('button, a, input[type=submit], input[type=button], [role=button]') : null) || e.target;
@@ -256,15 +332,19 @@ namespace AgenticAI.Core.ZeroCode
         
         var selector = window.__getSelector(el);
         var text = (el.innerText ? el.innerText.trim().substring(0, 30) : '') || '';
+        var inIFrame = window.__isInIFrame();
+        var iframeSelector = inIFrame ? window.__getIFrameSelector() : null;
         
         if (typeof window.__playwrightRecordAction === 'function') {
             window.__playwrightRecordAction({
                 type: 'click',
                 selector: selector,
                 text: text,
-                tagName: el.tagName
+                tagName: el.tagName,
+                inIFrame: inIFrame,
+                iframeSelector: iframeSelector
             });
-            console.log('RECORDER: Click captured on ' + selector);
+            console.log('RECORDER: Click captured on ' + selector + (inIFrame ? ' [in iframe: ' + iframeSelector + ']' : ''));
         } else {
             console.error('RECORDER: __playwrightRecordAction not found!');
         }
@@ -276,11 +356,16 @@ namespace AgenticAI.Core.ZeroCode
         if (el.type === 'checkbox' || el.type === 'radio') return;
         
         var selector = window.__getSelector(el);
+        var inIFrame = window.__isInIFrame();
+        var iframeSelector = inIFrame ? window.__getIFrameSelector() : null;
+        
         if (typeof window.__playwrightRecordAction === 'function') {
             window.__playwrightRecordAction({
                 type: 'fill',
                 selector: selector,
-                value: el.value
+                value: el.value,
+                inIFrame: inIFrame,
+                iframeSelector: iframeSelector
             });
         }
     }, true);
@@ -288,6 +373,8 @@ namespace AgenticAI.Core.ZeroCode
     document.addEventListener('change', function(e) {
         var el = e.target;
         var selector = window.__getSelector(el);
+        var inIFrame = window.__isInIFrame();
+        var iframeSelector = inIFrame ? window.__getIFrameSelector() : null;
         
         if (el.tagName === 'SELECT') {
             var option = el.options[el.selectedIndex];
@@ -296,9 +383,11 @@ namespace AgenticAI.Core.ZeroCode
                     type: 'select',
                     selector: selector,
                     value: option.value,
-                    text: option.text
+                    text: option.text,
+                    inIFrame: inIFrame,
+                    iframeSelector: iframeSelector
                 });
-                console.log('RECORDER: Select captured on ' + selector + ' = ' + option.value);
+                console.log('RECORDER: Select captured on ' + selector + ' = ' + option.value + (inIFrame ? ' [in iframe: ' + iframeSelector + ']' : ''));
             }
         } else if (el.tagName === 'INPUT' && (el.type === 'checkbox' || el.type === 'radio')) {
             if (typeof window.__playwrightRecordAction === 'function') {
@@ -312,18 +401,20 @@ namespace AgenticAI.Core.ZeroCode
                 window.__playwrightRecordAction({
                     type: el.checked ? 'check' : 'uncheck',
                     selector: specificSelector,
-                    value: el.value
+                    value: el.value,
+                    inIFrame: inIFrame,
+                    iframeSelector: iframeSelector
                 });
-                console.log('RECORDER: ' + (el.checked ? 'Check' : 'Uncheck') + ' captured on ' + specificSelector);
+                console.log('RECORDER: ' + (el.checked ? 'Check' : 'Uncheck') + ' captured on ' + specificSelector + (inIFrame ? ' [in iframe: ' + iframeSelector + ']' : ''));
             }
         }
     }, true);
     
-    console.log('RECORDER: Init script loaded, listeners attached');
+    console.log('RECORDER: Init script loaded, listeners attached' + (window.__isInIFrame() ? ' [INSIDE IFRAME]' : ' [MAIN FRAME]'));
 })();
 ");
 
-            Logger.Info("? Native action tracking enabled using AddInitScript");
+            Logger.Info("✅ Native action tracking enabled using AddInitScript with iframe detection");
         }
 
         /// <summary>
@@ -460,6 +551,65 @@ namespace AgenticAI.Core.ZeroCode
             if (!_scenario.Tags.Contains(tag))
             {
                 _scenario.Tags.Add(tag);
+            }
+        }
+
+        /// <summary>
+        /// Detect iframe context for an element and add switch actions if needed
+        /// </summary>
+        private async Task<bool> HandleIFrameContextAsync(string elementSelector)
+        {
+            if (_frameDetector == null || _page == null)
+                return false;
+
+            try
+            {
+                // Detect if element is in an iframe
+                var detection = await _frameDetector.DetectIFrameAsync(
+                    elementSelector,
+                    async (script) => await _page.EvaluateAsync<JsonElement>(script)
+                );
+
+                if (!detection.ElementFound)
+                {
+                    Logger.Debug($"Element '{elementSelector}' not found in any frame");
+                    return false;
+                }
+
+                // Check if we need to switch frames
+                if (!_frameDetector.NeedsFrameSwitch(detection))
+                {
+                    Logger.Debug("Already in correct frame context");
+                    return true;
+                }
+
+                // Generate and add frame switch actions
+                var switchActions = _frameDetector.GenerateSwitchActions(detection);
+                foreach (var action in switchActions)
+                {
+                    _recordedActions.Add(action);
+                    Logger.Info($"🔄 Auto-added: {action.Description}");
+                    OnActionCaptured?.Invoke(action);
+
+                    // Update frame context
+                    if (action.ActionType == "SwitchToFrame")
+                    {
+                        _frameContext.EnterFrame(action.Locator, action.Locator, 
+                            int.TryParse(action.Value, out var idx) ? idx : -1);
+                    }
+                    else if (action.ActionType == "SwitchToDefaultContent")
+                    {
+                        _frameContext.SwitchToDefaultContent();
+                    }
+                }
+
+                Logger.Info($"✅ IFrame context handled for '{elementSelector}': {_frameContext.GetContextInfo()}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"IFrame detection failed: {ex.Message}");
+                return false;
             }
         }
     }

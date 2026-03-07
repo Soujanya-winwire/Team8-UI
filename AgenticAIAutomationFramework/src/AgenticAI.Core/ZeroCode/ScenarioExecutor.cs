@@ -36,21 +36,6 @@ namespace AgenticAI.Core.ZeroCode
 
             try
             {
-                // Navigate to start URL - use Base URL from config if StartUrl is empty
-                var urlToNavigate = !string.IsNullOrEmpty(scenario.StartUrl) 
-                    ? scenario.StartUrl 
-                    : _config.BaseUrl;
-
-                if (!string.IsNullOrEmpty(urlToNavigate))
-                {
-                    Logger.TestInfo(scenario.Name, $"Navigating to: {urlToNavigate}");
-                    await ExecuteNavigationAsync(urlToNavigate, testResult);
-                }
-                else
-                {
-                    Logger.Warning("No Start URL specified and no Base URL configured. Skipping navigation.");
-                }
-
                 // Check if scenario uses new unified Steps model
                 if (scenario.Steps != null && scenario.Steps.Count > 0)
                 {
@@ -58,16 +43,36 @@ namespace AgenticAI.Core.ZeroCode
                     Logger.TestInfo(scenario.Name, $"Executing {scenario.Steps.Count} steps in sequence (unified model)");
                     
                     var orderedSteps = scenario.Steps.ToList();
+                    var totalSteps = orderedSteps.Count;
                     
-                    foreach (var step in orderedSteps)
+                    // Check if first step is Navigate (if StartUrl is set, it will be added as step 0)
+                    var hasNavigateStep = orderedSteps.Any(s => s.StepType == "Action" && s.Action?.ActionType?.ToLower() == "navigate");
+                    
+                    // Add navigation if needed and not already present
+                    var urlToNavigate = !string.IsNullOrEmpty(scenario.StartUrl) 
+                        ? scenario.StartUrl 
+                        : _config.BaseUrl;
+                    
+                    if (!string.IsNullOrEmpty(urlToNavigate) && !hasNavigateStep)
                     {
+                        Logger.TestInfo(scenario.Name, $"Navigating to: {urlToNavigate}");
+                        var isOnlyStep = orderedSteps.Count == 0;
+                        await ExecuteNavigationAsync(urlToNavigate, testResult, isOnlyStep);
+                        totalSteps++; // Include navigation in total count
+                    }
+                    
+                    for (int i = 0; i < orderedSteps.Count; i++)
+                    {
+                        var step = orderedSteps[i];
+                        var isLastStep = (i == orderedSteps.Count - 1);
+                        
                         if (step.StepType == "Action" && step.Action != null)
                         {
-                            await ExecuteActionAsync(step.Action, testResult);
+                            await ExecuteActionAsync(step.Action, testResult, isLastStep);
                         }
                         else if (step.StepType == "Assertion" && step.Assertion != null)
                         {
-                            await ExecuteAssertionAsync(step.Assertion, testResult);
+                            await ExecuteAssertionAsync(step.Assertion, testResult, isLastStep);
                         }
                         else
                         {
@@ -80,11 +85,39 @@ namespace AgenticAI.Core.ZeroCode
                     // LEGACY APPROACH: Execute actions then assertions (backward compatibility)
                     Logger.TestInfo(scenario.Name, "Using legacy execution model (Actions then Assertions)");
                     
+                    // Calculate total steps for last step detection
+                    var totalActions = scenario.Actions.Count;
+                    var assertionsForActions = scenario.Assertions.Where(a => a.ExecuteAfterActionIndex.HasValue).ToList();
+                    var remainingAssertions = scenario.Assertions.Where(a => !a.ExecuteAfterActionIndex.HasValue).ToList();
+                    var hasNavigation = !string.IsNullOrEmpty(scenario.StartUrl) || !string.IsNullOrEmpty(_config.BaseUrl);
+                    var totalSteps = (hasNavigation ? 1 : 0) + totalActions + remainingAssertions.Count;
+                    var currentStepIndex = 0;
+                    
+                    // Navigate to start URL - use Base URL from config if StartUrl is empty
+                    var urlToNavigate = !string.IsNullOrEmpty(scenario.StartUrl) 
+                        ? scenario.StartUrl 
+                        : _config.BaseUrl;
+
+                    if (!string.IsNullOrEmpty(urlToNavigate))
+                    {
+                        Logger.TestInfo(scenario.Name, $"Navigating to: {urlToNavigate}");
+                        var isLastStep = (currentStepIndex == totalSteps - 1);
+                        await ExecuteNavigationAsync(urlToNavigate, testResult, isLastStep);
+                        currentStepIndex++;
+                    }
+                    else
+                    {
+                        Logger.Warning("No Start URL specified and no Base URL configured. Skipping navigation.");
+                    }
+                    
                     // Execute actions with their assertions interleaved
                     for (int i = 0; i < scenario.Actions.Count; i++)
                     {
+                        var isLastStep = (currentStepIndex == totalSteps - 1);
+                        
                         // Execute the action
-                        await ExecuteActionAsync(scenario.Actions[i], testResult);
+                        await ExecuteActionAsync(scenario.Actions[i], testResult, isLastStep);
+                        currentStepIndex++;
                         
                         // Execute assertions that should run after this action
                         var assertionsForThisAction = scenario.Assertions
@@ -93,18 +126,18 @@ namespace AgenticAI.Core.ZeroCode
                         
                         foreach (var assertion in assertionsForThisAction)
                         {
-                            await ExecuteAssertionAsync(assertion, testResult);
+                            isLastStep = (currentStepIndex == totalSteps - 1);
+                            await ExecuteAssertionAsync(assertion, testResult, isLastStep);
+                            currentStepIndex++;
                         }
                     }
 
                     // Execute remaining assertions that don't have a specific action index (legacy support)
-                    var remainingAssertions = scenario.Assertions
-                        .Where(a => !a.ExecuteAfterActionIndex.HasValue)
-                        .ToList();
-                    
                     foreach (var assertion in remainingAssertions)
                     {
-                        await ExecuteAssertionAsync(assertion, testResult);
+                        var isLastStep = (currentStepIndex == totalSteps - 1);
+                        await ExecuteAssertionAsync(assertion, testResult, isLastStep);
+                        currentStepIndex++;
                     }
                 }
 
@@ -126,7 +159,7 @@ namespace AgenticAI.Core.ZeroCode
             return testResult;
         }
 
-        private async Task ExecuteNavigationAsync(string url, TestCaseResult testResult)
+        private async Task ExecuteNavigationAsync(string url, TestCaseResult testResult, bool isLastStep = false)
         {
             var step = new TestStepResult
             {
@@ -152,8 +185,11 @@ namespace AgenticAI.Core.ZeroCode
             {
                 step.EndTime = DateTime.Now;
                 
-                // Capture ONE screenshot per navigation step (either success or failure)
-                if (_config.EnableScreenshots)
+                // Enhanced screenshot logic - same as actions and assertions
+                // Only capture if: 1) Last step, OR 2) Step failed
+                var shouldCaptureScreenshot = _config.EnableScreenshots && (isLastStep || step.Status == TestStatus.Failed);
+                
+                if (shouldCaptureScreenshot)
                 {
                     try
                     {
@@ -161,7 +197,8 @@ namespace AgenticAI.Core.ZeroCode
                         
                         var screenshot = await _driver.TakeScreenshotAsync();
                         var statusSuffix = step.Status == TestStatus.Failed ? "_FAILED" : "";
-                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate{statusSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var lastStepSuffix = isLastStep ? "_LAST" : "";
+                        var screenshotFileName = $"{testResult.TestCaseName}_Navigate{statusSuffix}{lastStepSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}.png";
                         var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
                         
                         var directory = Path.GetDirectoryName(screenshotPath);
@@ -172,7 +209,9 @@ namespace AgenticAI.Core.ZeroCode
                         
                         await File.WriteAllBytesAsync(screenshotPath, screenshot);
                         step.ScreenshotPath = screenshotPath;
-                        Logger.Info($"Screenshot saved: {screenshotPath}");
+                        
+                        var reason = step.Status == TestStatus.Failed ? "step failed" : "last step";
+                        Logger.Info($"Screenshot saved ({reason}): {screenshotPath}");
                     }
                     catch (Exception screenshotEx)
                     {
@@ -184,7 +223,7 @@ namespace AgenticAI.Core.ZeroCode
             }
         }
 
-        private async Task ExecuteActionAsync(RecordedAction action, TestCaseResult testResult)
+        private async Task ExecuteActionAsync(RecordedAction action, TestCaseResult testResult, bool isLastStep = false)
         {
             var step = new TestStepResult
             {
@@ -293,6 +332,34 @@ namespace AgenticAI.Core.ZeroCode
                         await _driver.WaitForElementAsync(action.Locator, timeout);
                         break;
 
+                    // IFrame handling actions
+                    case "switchtoframe":
+                        await _driver.SwitchToFrameAsync(action.Locator);
+                        Logger.Info($"Switched to iframe: {action.Locator}");
+                        
+                        // Add a small wait to ensure frame content is loaded
+                        await Task.Delay(500);
+                        break;
+
+                    case "switchtoframebyindex":
+                        var frameIndex = int.TryParse(action.Value, out var idx) ? idx : 0;
+                        await _driver.SwitchToFrameByIndexAsync(frameIndex);
+                        Logger.Info($"Switched to iframe by index: {frameIndex}");
+                        
+                        // Add a small wait to ensure frame content is loaded
+                        await Task.Delay(500);
+                        break;
+
+                    case "switchtodefaultcontent":
+                        await _driver.SwitchToDefaultContentAsync();
+                        Logger.Info("Switched to default content (main frame)");
+                        break;
+
+                    case "switchtoparentframe":
+                        await _driver.SwitchToParentFrameAsync();
+                        Logger.Info("Switched to parent frame");
+                        break;
+
                     default:
                         Logger.Warning($"Unknown action type: {action.ActionType}");
                         break;
@@ -312,8 +379,13 @@ namespace AgenticAI.Core.ZeroCode
             {
                 step.EndTime = DateTime.Now;
                 
-                // Capture ONE screenshot per step (either success or failure)
-                if (_config.EnableScreenshots)
+                // Enhanced screenshot logic:
+                // 1. Always capture if this is the LAST step
+                // 2. Always capture if the step FAILED
+                // 3. If last step AND failed, only capture once (avoid duplicate)
+                var shouldCaptureScreenshot = _config.EnableScreenshots && (isLastStep || step.Status == TestStatus.Failed);
+                
+                if (shouldCaptureScreenshot)
                 {
                     try
                     {
@@ -321,7 +393,8 @@ namespace AgenticAI.Core.ZeroCode
                         
                         var screenshot = await _driver.TakeScreenshotAsync();
                         var statusSuffix = step.Status == TestStatus.Failed ? "_FAILED" : "";
-                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}{statusSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var lastStepSuffix = isLastStep ? "_LAST" : "";
+                        var screenshotFileName = $"{testResult.TestCaseName}_{action.ActionType}{statusSuffix}{lastStepSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
                         var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
                         
                         var directory = Path.GetDirectoryName(screenshotPath);
@@ -332,7 +405,9 @@ namespace AgenticAI.Core.ZeroCode
                         
                         await File.WriteAllBytesAsync(screenshotPath, screenshot);
                         step.ScreenshotPath = screenshotPath;
-                        Logger.Info($"Screenshot saved: {screenshotPath}");
+                        
+                        var reason = step.Status == TestStatus.Failed ? "step failed" : "last step";
+                        Logger.Info($"Screenshot saved ({reason}): {screenshotPath}");
                     }
                     catch (Exception screenshotEx)
                     {
@@ -344,7 +419,7 @@ namespace AgenticAI.Core.ZeroCode
             }
         }
 
-        private async Task ExecuteAssertionAsync(Assertion assertion, TestCaseResult testResult)
+        private async Task ExecuteAssertionAsync(Assertion assertion, TestCaseResult testResult, bool isLastStep = false)
         {
             var step = new TestStepResult
             {
@@ -468,14 +543,20 @@ namespace AgenticAI.Core.ZeroCode
             {
                 step.EndTime = DateTime.Now;
                 
-                // Capture ONE screenshot per assertion step (either success or failure)
-                if (_config.EnableScreenshots)
+                // Enhanced screenshot logic:
+                // 1. Always capture if this is the LAST step
+                // 2. Always capture if the step FAILED
+                // 3. If last step AND failed, only capture once (avoid duplicate)
+                var shouldCaptureScreenshot = _config.EnableScreenshots && (isLastStep || step.Status == TestStatus.Failed);
+                
+                if (shouldCaptureScreenshot)
                 {
                     try
                     {
                         var screenshot = await _driver.TakeScreenshotAsync();
                         var statusSuffix = step.Status == TestStatus.Failed ? "_FAILED" : "";
-                        var screenshotFileName = $"{testResult.TestCaseName}_Verify{statusSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
+                        var lastStepSuffix = isLastStep ? "_LAST" : "";
+                        var screenshotFileName = $"{testResult.TestCaseName}_Verify{statusSuffix}{lastStepSuffix}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fff}.png";
                         var screenshotPath = Path.Combine(_config.ScreenshotPath, testResult.Module, screenshotFileName);
                         
                         var directory = Path.GetDirectoryName(screenshotPath);
@@ -486,7 +567,9 @@ namespace AgenticAI.Core.ZeroCode
                         
                         await File.WriteAllBytesAsync(screenshotPath, screenshot);
                         step.ScreenshotPath = screenshotPath;
-                        Logger.Info($"Screenshot saved: {screenshotPath}");
+                        
+                        var reason = step.Status == TestStatus.Failed ? "step failed" : "last step";
+                        Logger.Info($"Screenshot saved ({reason}): {screenshotPath}");
                     }
                     catch (Exception screenshotEx)
                     {

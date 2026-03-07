@@ -1,0 +1,82 @@
+{
+  "ScenarioId": "5a3e7246-f84c-46b6-aa06-035933922230",
+  "Name": "Demo_Test",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke"
+  ],
+  "StartUrl": "https://rahulshettyacademy.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/",
+      "Value": "https://rahulshettyacademy.com/",
+      "Description": "Navigate to https://rahulshettyacademy.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "text=\"All-Access\"",
+      "Value": null,
+      "Description": "Click on text=\"All-Access\" (\"All-Access\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "text=\"Learning Paths\"",
+      "Value": null,
+      "Description": "Click on text=\"Learning Paths\" (\"Learning Paths\")",
+      "Metadata": {},
+      "Timestamp": 2
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/",
+        "Value": "https://rahulshettyacademy.com/",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "text=\"All-Access\"",
+        "Value": null,
+        "Description": "Click on text=\"All-Access\" (\"All-Access\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "text=\"Learning Paths\"",
+        "Value": null,
+        "Description": "Click on text=\"Learning Paths\" (\"Learning Paths\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-06T15:23:38.23305+05:30",
+  "ModifiedAt": "2026-03-06T15:23:38.234269+05:30"
+}

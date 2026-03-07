@@ -236,6 +236,46 @@ namespace AgenticAI.UIAutomation.Drivers
             return Task.CompletedTask;
         }
 
+        // IFrame handling methods
+        public Task SwitchToFrameAsync(string frameLocator)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            var by = GetBy(frameLocator, "auto");
+            var frameElement = _driver.FindElement(by);
+            _driver.SwitchTo().Frame(frameElement);
+            
+            return Task.CompletedTask;
+        }
+
+        public Task SwitchToFrameByIndexAsync(int index)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            _driver.SwitchTo().Frame(index);
+            return Task.CompletedTask;
+        }
+
+        public Task SwitchToDefaultContentAsync()
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            _driver.SwitchTo().DefaultContent();
+            return Task.CompletedTask;
+        }
+
+        public Task SwitchToParentFrameAsync()
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            _driver.SwitchTo().ParentFrame();
+            return Task.CompletedTask;
+        }
+
         private By GetBy(string locator, string strategy)
         {
             return strategy.ToLower() switch

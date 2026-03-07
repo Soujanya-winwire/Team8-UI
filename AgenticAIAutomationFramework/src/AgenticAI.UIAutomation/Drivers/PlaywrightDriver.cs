@@ -17,6 +17,10 @@ namespace AgenticAI.UIAutomation.Drivers
         private IPage? _page;
         private IBrowserContext? _context;
         private readonly FrameworkConfiguration _config;
+        
+        // Track current frame context for Playwright
+        private IFrame? _currentFrame;
+        private string? _currentFrameLocator;
 
         public PlaywrightDriver(FrameworkConfiguration config)
         {
@@ -78,16 +82,20 @@ namespace AgenticAI.UIAutomation.Drivers
 
         public async Task<Core.Interfaces.IWebElement> FindElementAsync(string locator, string strategy = "auto")
         {
-            var elementLocator = GetLocator(locator, strategy);
+            // Always return page-scoped element - frame context is handled in action methods
+            var elementLocator = _currentFrame != null 
+                ? GetFrameLocator(locator, strategy)
+                : GetLocator(locator, strategy);
+                
             return await Task.FromResult<Core.Interfaces.IWebElement>(new PlaywrightElement(_page!, elementLocator));
         }
 
         public async Task<IList<Core.Interfaces.IWebElement>> FindElementsAsync(string locator, string strategy = "auto")
         {
-            // Use Playwright Locator API to support css, xpath, text and other strategies reliably
-            var locatorObj = GetLocator(locator, strategy);
+            ILocator locatorObj = _currentFrame != null 
+                ? GetFrameLocator(locator, strategy)
+                : GetLocator(locator, strategy);
 
-            // Get element handles from locator
             var handles = await locatorObj.ElementHandlesAsync();
             var list = handles.Select(e => new PlaywrightElement(_page!, e)).Cast<Core.Interfaces.IWebElement>().ToList();
             return await Task.FromResult<IList<Core.Interfaces.IWebElement>>(list);
@@ -96,32 +104,46 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task ClickAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            await _page!.ClickAsync(selector);
+            
+            // If we're in a frame, click within frame context
+            if (_currentFrame != null)
+            {
+                Logger.Debug($"Clicking in frame context: {selector}");
+                await _currentFrame.ClickAsync(selector, new FrameClickOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+            }
+            else
+            {
+                await _page!.ClickAsync(selector, new PageClickOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+            }
         }
 
         public async Task CheckAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            var locatorEl = _page!.Locator(selector);
+            ILocator locatorEl;
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                locatorEl = _currentFrame.Locator(selector);
+            }
+            else
+            {
+                locatorEl = _page!.Locator(selector);
+            }
 
-            // If multiple elements match (e.g., radio group sharing same name),
-            // use the first visible one rather than throwing a strict-mode violation
             int count = await locatorEl.CountAsync();
             if (count > 1)
             {
-                // For radio groups: find the first visible element and use it
-                // (the preceding Click action should have already selected the right one)
                 locatorEl = locatorEl.First;
                 Logger.Debug($"Check: locator '{selector}' matched {count} elements, using .First()");
             }
 
             await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
-            // Radio buttons must be clicked; checkboxes use CheckAsync
             var inputType = await locatorEl.EvaluateAsync<string>("el => el.type ? el.type.toLowerCase() : ''");
             if (inputType == "radio")
             {
-                // Radio button: click to select (only if not already selected)
                 var isChecked = await locatorEl.IsCheckedAsync();
                 if (!isChecked)
                 {
@@ -130,7 +152,6 @@ namespace AgenticAI.UIAutomation.Drivers
             }
             else
             {
-                // Checkbox: use Playwright's CheckAsync
                 var isChecked = await locatorEl.IsCheckedAsync();
                 if (!isChecked)
                 {
@@ -142,7 +163,17 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task UncheckAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            var locatorEl = _page!.Locator(selector);
+            ILocator locatorEl;
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                locatorEl = _currentFrame.Locator(selector);
+            }
+            else
+            {
+                locatorEl = _page!.Locator(selector);
+            }
 
             int count = await locatorEl.CountAsync();
             if (count > 1)
@@ -156,7 +187,6 @@ namespace AgenticAI.UIAutomation.Drivers
             var inputType = await locatorEl.EvaluateAsync<string>("el => el.type ? el.type.toLowerCase() : ''");
             if (inputType == "radio")
             {
-                // Radio buttons cannot be unchecked; skip
                 Logger.Debug("Uncheck called on radio button — skipping (radio buttons cannot be unchecked)");
                 return;
             }
@@ -173,11 +203,20 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task SelectOptionAsync(string locator, string value)
         {
             var selector = GetSelector(locator, "auto");
-            var locatorEl = _page!.Locator(selector);
+            ILocator locatorEl;
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                locatorEl = _currentFrame.Locator(selector);
+            }
+            else
+            {
+                locatorEl = _page!.Locator(selector);
+            }
+            
             await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
-            // Removed ScrollIntoViewIfNeeded - Playwright auto-scrolls when needed
 
-            // Try by value attribute first, then by visible text (label), then by index
             try
             {
                 await locatorEl.SelectOptionAsync(new SelectOptionValue { Value = value });
@@ -192,7 +231,6 @@ namespace AgenticAI.UIAutomation.Drivers
             }
             catch { /* fall through */ }
 
-            // Last resort: try index if numeric
             if (int.TryParse(value, out var index))
             {
                 await locatorEl.SelectOptionAsync(new SelectOptionValue { Index = index });
@@ -206,41 +244,101 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task HoverAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            await _page!.HoverAsync(selector);
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                await _currentFrame.HoverAsync(selector);
+            }
+            else
+            {
+                await _page!.HoverAsync(selector);
+            }
         }
 
         public async Task ScrollToAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            var locatorEl = _page!.Locator(selector);
+            ILocator locatorEl;
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                locatorEl = _currentFrame.Locator(selector);
+            }
+            else
+            {
+                locatorEl = _page!.Locator(selector);
+            }
+            
             await locatorEl.ScrollIntoViewIfNeededAsync();
         }
 
         public async Task TypeAsync(string locator, string text)
         {
             var selector = GetSelector(locator, "auto");
-            await _page!.FillAsync(selector, text);
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                Logger.Debug($"Typing in frame context: {selector}");
+                await _currentFrame.FillAsync(selector, text, new FrameFillOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+            }
+            else
+            {
+                await _page!.FillAsync(selector, text, new PageFillOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+            }
         }
 
         public async Task<string> GetTextAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            return await _page!.TextContentAsync(selector) ?? "";
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                return await _currentFrame.TextContentAsync(selector) ?? "";
+            }
+            else
+            {
+                return await _page!.TextContentAsync(selector) ?? "";
+            }
         }
 
         public async Task<string> GetAttributeAsync(string locator, string attribute)
         {
             var selector = GetSelector(locator, "auto");
-            return await _page!.GetAttributeAsync(selector, attribute) ?? "";
+            
+            // Use frame context if available
+            if (_currentFrame != null)
+            {
+                return await _currentFrame.GetAttributeAsync(selector, attribute) ?? "";
+            }
+            else
+            {
+                return await _page!.GetAttributeAsync(selector, attribute) ?? "";
+            }
         }
 
         public async Task WaitForElementAsync(string locator, int timeoutSeconds = 30)
         {
             var selector = GetSelector(locator, "auto");
-            await _page!.WaitForSelectorAsync(selector, new PageWaitForSelectorOptions
+            
+            // Use frame context if available
+            if (_currentFrame != null)
             {
-                Timeout = timeoutSeconds * 1000
-            });
+                await _currentFrame.WaitForSelectorAsync(selector, new FrameWaitForSelectorOptions
+                {
+                    Timeout = timeoutSeconds * 1000
+                });
+            }
+            else
+            {
+                await _page!.WaitForSelectorAsync(selector, new PageWaitForSelectorOptions
+                {
+                    Timeout = timeoutSeconds * 1000
+                });
+            }
         }
 
         public async Task<byte[]> TakeScreenshotAsync()
@@ -290,6 +388,79 @@ namespace AgenticAI.UIAutomation.Drivers
             _playwright?.Dispose();
         }
 
+        // IFrame handling methods - FIXED for Playwright
+        public async Task SwitchToFrameAsync(string frameLocator)
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+
+            var selector = GetSelector(frameLocator, "auto");
+            
+            // In Playwright, get the actual frame object
+            Logger.Info($"Switching to iframe: {selector}");
+            
+            // Wait for frame to be available
+            await _page.WaitForSelectorAsync(selector, new PageWaitForSelectorOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+            
+            // Get the frame by selector
+            var frameElement = await _page.QuerySelectorAsync(selector);
+            if (frameElement == null)
+            {
+                throw new Exception($"Frame not found: {selector}");
+            }
+            
+            // Get the content frame
+            var frame = await frameElement.ContentFrameAsync();
+            if (frame == null)
+            {
+                throw new Exception($"Could not get content frame for: {selector}");
+            }
+            
+            _currentFrame = frame;
+            _currentFrameLocator = selector;
+            
+            Logger.Info($"✅ Successfully switched to iframe: {selector}");
+        }
+
+        public async Task SwitchToFrameByIndexAsync(int index)
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+
+            var frames = _page.Frames.ToList();
+            if (index < 0 || index >= frames.Count)
+                throw new ArgumentOutOfRangeException(nameof(index), $"Frame index {index} out of range. Available frames: {frames.Count}");
+
+            _currentFrame = frames[index];
+            _currentFrameLocator = $"iframe:nth-of-type({index + 1})";
+            
+            Logger.Info($"✅ Switched to iframe by index: {index}");
+        }
+
+        public async Task SwitchToDefaultContentAsync()
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+
+            _currentFrame = null;
+            _currentFrameLocator = null;
+            
+            Logger.Info("✅ Switched to default content (main frame)");
+            await Task.CompletedTask;
+        }
+
+        public async Task SwitchToParentFrameAsync()
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+
+            // In Playwright, parent frame access is limited
+            // For now, just switch to default content
+            await SwitchToDefaultContentAsync();
+            
+            Logger.Info("✅ Switched to parent frame (defaulted to main content)");
+        }
+
         private ILocator GetLocator(string locator, string strategy)
         {
             return strategy.ToLower() switch
@@ -305,9 +476,26 @@ namespace AgenticAI.UIAutomation.Drivers
             };
         }
 
+        private ILocator GetFrameLocator(string locator, string strategy)
+        {
+            if (_currentFrame == null)
+                throw new InvalidOperationException("Not in frame context");
+                
+            return strategy.ToLower() switch
+            {
+                "css" => _currentFrame.Locator(locator),
+                "xpath" => _currentFrame.Locator($"xpath={locator}"),
+                "text" => _currentFrame.GetByText(locator),
+                "placeholder" => _currentFrame.GetByPlaceholder(locator),
+                "role" => _currentFrame.GetByRole(AriaRole.Button, new FrameGetByRoleOptions { Name = locator }),
+                "testid" => _currentFrame.GetByTestId(locator),
+                "auto" => AutoDetectFrameLocator(locator),
+                _ => _currentFrame.Locator(locator)
+            };
+        }
+
         private ILocator AutoDetectLocator(string locator)
         {
-            // Auto-detect locator strategy
             if (locator.StartsWith("//") || locator.StartsWith("(//"))
             {
                 return _page!.Locator($"xpath={locator}");
@@ -318,8 +506,26 @@ namespace AgenticAI.UIAutomation.Drivers
             }
             else
             {
-                // Try text-based locator
                 return _page!.GetByText(locator);
+            }
+        }
+
+        private ILocator AutoDetectFrameLocator(string locator)
+        {
+            if (_currentFrame == null)
+                throw new InvalidOperationException("Not in frame context");
+                
+            if (locator.StartsWith("//") || locator.StartsWith("(//"))
+            {
+                return _currentFrame.Locator($"xpath={locator}");
+            }
+            else if (locator.StartsWith("#") || locator.Contains("[") || locator.Contains("."))
+            {
+                return _currentFrame.Locator(locator);
+            }
+            else
+            {
+                return _currentFrame.GetByText(locator);
             }
         }
 
