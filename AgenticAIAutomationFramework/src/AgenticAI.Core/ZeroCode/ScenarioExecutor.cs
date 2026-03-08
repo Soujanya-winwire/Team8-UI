@@ -319,7 +319,97 @@ namespace AgenticAI.Core.ZeroCode
                         break;
 
                     case "scroll":
-                        await _driver.ScrollToAsync(action.Locator);
+                        // GLOBAL FIX: Enhanced scroll with special value support
+                        if (string.IsNullOrEmpty(action.Locator) && !string.IsNullOrEmpty(action.Value))
+                        {
+                            // Handle special scroll values: "top", "bottom", or pixel coordinates
+                            var scrollValue = action.Value.ToLower().Trim();
+                            
+                            if (scrollValue == "top")
+                            {
+                                // Scroll to top of page
+                                await _driver.ExecuteScriptAsync("window.scrollTo({ top: 0, behavior: 'smooth' })");
+                                await Task.Delay(500); // Wait for scroll to complete
+                                Logger.Info("Scrolled to top of page");
+                            }
+                            else if (scrollValue == "bottom")
+                            {
+                                // Scroll to bottom of page
+                                await _driver.ExecuteScriptAsync("window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })");
+                                await Task.Delay(500); // Wait for scroll to complete
+                                Logger.Info("Scrolled to bottom of page");
+                            }
+                            else if (scrollValue.Contains(","))
+                            {
+                                // Parse coordinates: "x,y" format
+                                var coords = scrollValue.Split(',');
+                                if (coords.Length == 2 && int.TryParse(coords[0].Trim(), out var x) && int.TryParse(coords[1].Trim(), out var y))
+                                {
+                                    await _driver.ExecuteScriptAsync($"window.scrollTo({{ left: {x}, top: {y}, behavior: 'smooth' }})");
+                                    await Task.Delay(500);
+                                    Logger.Info($"Scrolled to coordinates: ({x}, {y})");
+                                }
+                                else
+                                {
+                                    Logger.Warning($"Invalid scroll coordinates format: {action.Value}. Expected 'x,y' format.");
+                                }
+                            }
+                            else if (int.TryParse(scrollValue, out var pixels))
+                            {
+                                // Scroll by pixel amount (vertical)
+                                await _driver.ExecuteScriptAsync($"window.scrollBy({{ top: {pixels}, behavior: 'smooth' }})");
+                                await Task.Delay(500);
+                                Logger.Info($"Scrolled by {pixels} pixels");
+                            }
+                            else
+                            {
+                                Logger.Warning($"Unknown scroll value: {action.Value}");
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(action.Locator))
+                        {
+                            // Scroll to specific element using locator
+                            try
+                            {
+                                await _driver.ScrollToAsync(action.Locator);
+                                Logger.Info($"Scrolled to element: {action.Locator}");
+                            }
+                            catch (Exception scrollEx)
+                            {
+                                // ENHANCED: If element scroll fails, try page-level scroll to make element visible
+                                Logger.Warning($"Element scroll failed: {scrollEx.Message}. Trying page scroll...");
+                                
+                                try
+                                {
+                                    // Try scrolling the page to reveal the element
+                                    await _driver.ExecuteScriptAsync(@"
+                                        (function() {
+                                            // Scroll down in increments to find the element
+                                            const scrollInterval = window.innerHeight * 0.8;
+                                            
+                                            // Initial scroll attempts
+                                            for (let i = 0; i < 3; i++) {
+                                                window.scrollBy({ top: scrollInterval, behavior: 'smooth' });
+                                            }
+                                        })()
+                                    ");
+                                    await Task.Delay(1500); // Wait for scroll and content load
+                                    
+                                    // Retry scrolling to element after page scroll
+                                    await _driver.ScrollToAsync(action.Locator);
+                                    Logger.Info($"Successfully scrolled to element after page scroll: {action.Locator}");
+                                }
+                                catch (Exception retryEx)
+                                {
+                                    Logger.Error($"Scroll failed even after retry: {retryEx.Message}");
+                                    throw;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Logger.Warning("Scroll action requires either a locator or a value (top/bottom/pixels)");
+                        }
                         break;
 
                     case "wait":
@@ -358,6 +448,61 @@ namespace AgenticAI.Core.ZeroCode
                     case "switchtoparentframe":
                         await _driver.SwitchToParentFrameAsync();
                         Logger.Info("Switched to parent frame");
+                        break;
+
+                    // PRIORITY 1 ACTIONS - Quick Wins ?
+                    
+                    case "doubleclick":
+                        await _driver.DoubleClickAsync(action.Locator);
+                        Logger.Info($"Double-clicked on: {action.Locator}");
+                        break;
+
+                    case "rightclick":
+                    case "contextclick":
+                        await _driver.RightClickAsync(action.Locator);
+                        Logger.Info($"Right-clicked on: {action.Locator}");
+                        break;
+
+                    case "clear":
+                        await _driver.ClearAsync(action.Locator);
+                        Logger.Info($"Cleared input field: {action.Locator}");
+                        break;
+
+                    case "presskey":
+                    case "press":
+                        if (!string.IsNullOrEmpty(action.Value))
+                        {
+                            await _driver.PressKeyAsync(action.Locator, action.Value!);
+                            Logger.Info($"Pressed key '{action.Value}' on: {action.Locator}");
+                        }
+                        else
+                        {
+                            Logger.Warning("PressKey action requires a Value (key name like 'Enter', 'Tab', 'Escape')");
+                        }
+                        break;
+
+                    case "refresh":
+                    case "reload":
+                        await _driver.RefreshAsync();
+                        Logger.Info("Page refreshed");
+                        // Add a small wait to ensure page has reloaded
+                        await Task.Delay(500);
+                        break;
+
+                    case "goback":
+                    case "back":
+                        await _driver.GoBackAsync();
+                        Logger.Info("Navigated back in browser history");
+                        // Add a small wait to ensure navigation is complete
+                        await Task.Delay(500);
+                        break;
+
+                    case "goforward":
+                    case "forward":
+                        await _driver.GoForwardAsync();
+                        Logger.Info("Navigated forward in browser history");
+                        // Add a small wait to ensure navigation is complete
+                        await Task.Delay(500);
                         break;
 
                     default:

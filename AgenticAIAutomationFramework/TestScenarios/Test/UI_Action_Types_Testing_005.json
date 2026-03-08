@@ -1,0 +1,167 @@
+{
+  "ScenarioId": "09a9b4aa-2e5d-4153-b8f2-d9126993cb23",
+  "Name": "UI_Action_Types_Testing_005",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Buttons\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#doubleClickBtn",
+      "Value": null,
+      "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#doubleClickBtn",
+      "Value": null,
+      "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Dblclick",
+      "Locator": "#doubleClickBtn",
+      "Value": null,
+      "Description": "Double-click on #doubleClickBtn",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#bH53J",
+      "Value": null,
+      "Description": "Click on #bH53J (\"Click Me\")",
+      "Metadata": {},
+      "Timestamp": 6
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Buttons\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#doubleClickBtn",
+        "Value": null,
+        "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#doubleClickBtn",
+        "Value": null,
+        "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Dblclick",
+        "Locator": "#doubleClickBtn",
+        "Value": null,
+        "Description": "Double-click on #doubleClickBtn",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#bH53J",
+        "Value": null,
+        "Description": "Click on #bH53J (\"Click Me\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T16:44:07.4373261+05:30",
+  "ModifiedAt": "2026-03-08T16:44:07.4394889+05:30"
+}

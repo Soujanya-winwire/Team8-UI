@@ -1,0 +1,125 @@
+{
+  "ScenarioId": "bdc424c2-5919-4c42-8ebd-b90975c5c27d",
+  "Name": "UI_Action_Types_Testing_008",
+  "Description": "testing double click, right click and click",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Buttons\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Dblclick",
+      "Locator": "button:has-text(\"Double Click Me\")",
+      "Value": null,
+      "Description": "Double-click on button:has-text(\"Double Click Me\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Rightclick",
+      "Locator": "button:has-text(\"Right Click Me\")",
+      "Value": null,
+      "Description": "Rightclick on button:has-text(\"Right Click Me\")",
+      "Metadata": {},
+      "Timestamp": 4
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Buttons\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Dblclick",
+        "Locator": "button:has-text(\"Double Click Me\")",
+        "Value": null,
+        "Description": "Double-click on button:has-text(\"Double Click Me\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Rightclick",
+        "Locator": "button:has-text(\"Right Click Me\")",
+        "Value": null,
+        "Description": "Rightclick on button:has-text(\"Right Click Me\")",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T17:25:05.1740862+05:30",
+  "ModifiedAt": "2026-03-08T17:25:05.1754296+05:30"
+}

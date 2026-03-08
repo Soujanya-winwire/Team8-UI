@@ -1,0 +1,272 @@
+{
+  "ScenarioId": "5b2f19d0-c1a4-4506-8270-3fe363def1f5",
+  "Name": "UI_Action_Types_Testing_016",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Text Box\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Check Box\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Check Box\") (\"Check Box\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Buttons\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Back",
+      "Locator": "",
+      "Value": null,
+      "Description": "Back on ",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Forward",
+      "Locator": "",
+      "Value": null,
+      "Description": "Forward on ",
+      "Metadata": {},
+      "Timestamp": 11
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Text Box\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Check Box\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Check Box\") (\"Check Box\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Buttons\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Back",
+        "Locator": "",
+        "Value": null,
+        "Description": "Back on ",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Forward",
+        "Locator": "",
+        "Value": null,
+        "Description": "Forward on ",
+        "Metadata": {},
+        "Timestamp": 11
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T18:29:04.6466139+05:30",
+  "ModifiedAt": "2026-03-08T18:29:04.6477009+05:30"
+}

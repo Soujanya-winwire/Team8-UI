@@ -1,5 +1,3531 @@
 [
   {
+    "ExecutionId": "7ae9919c-b585-4ae3-be2e-5c7792d42b55",
+    "ScenarioName": "Test_Recorder_05",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T20:01:52.7144457\u002B05:30",
+    "Duration": 6,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on select[name=\u0022dropdown-class-example\u0022] (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option1\u0022 from select[name=\u0022dropdown-class-example\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on select[name=\u0022dropdown-class-example\u0022] (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022checkBoxOption1\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check input[name=\u0022checkBoxOption1\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022checkBoxOption1\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on input.btn-style.class2",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on input.btn-style.class2",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Test_Recorder_05_Click_LAST_2026-03-08_20-01-51_230.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Test_Recorder_05_Click_LAST_2026-03-08_20-01-51_230.png"
+    ]
+  },
+  {
+    "ExecutionId": "6194ca45-a533-405e-95d5-006a27853028",
+    "ScenarioName": "Test_Recorder_02",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T19:35:17.9670944\u002B05:30",
+    "Duration": 4,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on select[name=\u0022dropdown-class-example\u0022] (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option2\u0022 from select[name=\u0022dropdown-class-example\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on select[name=\u0022dropdown-class-example\u0022] (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Test_Recorder_02_Click_LAST_2026-03-08_19-35-15_918.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Test_Recorder_02_Click_LAST_2026-03-08_19-35-15_918.png"
+    ]
+  },
+  {
+    "ExecutionId": "6e477a32-d167-4430-9a62-b7bda8ca1770",
+    "ScenarioName": "UI_Action_Types_Testing_021",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T19:01:05.7708306\u002B05:30",
+    "Duration": 1,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Pressenter",
+        "Description": "Press Enter on [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Submit",
+        "Description": "Submit form form",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022login-button\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022add-to-cart-sauce-labs-backpack\u0022] (\u0022Add to cart\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022remove-sauce-labs-backpack\u0022] (\u0022Remove\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_021_Click_LAST_2026-03-08_19-01-04_659.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_021_Click_LAST_2026-03-08_19-01-04_659.png"
+    ]
+  },
+  {
+    "ExecutionId": "9a3c58eb-9861-43ef-bcce-3deb5c923a2a",
+    "ScenarioName": "UI_Action_Types_Testing_020",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T18:58:34.0890021\u002B05:30",
+    "Duration": 5,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Links\u0022) (\u0022Links\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Radio Button\u0022) (\u0022Radio Button\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Forward",
+        "Description": "Forward on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_020_Forward_LAST_2026-03-08_18-58-32_148.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_020_Forward_LAST_2026-03-08_18-58-32_148.png"
+    ]
+  },
+  {
+    "ExecutionId": "c9fd5c9f-0e6d-4e56-ac05-530d732e9ae0",
+    "ScenarioName": "UI_Action_Types_Testing_019",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T18:51:02.9777088\u002B05:30",
+    "Duration": 10,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Links\u0022) (\u0022Links\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Radio Button\u0022) (\u0022Radio Button\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Forward",
+        "Description": "Forward on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_019_Forward_LAST_2026-03-08_18-51-01_923.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_019_Forward_LAST_2026-03-08_18-51-01_923.png"
+    ]
+  },
+  {
+    "ExecutionId": "abe6fca0-f07b-439b-b451-3b72ce983c7d",
+    "ScenarioName": "UI_Action_Types_Testing_016",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T18:30:32.1867341\u002B05:30",
+    "Duration": 9,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Forward",
+        "Description": "Forward on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_016_Forward_LAST_2026-03-08_18-30-30_837.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_016_Forward_LAST_2026-03-08_18-30-30_837.png"
+    ]
+  },
+  {
+    "ExecutionId": "3e590947-50cb-4e6f-b8c0-be8abee74226",
+    "ScenarioName": "UI_Action_Types_Testing_016",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T18:26:15.2537634\u002B05:30",
+    "Duration": 9,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Links\u0022) (\u0022Links\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Forward",
+        "Description": "Forward on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_016_Back_LAST_2026-03-08_18-26-12_703.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_016_Back_LAST_2026-03-08_18-26-12_703.png"
+    ]
+  },
+  {
+    "ExecutionId": "38ca9a77-d9b5-49bc-8c54-2987ec726d5b",
+    "ScenarioName": "UI_Action_Types_Testing_014",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T18:15:54.2448240\u002B05:30",
+    "Duration": 10,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Forms\u0022) (\u0022Forms\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "Refresh on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Back",
+        "Description": "Back on ",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_014_Back_LAST_2026-03-08_18-15-50_366.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_014_Back_LAST_2026-03-08_18-15-50_366.png"
+    ]
+  },
+  {
+    "ExecutionId": "7631f1cc-c073-4e8c-a3a8-7b68a9a22d53",
+    "ScenarioName": "UI_Action_Types_Testing_012",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T17:57:34.2178541\u002B05:30",
+    "Duration": 9,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Click Me\u0022) (\u0022Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Rightclick",
+        "Description": "Rightclick on button:has-text(\u0022Right Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Double Click Me\u0022) (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on button:has-text(\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Links\u0022) (\u0022Links\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Home\u0022) (\u0022Home\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_012_Click_LAST_2026-03-08_17-57-30_787.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_012_Click_LAST_2026-03-08_17-57-30_787.png"
+    ]
+  },
+  {
+    "ExecutionId": "95ecf5ce-db57-4748-b58d-350ae8ab3bfd",
+    "ScenarioName": "UI_Action_Types_Testing_011",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T17:39:12.4528976\u002B05:30",
+    "Duration": 39,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [aria-label=\u0022Select Home\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Click Me\u0022) (\u0022Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Double Click Me\u0022) (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on button:has-text(\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Rightclick",
+        "Description": "Rightclick on button:has-text(\u0022Right Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Home\u0022) (\u0022Home\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022a:has-text(\\\u0022Home\\\u0022)\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_011_Click_FAILED_LAST_2026-03-08_17-39-04_949.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022a:has-text(\\\u0022Home\\\u0022)\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_011_Click_FAILED_LAST_2026-03-08_17-39-04_949.png"
+    ]
+  },
+  {
+    "ExecutionId": "38baf034-1841-4825-8d5d-e7d4fb058076",
+    "ScenarioName": "UI_Action_Types_Testing_011",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T17:36:40.9357805\u002B05:30",
+    "Duration": 43,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Click Me\u0022) (\u0022Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Double Click Me\u0022) (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on button:has-text(\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Rightclick",
+        "Description": "Rightclick on button:has-text(\u0022Right Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022like\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check input[name=\u0022like\u0022]",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022input[name=\\\u0022like\\\u0022]\u0022) to be visible",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_011_Check_FAILED_2026-03-08_17-36-33_146.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022input[name=\\\u0022like\\\u0022]\u0022) to be visible",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_011_Check_FAILED_2026-03-08_17-36-33_146.png"
+    ]
+  },
+  {
+    "ExecutionId": "70f12fff-8731-4b68-9023-e349e92abd5a",
+    "ScenarioName": "UI_Action_Types_Testing_007",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T17:17:05.3726036\u002B05:30",
+    "Duration": 10,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on button:has-text(\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Rightclick",
+        "Description": "Rightclick on button:has-text(\u0022Right Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_007_Rightclick_LAST_2026-03-08_17-16-59_693.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_007_Rightclick_LAST_2026-03-08_17-16-59_693.png"
+    ]
+  },
+  {
+    "ExecutionId": "8cbdcaa7-ffc2-4867-8414-20268cf9731e",
+    "ScenarioName": "UI_Action_Types_Testing_006",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T17:05:51.1316891\u002B05:30",
+    "Duration": 6,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Double Click Me\u0022) (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Double Click Me\u0022) (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on button:has-text(\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on button:has-text(\u0022Click Me\u0022) (\u0022Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_006_Click_LAST_2026-03-08_17-05-47_312.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_006_Click_LAST_2026-03-08_17-05-47_312.png"
+    ]
+  },
+  {
+    "ExecutionId": "f9a5155c-29f5-4b13-9c96-32206b419dae",
+    "ScenarioName": "UI_Action_Types_Testing_005",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T16:45:14.1992828\u002B05:30",
+    "Duration": 40,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #bH53J (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#bH53J\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_005_Click_FAILED_LAST_2026-03-08_16-45-01_449.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#bH53J\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_005_Click_FAILED_LAST_2026-03-08_16-45-01_449.png"
+    ]
+  },
+  {
+    "ExecutionId": "2121011f-12fe-462a-ab29-dd85699f7a01",
+    "ScenarioName": "UI_Action_Types_Testing_004",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T16:28:53.4551785\u002B05:30",
+    "Duration": 36,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #ShcF1 (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#ShcF1\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_004_Click_FAILED_LAST_2026-03-08_16-28-46_639.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#ShcF1\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_004_Click_FAILED_LAST_2026-03-08_16-28-46_639.png"
+    ]
+  },
+  {
+    "ExecutionId": "8caf1d19-4fa0-4234-8381-c38581457bd9",
+    "ScenarioName": "UI_Action_Types_Testing_003",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T16:27:00.2888201\u002B05:30",
+    "Duration": 37,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test\u0022 into #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022abc\u0022 into #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022xyz\u0022 into #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #1vinD (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022[id=\\\u00221vinD\\\u0022]\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_003_Click_FAILED_LAST_2026-03-08_16-26-53_114.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022[id=\\\u00221vinD\\\u0022]\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_003_Click_FAILED_LAST_2026-03-08_16-26-53_114.png"
+    ]
+  },
+  {
+    "ExecutionId": "e64d1626-2165-4bff-883b-954374eae876",
+    "ScenarioName": "UI_Action_Types_Testing_003",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T16:14:50.3341762\u002B05:30",
+    "Duration": 4,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test\u0022 into #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022abc\u0022 into #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022xyz\u0022 into #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #1vinD (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "DOMException: Failed to execute \u0027querySelectorAll\u0027 on \u0027Document\u0027: \u0027#1vinD\u0027 is not a valid selector.\n    at query (\u003Canonymous\u003E:3329:41)\n    at \u003Canonymous\u003E:3339:7\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl._queryCSS (\u003Canonymous\u003E:3326:17)\n    at SelectorEvaluatorImpl._querySimple (\u003Canonymous\u003E:3206:19)\n    at \u003Canonymous\u003E:3154:29\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl.query (\u003Canonymous\u003E:3147:19)\n    at Object.query (\u003Canonymous\u003E:3361:44)\n    at \u003Canonymous\u003E:3319:21\nCall log:\n  - waiting for Locator(\u0022#1vinD\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_003_Click_FAILED_LAST_2026-03-08_16-14-47_807.png"
+      }
+    ],
+    "Error": "DOMException: Failed to execute \u0027querySelectorAll\u0027 on \u0027Document\u0027: \u0027#1vinD\u0027 is not a valid selector.\n    at query (\u003Canonymous\u003E:3329:41)\n    at \u003Canonymous\u003E:3339:7\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl._queryCSS (\u003Canonymous\u003E:3326:17)\n    at SelectorEvaluatorImpl._querySimple (\u003Canonymous\u003E:3206:19)\n    at \u003Canonymous\u003E:3154:29\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl.query (\u003Canonymous\u003E:3147:19)\n    at Object.query (\u003Canonymous\u003E:3361:44)\n    at \u003Canonymous\u003E:3319:21\nCall log:\n  - waiting for Locator(\u0022#1vinD\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_003_Click_FAILED_LAST_2026-03-08_16-14-47_807.png"
+    ]
+  },
+  {
+    "ExecutionId": "946b5891-a89d-4581-8a57-8cf85680b9cc",
+    "ScenarioName": "UI_Action_Types_Testing_002",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T16:02:28.6077649\u002B05:30",
+    "Duration": 6,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test\u0022 into #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022abc\u0022 into #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022xyz\u0022 into #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [aria-label=\u0022Select Home\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Radio Button\u0022) (\u0022Radio Button\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check #yesRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #yesRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #yesRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #8kBEs (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "DOMException: Failed to execute \u0027querySelectorAll\u0027 on \u0027Document\u0027: \u0027#8kBEs\u0027 is not a valid selector.\n    at query (\u003Canonymous\u003E:3329:41)\n    at \u003Canonymous\u003E:3339:7\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl._queryCSS (\u003Canonymous\u003E:3326:17)\n    at SelectorEvaluatorImpl._querySimple (\u003Canonymous\u003E:3206:19)\n    at \u003Canonymous\u003E:3154:29\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl.query (\u003Canonymous\u003E:3147:19)\n    at Object.query (\u003Canonymous\u003E:3361:44)\n    at \u003Canonymous\u003E:3319:21\nCall log:\n  - waiting for Locator(\u0022#8kBEs\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_002_Click_FAILED_LAST_2026-03-08_16-02-26_523.png"
+      }
+    ],
+    "Error": "DOMException: Failed to execute \u0027querySelectorAll\u0027 on \u0027Document\u0027: \u0027#8kBEs\u0027 is not a valid selector.\n    at query (\u003Canonymous\u003E:3329:41)\n    at \u003Canonymous\u003E:3339:7\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl._queryCSS (\u003Canonymous\u003E:3326:17)\n    at SelectorEvaluatorImpl._querySimple (\u003Canonymous\u003E:3206:19)\n    at \u003Canonymous\u003E:3154:29\n    at SelectorEvaluatorImpl._cached (\u003Canonymous\u003E:3116:20)\n    at SelectorEvaluatorImpl.query (\u003Canonymous\u003E:3147:19)\n    at Object.query (\u003Canonymous\u003E:3361:44)\n    at \u003Canonymous\u003E:3319:21\nCall log:\n  - waiting for Locator(\u0022#8kBEs\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_002_Click_FAILED_LAST_2026-03-08_16-02-26_523.png"
+    ]
+  },
+  {
+    "ExecutionId": "19a3cd7c-6c44-4275-aa0d-0ecfd9648dd5",
+    "ScenarioName": "UI_Action_Types_Testing_002",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T16:00:09.3824838\u002B05:30",
+    "Duration": 35,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #yZtLe (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#yZtLe\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_002_Click_FAILED_2026-03-08_16-00-04_767.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#yZtLe\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_002_Click_FAILED_2026-03-08_16-00-04_767.png"
+    ]
+  },
+  {
+    "ExecutionId": "80153e44-cf34-4219-a9f9-d645fcca3417",
+    "ScenarioName": "UI_Action_Types_Testing_001",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T15:55:17.9411681\u002B05:30",
+    "Duration": 39,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test\u0022 into #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022xyz\u0022 into #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022abc\u0022 into #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [aria-label=\u0022Select Home\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Radio Button\u0022) (\u0022Radio Button\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Submit",
+        "Description": "Submit form #userForm",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Buttons\u0022) (\u0022Buttons\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #doubleClickBtn (\u0022Double Click Me\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Dblclick",
+        "Description": "Double-click on #doubleClickBtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #toFPe (\u0022Click Me\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#toFPe\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_001_Click_FAILED_2026-03-08_15-55-11_115.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#toFPe\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_001_Click_FAILED_2026-03-08_15-55-11_115.png"
+    ]
+  },
+  {
+    "ExecutionId": "5f3bce21-4c6d-4b9e-9ea7-e28c77e3575c",
+    "ScenarioName": "UI_Action_Types_Testing_001",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T15:54:11.1872301\u002B05:30",
+    "Duration": 37,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test\u0022 into #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022xyz\u0022 into #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022abc\u0022 into #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [aria-label=\u0022Select Home\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Radio Button\u0022) (\u0022Radio Button\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Web Tables\u0022) (\u0022Web Tables\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [role=\u0022group\u0022] (\u0022FirstPreviousNextLast\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on path",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#submit\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_001_Click_FAILED_2026-03-08_15-54-04_797.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#submit\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_001_Click_FAILED_2026-03-08_15-54-04_797.png"
+    ]
+  },
+  {
+    "ExecutionId": "7155f127-c327-4e6e-9b37-cb84e515b147",
+    "ScenarioName": "UI_Action_Types_Testing_001",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-08T15:51:56.8917758\u002B05:30",
+    "Duration": 36,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://demoqa.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Elements\u0022) (\u0022Elements\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Text Box\u0022) (\u0022Text Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Test\u0022 into #userName",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #userEmail",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022xyz\u0022 into #currentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022abc\u0022 into #permanentAddress",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Check Box\u0022) (\u0022Check Box\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [aria-label=\u0022Select Home\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Radio Button\u0022) (\u0022Radio Button\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #impressiveRadio",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Web Tables\u0022) (\u0022Web Tables\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [role=\u0022group\u0022] (\u0022FirstPreviousNextLast\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on path",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #submit (\u0022Submit\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#submit\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_001_Click_FAILED_2026-03-08_15-51-50_878.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#submit\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\UI_Action_Types_Testing_001_Click_FAILED_2026-03-08_15-51-50_878.png"
+    ]
+  },
+  {
+    "ExecutionId": "360805c1-d2e4-48f4-9acf-168e04bb9a83",
+    "ScenarioName": "Test_All_Priority1_Actions",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:41:14.5136127\u002B05:30",
+    "Duration": 16,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to buttons page for DoubleClick and RightClick tests",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "DoubleClick",
+        "Description": "ACTION 1/7: DoubleClick - Test double-click functionality",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait to see double-click result",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "RightClick",
+        "Description": "ACTION 2/7: RightClick - Test right-click functionality",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait to see right-click result",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to text box page for Clear and PressKey tests",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type initial text to demonstrate Clear action",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait to show initial text",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Clear",
+        "Description": "ACTION 3/7: Clear - Clear the text field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type new text after clearing",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "PressKey",
+        "Description": "ACTION 4/7: PressKey - Press Tab to move to next field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type email in next field (reached via Tab)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "PressKey",
+        "Description": "Tab to current address field",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type address",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "PressKey",
+        "Description": "Tab to permanent address",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type permanent address",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "PressKey",
+        "Description": "ACTION 4/7: PressKey - Press Enter to submit form",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait to see form submission result",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Refresh",
+        "Description": "ACTION 5/7: Refresh - Refresh the page",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait after refresh",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to links page for navigation tests",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait on links page",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "GoBack",
+        "Description": "ACTION 6/7: GoBack - Navigate back to text-box page",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait after going back",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "GoForward",
+        "Description": "ACTION 7/7: GoForward - Navigate forward to links page again",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait after going forward - Test complete!",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_All_Priority1_Actions_Wait_LAST_2026-03-08_15-41-13_172.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_All_Priority1_Actions_Wait_LAST_2026-03-08_15-41-13_172.png"
+    ]
+  },
+  {
+    "ExecutionId": "8d232a72-eace-464b-9a23-c0c2513afadf",
+    "ScenarioName": "Test_iFrame_02",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:28:29.3246041\u002B05:30",
+    "Duration": 18,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option1\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #hide-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #show-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022legacy.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Courses\u0022) (\u0022Courses\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022courses.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a.flex.flex-col (\u0022Playwright JS Automation Testing from ScratchEnd t\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_iFrame_02_Click_LAST_2026-03-08_15-28-27_232.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_iFrame_02_Click_LAST_2026-03-08_15-28-27_232.png"
+    ]
+  },
+  {
+    "ExecutionId": "53a7fa47-9f0e-43ab-b702-d1f835b116cc",
+    "ScenarioName": "Test_iFrame_02",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:27:40.0028669\u002B05:30",
+    "Duration": 19,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option1\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #hide-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #show-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022legacy.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Courses\u0022) (\u0022Courses\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022courses.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #heap_product-search",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a.flex.flex-col (\u0022Playwright JS Automation Testing from ScratchEnd t\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_iFrame_02_Click_LAST_2026-03-08_15-27-37_526.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_iFrame_02_Click_LAST_2026-03-08_15-27-37_526.png"
+    ]
+  },
+  {
+    "ExecutionId": "5cae4575-b67a-40ae-b1ee-75feab9af5c4",
+    "ScenarioName": "Test_iFrame_01",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:25:01.4973262\u002B05:30",
+    "Duration": 37,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option1\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022legacy.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Courses\u0022) (\u0022Courses\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022courses.rahulshettyacademy.com\u0022]",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022iframe[src*=\\\u0022courses.rahulshettyacademy.com\\\u0022]\u0022) to be visible",
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_iFrame_01_SwitchToFrame_FAILED_2026-03-08_15-24-55_894.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022iframe[src*=\\\u0022courses.rahulshettyacademy.com\\\u0022]\u0022) to be visible",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_iFrame_01_SwitchToFrame_FAILED_2026-03-08_15-24-55_894.png"
+    ]
+  },
+  {
+    "ExecutionId": "30b63d63-fd52-4373-b5db-21b13d372600",
+    "ScenarioName": "Test_Scroll_04",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:10:13.4160430\u002B05:30",
+    "Duration": 37,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022india\u0022 into #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #ui-id-3 (\u0022India\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022India\u0022 into #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option2\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check #checkBoxOption3",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #checkBoxOption3",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #checkBoxOption3",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #hide-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #show-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022legacy.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Courses\u0022) (\u0022Courses\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022courses.rahulshettyacademy.com\u0022]",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022iframe[src*=\\\u0022courses.rahulshettyacademy.com\\\u0022]\u0022) to be visible",
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_Scroll_04_SwitchToFrame_FAILED_2026-03-08_15-10-08_408.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022iframe[src*=\\\u0022courses.rahulshettyacademy.com\\\u0022]\u0022) to be visible",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_Scroll_04_SwitchToFrame_FAILED_2026-03-08_15-10-08_408.png"
+    ]
+  },
+  {
+    "ExecutionId": "e7834434-3464-4a32-9348-199461c008aa",
+    "ScenarioName": "Test_Scroll_03",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:05:00.2594854\u002B05:30",
+    "Duration": 44,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022legacy.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Blog\u0022) (\u0022Blog\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: #courses-iframe",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [aria-label=\u0022Playwright\u0022] (\u0022Playwright\u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022[aria-label=\\\u0022Playwright\\\u0022]\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_Scroll_03_Click_FAILED_LAST_2026-03-08_15-04-54_130.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022[aria-label=\\\u0022Playwright\\\u0022]\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_Scroll_03_Click_FAILED_LAST_2026-03-08_15-04-54_130.png"
+    ]
+  },
+  {
+    "ExecutionId": "c509af36-90ec-4293-b840-92d77ec7403d",
+    "ScenarioName": "Test_Scroll_02",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T15:01:54.2682285\u002B05:30",
+    "Duration": 39,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on input[name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022india\u0022 into #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #ui-id-3 (\u0022India\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022India\u0022 into #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option2\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check #checkBoxOption1",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #checkBoxOption1",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Input",
+        "Description": "Input on #checkBoxOption1",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #hide-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #show-textbox",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022legacy.rahulshettyacademy.com\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on a:has-text(\u0022Courses\u0022) (\u0022Courses\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "SwitchToFrame",
+        "Description": "Switch to iframe: iframe[src*=\u0022courses.rahulshettyacademy.com\u0022]",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022iframe[src*=\\\u0022courses.rahulshettyacademy.com\\\u0022]\u0022) to be visible",
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_Scroll_02_SwitchToFrame_FAILED_2026-03-08_15-01-48_839.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022iframe[src*=\\\u0022courses.rahulshettyacademy.com\\\u0022]\u0022) to be visible",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_Scroll_02_SwitchToFrame_FAILED_2026-03-08_15-01-48_839.png"
+    ]
+  },
+  {
+    "ExecutionId": "ad4278e1-4fcf-42b0-8816-af930e730b56",
+    "ScenarioName": "Test_Scroll_01",
+    "Module": "Practice",
+    "ExecutedAt": "2026-03-08T14:59:17.5847710\u002B05:30",
+    "Duration": 32,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\n                    Option1\n               \u0022)",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#dropdown-class-example\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_Scroll_01_Click_FAILED_2026-03-08_14-59-10_526.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022#dropdown-class-example\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_Scroll_01_Click_FAILED_2026-03-08_14-59-10_526.png"
+    ]
+  },
+  {
+    "ExecutionId": "1af39a31-9ca5-439a-9977-2c77ac97f7fa",
+    "ScenarioName": "Test_16",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-07T23:45:52.7252403\u002B05:30",
+    "Duration": 68,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022india\u0022 into #autocomplete",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #ui-id-3 (\u0022India\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [name=\u0022radioButton\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check [name=radioButton][value=radio1]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\nOption1\nOption2\nOption3\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Select",
+        "Description": "Select \u0022Option2\u0022 from #dropdown-class-example",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #dropdown-class-example (\u0022Select\nOption1\nOption2\nOption3\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #checkBoxOption2",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Check",
+        "Description": "Check [name=checkBoxOption2][value=option2]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #name",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022Pooja\u0022 into #name",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on #alertbtn",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Courses\u0022 (\u0022Courses\u0022)",
+        "Status": "Failed",
+        "Error": "Failed to click element with any of the provided selectors. Last error: Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022text=\\\u0022Courses\\\u0022\u0022)",
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Test_16_Click_FAILED_LAST_2026-03-07_23-45-52_129.png"
+      }
+    ],
+    "Error": "Failed to click element with any of the provided selectors. Last error: Timeout 30000ms exceeded.\nCall log:\n  - waiting for Locator(\u0022text=\\\u0022Courses\\\u0022\u0022)",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Test_16_Click_FAILED_LAST_2026-03-07_23-45-52_129.png"
+    ]
+  },
+  {
+    "ExecutionId": "20e0d482-36e0-4f76-ab96-675b15d6e8c6",
+    "ScenarioName": "Test_15",
+    "Module": "Test",
+    "ExecutedAt": "2026-03-07T23:42:45.5287174\u002B05:30",
+    "Duration": 19,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022login-button\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022add-to-cart-sauce-labs-fleece-jacket\u0022] (\u0022Add to cart\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022shopping-cart-link\u0022] (\u00221\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022checkout\u0022] (\u0022Checkout\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Test_15_Click_LAST_2026-03-07_23-42-44_529.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Test_15_Click_LAST_2026-03-07_23-42-44_529.png"
+    ]
+  },
+  {
     "ExecutionId": "b0b2000d-e7da-44e1-96a7-8f8df6f57e07",
     "ScenarioName": "Verify_Rel-Iframe",
     "Module": "Login",

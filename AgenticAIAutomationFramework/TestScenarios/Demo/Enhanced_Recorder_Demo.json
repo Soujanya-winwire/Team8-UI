@@ -1,0 +1,122 @@
+{
+  "scenarioId": "demo-enhanced-recorder",
+  "name": "Enhanced Recorder Demo",
+  "module": "Demo",
+  "description": "Example scenario showing enhanced recorder capabilities with smart selectors, iframe support, and action normalization",
+  "startUrl": "https://example.com/demo",
+  "tags": ["demo", "recorder", "enhanced"],
+  "actions": [
+    {
+      "actionType": "Navigate",
+      "locator": "https://example.com/demo",
+      "value": "https://example.com/demo",
+      "description": "Navigate to https://example.com/demo",
+      "timestamp": 0
+    },
+    {
+      "actionType": "Click",
+      "locator": "[data-testid='start-demo']",
+      "value": null,
+      "description": "Click on [data-testid='start-demo'] (\"Start Demo\")",
+      "timestamp": 1,
+      "comment": "Smart selector prioritizes data-testid"
+    },
+    {
+      "actionType": "Type",
+      "locator": "input[name='username']",
+      "value": "testuser",
+      "description": "Type \"testuser\" into input[name='username']",
+      "timestamp": 2,
+      "comment": "Input debounced - single action for complete typing"
+    },
+    {
+      "actionType": "Type",
+      "locator": "input[type='password']",
+      "value": "password123",
+      "description": "Type \"password123\" into input[type='password']",
+      "timestamp": 3
+    },
+    {
+      "actionType": "Check",
+      "locator": "[id='remember-me']",
+      "value": null,
+      "description": "Check [id='remember-me']",
+      "timestamp": 4,
+      "comment": "Checkbox action normalized from change event"
+    },
+    {
+      "actionType": "SwitchToFrame",
+      "locator": "iframe[title='Payment Form']",
+      "value": null,
+      "description": "Switch to iframe: iframe[title='Payment Form']",
+      "timestamp": 5,
+      "comment": "Automatically added when action detected in iframe"
+    },
+    {
+      "actionType": "Type",
+      "locator": "input[name='cardNumber']",
+      "value": "4111111111111111",
+      "description": "Type \"4111111111111111\" into input[name='cardNumber']",
+      "timestamp": 6,
+      "comment": "Action performed inside iframe"
+    },
+    {
+      "actionType": "Select",
+      "locator": "select[name='expiryMonth']",
+      "value": "12",
+      "description": "Select \"December\" from select[name='expiryMonth']",
+      "timestamp": 7,
+      "comment": "Dropdown selection normalized from change event"
+    },
+    {
+      "actionType": "SwitchToDefaultContent",
+      "locator": "",
+      "value": null,
+      "description": "Switch to default content",
+      "timestamp": 8,
+      "comment": "Automatically added when exiting iframe context"
+    },
+    {
+      "actionType": "Click",
+      "locator": "button:has-text(\"Submit Order\")",
+      "value": null,
+      "description": "Click on button:has-text(\"Submit Order\") (\"Submit Order\")",
+      "timestamp": 9,
+      "comment": "Text-based selector for button with stable text"
+    },
+    {
+      "actionType": "Wait",
+      "locator": null,
+      "value": "3",
+      "description": "Wait 3 seconds",
+      "timestamp": 10,
+      "comment": "Automatically detected wait between actions"
+    },
+    {
+      "actionType": "Navigate",
+      "locator": "https://example.com/confirmation",
+      "value": "https://example.com/confirmation",
+      "description": "Navigate to https://example.com/confirmation",
+      "timestamp": 11,
+      "comment": "Navigation automatically tracked and recorded"
+    },
+    {
+      "actionType": "Pressenter",
+      "locator": "input[type='search']",
+      "value": null,
+      "description": "Press Enter on input[type='search']",
+      "timestamp": 12,
+      "comment": "Keyboard event normalized to specific action"
+    }
+  ],
+  "assertions": [
+    {
+      "type": "ElementVisible",
+      "locator": "[data-testid='success-message']",
+      "expectedValue": "true",
+      "description": "Verify success message is visible"
+    }
+  ],
+  "createdAt": "2024-01-15T10:30:00",
+  "modifiedAt": null
+}

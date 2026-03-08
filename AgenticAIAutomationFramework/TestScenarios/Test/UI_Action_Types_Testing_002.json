@@ -1,0 +1,587 @@
+{
+  "ScenarioId": "ab856219-a607-4ad6-94f8-592830d58e8b",
+  "Name": "UI_Action_Types_Testing_002",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Text Box\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#userName",
+      "Value": null,
+      "Description": "Click on #userName",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#userName",
+      "Value": "Test",
+      "Description": "Type \"Test\" into #userName",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#userEmail",
+      "Value": null,
+      "Description": "Click on #userEmail",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#userEmail",
+      "Value": "Test",
+      "Description": "Input on #userEmail",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#userEmail",
+      "Value": "Test@",
+      "Description": "Input on #userEmail",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#userEmail",
+      "Value": "Test@work",
+      "Description": "Input on #userEmail",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#userEmail",
+      "Value": "Test@work.com",
+      "Description": "Input on #userEmail",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#userEmail",
+      "Value": "Test@work.com",
+      "Description": "Input on #userEmail",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#currentAddress",
+      "Value": null,
+      "Description": "Click on #currentAddress",
+      "Metadata": {},
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#currentAddress",
+      "Value": "abc",
+      "Description": "Type \"abc\" into #currentAddress",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#permanentAddress",
+      "Value": null,
+      "Description": "Click on #permanentAddress",
+      "Metadata": {},
+      "Timestamp": 13
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#permanentAddress",
+      "Value": "xyz",
+      "Description": "Type \"xyz\" into #permanentAddress",
+      "Metadata": {},
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#submit",
+      "Value": null,
+      "Description": "Click on #submit (\"Submit\")",
+      "Metadata": {},
+      "Timestamp": 15
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Check Box\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Check Box\") (\"Check Box\")",
+      "Metadata": {},
+      "Timestamp": 16
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[aria-label=\"Select Home\"]",
+      "Value": null,
+      "Description": "Click on [aria-label=\"Select Home\"]",
+      "Metadata": {},
+      "Timestamp": 17
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Radio Button\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Radio Button\") (\"Radio Button\")",
+      "Metadata": {},
+      "Timestamp": 18
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "#yesRadio",
+      "Value": null,
+      "Description": "Check #yesRadio",
+      "Metadata": {},
+      "Timestamp": 19
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#yesRadio",
+      "Value": "on",
+      "Description": "Input on #yesRadio",
+      "Metadata": {},
+      "Timestamp": 20
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "#yesRadio",
+      "Value": "on",
+      "Description": "Input on #yesRadio",
+      "Metadata": {},
+      "Timestamp": 21
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Buttons\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+      "Metadata": {},
+      "Timestamp": 22
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#doubleClickBtn",
+      "Value": null,
+      "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+      "Metadata": {},
+      "Timestamp": 23
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#doubleClickBtn",
+      "Value": null,
+      "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+      "Metadata": {},
+      "Timestamp": 24
+    },
+    {
+      "ActionType": "Dblclick",
+      "Locator": "#doubleClickBtn",
+      "Value": null,
+      "Description": "Double-click on #doubleClickBtn",
+      "Metadata": {},
+      "Timestamp": 25
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#8kBEs",
+      "Value": null,
+      "Description": "Click on #8kBEs (\"Click Me\")",
+      "Metadata": {},
+      "Timestamp": 26
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Text Box\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#userName",
+        "Value": null,
+        "Description": "Click on #userName",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#userName",
+        "Value": "Test",
+        "Description": "Type \"Test\" into #userName",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#userEmail",
+        "Value": null,
+        "Description": "Click on #userEmail",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#userEmail",
+        "Value": "Test",
+        "Description": "Input on #userEmail",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#userEmail",
+        "Value": "Test@",
+        "Description": "Input on #userEmail",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#userEmail",
+        "Value": "Test@work",
+        "Description": "Input on #userEmail",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#userEmail",
+        "Value": "Test@work.com",
+        "Description": "Input on #userEmail",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#userEmail",
+        "Value": "Test@work.com",
+        "Description": "Input on #userEmail",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#currentAddress",
+        "Value": null,
+        "Description": "Click on #currentAddress",
+        "Metadata": {},
+        "Timestamp": 11
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#currentAddress",
+        "Value": "abc",
+        "Description": "Type \"abc\" into #currentAddress",
+        "Metadata": {},
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#permanentAddress",
+        "Value": null,
+        "Description": "Click on #permanentAddress",
+        "Metadata": {},
+        "Timestamp": 13
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 14,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#permanentAddress",
+        "Value": "xyz",
+        "Description": "Type \"xyz\" into #permanentAddress",
+        "Metadata": {},
+        "Timestamp": 14
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 15,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#submit",
+        "Value": null,
+        "Description": "Click on #submit (\"Submit\")",
+        "Metadata": {},
+        "Timestamp": 15
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 16,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Check Box\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Check Box\") (\"Check Box\")",
+        "Metadata": {},
+        "Timestamp": 16
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 17,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[aria-label=\"Select Home\"]",
+        "Value": null,
+        "Description": "Click on [aria-label=\"Select Home\"]",
+        "Metadata": {},
+        "Timestamp": 17
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 18,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Radio Button\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Radio Button\") (\"Radio Button\")",
+        "Metadata": {},
+        "Timestamp": 18
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 19,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "#yesRadio",
+        "Value": null,
+        "Description": "Check #yesRadio",
+        "Metadata": {},
+        "Timestamp": 19
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 20,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#yesRadio",
+        "Value": "on",
+        "Description": "Input on #yesRadio",
+        "Metadata": {},
+        "Timestamp": 20
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 21,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "#yesRadio",
+        "Value": "on",
+        "Description": "Input on #yesRadio",
+        "Metadata": {},
+        "Timestamp": 21
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 22,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Buttons\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+        "Metadata": {},
+        "Timestamp": 22
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 23,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#doubleClickBtn",
+        "Value": null,
+        "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+        "Metadata": {},
+        "Timestamp": 23
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 24,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#doubleClickBtn",
+        "Value": null,
+        "Description": "Click on #doubleClickBtn (\"Double Click Me\")",
+        "Metadata": {},
+        "Timestamp": 24
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 25,
+      "Action": {
+        "ActionType": "Dblclick",
+        "Locator": "#doubleClickBtn",
+        "Value": null,
+        "Description": "Double-click on #doubleClickBtn",
+        "Metadata": {},
+        "Timestamp": 25
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 26,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#8kBEs",
+        "Value": null,
+        "Description": "Click on #8kBEs (\"Click Me\")",
+        "Metadata": {},
+        "Timestamp": 26
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T16:01:40.1126549+05:30",
+  "ModifiedAt": "2026-03-08T16:01:40.1136813+05:30"
+}

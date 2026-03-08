@@ -28,4 +28,10 @@
     <None Remove="tools\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ZeroCode\Resources\*.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
