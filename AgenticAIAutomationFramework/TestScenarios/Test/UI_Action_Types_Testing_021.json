@@ -1,0 +1,251 @@
+{
+  "ScenarioId": "291f293f-06b3-49c6-9001-04c17e4c1ac4",
+  "Name": "UI_Action_Types_Testing_021",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://www.saucedemo.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com/",
+      "Value": "https://www.saucedemo.com/",
+      "Description": "Navigate to https://www.saucedemo.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"username\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "standard_user",
+      "Description": "Type \"standard_user\" into [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"password\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "secret_sauce",
+      "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Pressenter",
+      "Locator": "[data-test=\"password\"]",
+      "Value": null,
+      "Description": "Press Enter on [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "secret_sauce",
+      "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Submit",
+      "Locator": "form",
+      "Value": null,
+      "Description": "Submit form form",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"login-button\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"login-button\"]",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"add-to-cart-sauce-labs-backpack\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"add-to-cart-sauce-labs-backpack\"] (\"Add to cart\")",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"remove-sauce-labs-backpack\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"remove-sauce-labs-backpack\"] (\"Remove\")",
+      "Metadata": {},
+      "Timestamp": 10
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://www.saucedemo.com/",
+        "Value": "https://www.saucedemo.com/",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"username\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"username\"]",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"username\"]",
+        "Value": "standard_user",
+        "Description": "Type \"standard_user\" into [data-test=\"username\"]",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"password\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"password\"]",
+        "Value": "secret_sauce",
+        "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Pressenter",
+        "Locator": "[data-test=\"password\"]",
+        "Value": null,
+        "Description": "Press Enter on [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"password\"]",
+        "Value": "secret_sauce",
+        "Description": "Type \"secret_sauce\" into [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Submit",
+        "Locator": "form",
+        "Value": null,
+        "Description": "Submit form form",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"login-button\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"login-button\"]",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"add-to-cart-sauce-labs-backpack\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"add-to-cart-sauce-labs-backpack\"] (\"Add to cart\")",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"remove-sauce-labs-backpack\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"remove-sauce-labs-backpack\"] (\"Remove\")",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T19:00:23.1693397+05:30",
+  "ModifiedAt": "2026-03-08T19:00:23.1699788+05:30"
+}

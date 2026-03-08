@@ -24,6 +24,25 @@ namespace AgenticAI.Core.Interfaces
         Task CloseAsync();
         Task DisposeAsync();
         
+        // JavaScript execution (for advanced scenarios like page-level scrolling)
+        Task<T> ExecuteScriptAsync<T>(string script);
+        Task ExecuteScriptAsync(string script);
+        
+        // Additional navigation methods
+        Task RefreshAsync();
+        Task GoBackAsync();
+        Task GoForwardAsync();
+        
+        // Additional element interaction methods
+        Task ClearAsync(string locator);
+        Task DoubleClickAsync(string locator);
+        Task RightClickAsync(string locator);
+        Task PressKeyAsync(string locator, string key);
+        
+        // Element state methods
+        Task<bool> IsElementVisibleAsync(string locator);
+        Task<bool> IsElementEnabledAsync(string locator);
+        
         // IFrame handling methods
         Task SwitchToFrameAsync(string frameLocator);
         Task SwitchToFrameByIndexAsync(int index);

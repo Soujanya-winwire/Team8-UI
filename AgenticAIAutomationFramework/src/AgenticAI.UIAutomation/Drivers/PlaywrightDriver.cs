@@ -80,6 +80,66 @@ namespace AgenticAI.UIAutomation.Drivers
             await _page!.GotoAsync(url);
         }
 
+        /// <summary>
+        /// Highlight an element during playback for visual verification
+        /// </summary>
+        private async Task HighlightElementAsync(string selector)
+        {
+            if (_page == null) return;
+
+            try
+            {
+                var highlightScript = @"
+                    (selector) => {
+                        try {
+                            const element = document.querySelector(selector);
+                            if (!element) return;
+                            
+                            // Store original styles
+                            const originalBorder = element.style.border;
+                            const originalBoxShadow = element.style.boxShadow;
+                            const originalOutline = element.style.outline;
+                            
+                            // Apply highlight styles
+                            element.style.border = '3px solid #4CAF50';
+                            element.style.boxShadow = '0 0 20px #4CAF50';
+                            element.style.outline = '2px solid #81C784';
+                            
+                            // Scroll element into view
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                            
+                            // Remove highlight after 1.5 seconds
+                            setTimeout(() => {
+                                element.style.border = originalBorder;
+                                element.style.boxShadow = originalBoxShadow;
+                                element.style.outline = originalOutline;
+                            }, 1500);
+                        } catch (e) {
+                            console.warn('Highlight failed:', e);
+                        }
+                    }
+                ";
+
+                // Execute in frame context if applicable
+                if (_currentFrame != null)
+                {
+                    await _currentFrame.EvaluateAsync(highlightScript, selector);
+                }
+                else
+                {
+                    await _page.EvaluateAsync(highlightScript, selector);
+                }
+
+                // Small delay to let highlight be visible before action
+                await Task.Delay(300);
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug($"Highlight element failed: {ex.Message}");
+                // Don't fail test if highlighting fails
+            }
+        }
+
         public async Task<Core.Interfaces.IWebElement> FindElementAsync(string locator, string strategy = "auto")
         {
             // Always return page-scoped element - frame context is handled in action methods
@@ -105,6 +165,9 @@ namespace AgenticAI.UIAutomation.Drivers
         {
             var selector = GetSelector(locator, "auto");
             
+            // Highlight element before clicking
+            await HighlightElementAsync(selector);
+            
             // If we're in a frame, click within frame context
             if (_currentFrame != null)
             {
@@ -120,6 +183,10 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task CheckAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
+            
+            // Highlight element before checking
+            await HighlightElementAsync(selector);
+            
             ILocator locatorEl;
             
             // Use frame context if available
@@ -163,6 +230,10 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task UncheckAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
+            
+            // Highlight element before unchecking
+            await HighlightElementAsync(selector);
+            
             ILocator locatorEl;
             
             // Use frame context if available
@@ -203,6 +274,10 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task SelectOptionAsync(string locator, string value)
         {
             var selector = GetSelector(locator, "auto");
+            
+            // Highlight element before selecting
+            await HighlightElementAsync(selector);
+            
             ILocator locatorEl;
             
             // Use frame context if available
@@ -245,6 +320,9 @@ namespace AgenticAI.UIAutomation.Drivers
         {
             var selector = GetSelector(locator, "auto");
             
+            // Highlight element before hovering
+            await HighlightElementAsync(selector);
+            
             // Use frame context if available
             if (_currentFrame != null)
             {
@@ -259,24 +337,87 @@ namespace AgenticAI.UIAutomation.Drivers
         public async Task ScrollToAsync(string locator)
         {
             var selector = GetSelector(locator, "auto");
-            ILocator locatorEl;
             
-            // Use frame context if available
-            if (_currentFrame != null)
+            // GLOBAL FIX: Support multiple fallback selectors for scroll
+            var selectors = SplitFallbackSelectors(selector);
+            Exception? lastException = null;
+            
+            foreach (var selectorToTry in selectors)
             {
-                locatorEl = _currentFrame.Locator(selector);
-            }
-            else
-            {
-                locatorEl = _page!.Locator(selector);
+                try
+                {
+                    ILocator locatorEl;
+                    
+                    // Use frame context if available
+                    if (_currentFrame != null)
+                    {
+                        locatorEl = _currentFrame.Locator(selectorToTry.Trim());
+                    }
+                    else
+                    {
+                        locatorEl = _page!.Locator(selectorToTry.Trim());
+                    }
+                    
+                    // ENHANCED: Wait for element to be attached to DOM before scrolling
+                    await locatorEl.WaitForAsync(new LocatorWaitForOptions 
+                    { 
+                        State = WaitForSelectorState.Attached,
+                        Timeout = 10000 // 10 second timeout
+                    });
+                    
+                    // ENHANCED: Scroll with multiple strategies for robustness
+                    try
+                    {
+                        // Strategy 1: ScrollIntoViewIfNeeded (Playwright's smart scroll)
+                        await locatorEl.ScrollIntoViewIfNeededAsync(new LocatorScrollIntoViewIfNeededOptions 
+                        {
+                            Timeout = 5000
+                        });
+                        Logger.Debug($"Scrolled to element using ScrollIntoViewIfNeeded: {selectorToTry}");
+                    }
+                    catch
+                    {
+                        // Strategy 2: Fallback to JavaScript scroll (more aggressive)
+                        Logger.Debug("ScrollIntoViewIfNeeded failed, trying JavaScript scroll...");
+                        await locatorEl.EvaluateAsync(@"
+                            element => {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                            }
+                        ");
+                        
+                        // Wait for scroll to complete
+                        await Task.Delay(500);
+                        Logger.Debug($"Scrolled to element using JavaScript: {selectorToTry}");
+                    }
+                    
+                    // If we reached here, scroll was successful
+                    if (selectors.Count > 1 && selectorToTry != selectors[0])
+                    {
+                        Logger.Info($"Scroll succeeded with fallback selector: {selectorToTry}");
+                    }
+                    return; // Success - exit method
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    if (selectors.Count > 1)
+                    {
+                        Logger.Debug($"Scroll failed with selector '{selectorToTry}': {ex.Message}. Trying next fallback...");
+                    }
+                    continue; // Try next selector
+                }
             }
             
-            await locatorEl.ScrollIntoViewIfNeededAsync();
+            // If we get here, all selectors failed
+            throw new Exception($"Failed to scroll to element with any of the provided selectors. Last error: {lastException?.Message}", lastException);
         }
 
         public async Task TypeAsync(string locator, string text)
         {
             var selector = GetSelector(locator, "auto");
+            
+            // Highlight element before typing
+            await HighlightElementAsync(selector);
             
             // Use frame context if available
             if (_currentFrame != null)
@@ -388,7 +529,138 @@ namespace AgenticAI.UIAutomation.Drivers
             _playwright?.Dispose();
         }
 
-        // IFrame handling methods - FIXED for Playwright
+        // Additional navigation methods
+        public async Task RefreshAsync()
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+            await _page.ReloadAsync();
+        }
+
+        public async Task GoBackAsync()
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+            await _page.GoBackAsync();
+        }
+
+        public async Task GoForwardAsync()
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+            await _page.GoForwardAsync();
+        }
+
+        // Additional element interaction methods
+        public async Task ClearAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            ILocator locatorEl;
+            
+            if (_currentFrame != null)
+            {
+                locatorEl = _currentFrame.Locator(selector);
+            }
+            else
+            {
+                locatorEl = _page!.Locator(selector);
+            }
+            
+            await locatorEl.ClearAsync();
+        }
+
+        public async Task DoubleClickAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            
+            if (_currentFrame != null)
+            {
+                await _currentFrame.DblClickAsync(selector);
+            }
+            else
+            {
+                await _page!.DblClickAsync(selector);
+            }
+        }
+
+        public async Task RightClickAsync(string locator)
+        {
+            var selector = GetSelector(locator, "auto");
+            
+            if (_currentFrame != null)
+            {
+                await _currentFrame.ClickAsync(selector, new FrameClickOptions { Button = MouseButton.Right });
+            }
+            else
+            {
+                await _page!.ClickAsync(selector, new PageClickOptions { Button = MouseButton.Right });
+            }
+        }
+
+        public async Task PressKeyAsync(string locator, string key)
+        {
+            var selector = GetSelector(locator, "auto");
+            
+            if (_currentFrame != null)
+            {
+                await _currentFrame.PressAsync(selector, key);
+            }
+            else
+            {
+                await _page!.PressAsync(selector, key);
+            }
+        }
+
+        // Element state methods
+        public async Task<bool> IsElementVisibleAsync(string locator)
+        {
+            try
+            {
+                var selector = GetSelector(locator, "auto");
+                ILocator locatorEl;
+                
+                if (_currentFrame != null)
+                {
+                    locatorEl = _currentFrame.Locator(selector);
+                }
+                else
+                {
+                    locatorEl = _page!.Locator(selector);
+                }
+                
+                return await locatorEl.IsVisibleAsync();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsElementEnabledAsync(string locator)
+        {
+            try
+            {
+                var selector = GetSelector(locator, "auto");
+                ILocator locatorEl;
+                
+                if (_currentFrame != null)
+                {
+                    locatorEl = _currentFrame.Locator(selector);
+                }
+                else
+                {
+                    locatorEl = _page!.Locator(selector);
+                }
+                
+                return await locatorEl.IsEnabledAsync();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // IFrame handling methods - ENHANCED with smart frame detection
         public async Task SwitchToFrameAsync(string frameLocator)
         {
             if (_page == null)
@@ -396,30 +668,137 @@ namespace AgenticAI.UIAutomation.Drivers
 
             var selector = GetSelector(frameLocator, "auto");
             
-            // In Playwright, get the actual frame object
-            Logger.Info($"Switching to iframe: {selector}");
+            Logger.Info($"🔍 Attempting to switch to iframe: {selector}");
             
-            // Wait for frame to be available
-            await _page.WaitForSelectorAsync(selector, new PageWaitForSelectorOptions { Timeout = _config.TimeoutInSeconds * 1000 });
-            
-            // Get the frame by selector
-            var frameElement = await _page.QuerySelectorAsync(selector);
-            if (frameElement == null)
+            // GLOBAL FIX: Check if we're already in the correct frame
+            if (_currentFrame != null && _currentFrameLocator == selector)
             {
-                throw new Exception($"Frame not found: {selector}");
+                Logger.Info($"✅ Already in target iframe: {selector} - Skipping switch");
+                return;
             }
             
-            // Get the content frame
-            var frame = await frameElement.ContentFrameAsync();
-            if (frame == null)
+            // GLOBAL FIX: Smart frame detection with multiple search strategies
+            IFrame? targetFrame = null;
+            IElementHandle? frameElement = null;
+            
+            try
             {
-                throw new Exception($"Could not get content frame for: {selector}");
+                // Strategy 1: Try finding frame from main page (for top-level iframes)
+                Logger.Debug($"Strategy 1: Looking for iframe from main page context...");
+                
+                // Wait for frame with timeout
+                try
+                {
+                    await _page.WaitForSelectorAsync(selector, new PageWaitForSelectorOptions { Timeout = 5000 });
+                    frameElement = await _page.QuerySelectorAsync(selector);
+                    
+                    if (frameElement != null)
+                    {
+                        targetFrame = await frameElement.ContentFrameAsync();
+                        if (targetFrame != null)
+                        {
+                            Logger.Debug($"✅ Found iframe from main page");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug($"Frame not found in main page: {ex.Message}");
+                }
+                
+                // Strategy 2: Try finding frame from current frame context (for nested iframes)
+                if (targetFrame == null && _currentFrame != null)
+                {
+                    Logger.Debug($"Strategy 2: Looking for nested iframe inside current frame...");
+                    try
+                    {
+                        await _currentFrame.WaitForSelectorAsync(selector, new FrameWaitForSelectorOptions { Timeout = 5000 });
+                        frameElement = await _currentFrame.QuerySelectorAsync(selector);
+                        
+                        if (frameElement != null)
+                        {
+                            targetFrame = await frameElement.ContentFrameAsync();
+                            if (targetFrame != null)
+                            {
+                                Logger.Debug($"✅ Found nested iframe inside current frame");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Debug($"Nested iframe not found: {ex.Message}");
+                    }
+                }
+                
+                // Strategy 3: Search by URL pattern in all frames
+                if (targetFrame == null)
+                {
+                    Logger.Debug($"Strategy 3: Searching all frames by URL pattern...");
+                    
+                    // Extract URL pattern from selector if it uses src attribute
+                    var urlPattern = ExtractUrlPatternFromSelector(selector);
+                    
+                    if (!string.IsNullOrEmpty(urlPattern))
+                    {
+                        var allFrames = _page.Frames.ToList();
+                        Logger.Debug($"Total frames on page: {allFrames.Count}");
+                        
+                        foreach (var frame in allFrames)
+                        {
+                            var frameUrl = frame.Url;
+                            Logger.Debug($"  Checking frame URL: {frameUrl}");
+                            
+                            if (frameUrl.Contains(urlPattern, StringComparison.OrdinalIgnoreCase))
+                            {
+                                targetFrame = frame;
+                                Logger.Debug($"✅ Found matching frame by URL pattern: {urlPattern}");
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Strategy 4: If we're already in a frame and target not found, assume content is in current frame
+                if (targetFrame == null && _currentFrame != null)
+                {
+                    Logger.Warning($"⚠️ Target iframe '{selector}' not found. Content may have loaded in current iframe. Staying in current frame context.");
+                    Logger.Info($"✅ Continuing in current iframe: {_currentFrameLocator}");
+                    return; // Stay in current frame instead of failing
+                }
+                
+                // If still not found, throw error
+                if (targetFrame == null)
+                {
+                    throw new Exception($"Frame not found: {selector}. Tried main page, current frame, nested frames, and URL pattern matching.");
+                }
+                
+                // Switch to the found frame
+                _currentFrame = targetFrame;
+                _currentFrameLocator = selector;
+                
+                Logger.Info($"✅ Successfully switched to iframe: {selector}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"❌ Failed to switch to iframe '{selector}': {ex.Message}");
+                throw;
+            }
+        }
+        
+        // Helper method to extract URL pattern from iframe selector
+        private string ExtractUrlPatternFromSelector(string selector)
+        {
+            // Extract URL pattern from selectors like: iframe[src*="courses.example.com"]
+            if (selector.Contains("src*=") || selector.Contains("src~=") || selector.Contains("src|="))
+            {
+                var match = System.Text.RegularExpressions.Regex.Match(selector, @"src[*~|]=['""]([^'""]+)['""]");
+                if (match.Success && match.Groups.Count > 1)
+                {
+                    return match.Groups[1].Value;
+                }
             }
             
-            _currentFrame = frame;
-            _currentFrameLocator = selector;
-            
-            Logger.Info($"✅ Successfully switched to iframe: {selector}");
+            return string.Empty;
         }
 
         public async Task SwitchToFrameByIndexAsync(int index)
@@ -543,11 +922,125 @@ namespace AgenticAI.UIAutomation.Drivers
 
         private string AutoDetectSelector(string locator)
         {
+            // Handle XPath
             if (locator.StartsWith("//") || locator.StartsWith("(//"))
             {
                 return $"xpath={locator}";
             }
+            
+            // GLOBAL FIX: Handle invalid CSS ID selectors (IDs starting with numbers)
+            // CSS selector "#1vinD" is invalid → Convert to [id="1vinD"]
+            if (locator.StartsWith("#"))
+            {
+                var id = locator.Substring(1); // Remove '#'
+                
+                // Check if ID starts with number or invalid character
+                if (IsInvalidCssId(id))
+                {
+                    // Convert #1vinD → [id="1vinD"]
+                    Logger.Debug($"Converting invalid CSS ID selector '{locator}' to attribute selector '[id=\"{id}\"]'");
+                    return $"[id=\"{id}\"]";
+                }
+            }
+            
             return locator;
+        }
+        
+        // GLOBAL FIX: Check if ID is invalid for CSS selector syntax
+        private bool IsInvalidCssId(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return false;
+            
+            // CSS IDs cannot start with:
+            // - Numbers: "1vinD", "123abc" ❌
+            // - Special characters (except hyphen and underscore): "!abc", "@test" ❌
+            // - Double hyphen: "--abc" ❌
+            
+            var firstChar = id[0];
+            
+            // Check if starts with number
+            if (char.IsDigit(firstChar))
+            {
+                return true;
+            }
+            
+            // Check if starts with invalid special character (not letter, not hyphen, not underscore)
+            if (!char.IsLetter(firstChar) && firstChar != '-' && firstChar != '_')
+            {
+                return true;
+            }
+            
+            // Check if starts with double hyphen
+            if (id.StartsWith("--"))
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Helper method to split fallback selectors
+        private List<string> SplitFallbackSelectors(string locator)
+        {
+            // Split by comma, but only if not inside brackets (to preserve CSS attribute selectors)
+            var selectors = new List<string>();
+            var current = new System.Text.StringBuilder();
+            int bracketDepth = 0;
+            
+            foreach (char c in locator)
+            {
+                if (c == '[')
+                {
+                    bracketDepth++;
+                    current.Append(c);
+                }
+                else if (c == ']')
+                {
+                    bracketDepth--;
+                    current.Append(c);
+                }
+                else if (c == ',' && bracketDepth == 0)
+                {
+                    // This comma is a selector separator
+                    var selector = current.ToString().Trim();
+                    if (!string.IsNullOrEmpty(selector))
+                    {
+                        selectors.Add(selector);
+                    }
+                    current.Clear();
+                }
+                else
+                {
+                    current.Append(c);
+                }
+            }
+            
+            // Add the last selector
+            var lastSelector = current.ToString().Trim();
+            if (!string.IsNullOrEmpty(lastSelector))
+            {
+                selectors.Add(lastSelector);
+            }
+            
+            return selectors.Count > 0 ? selectors : new List<string> { locator };
+        }
+
+        // JavaScript execution methods for advanced scenarios
+        public async Task<T> ExecuteScriptAsync<T>(string script)
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+                
+            return await _page.EvaluateAsync<T>(script);
+        }
+
+        public async Task ExecuteScriptAsync(string script)
+        {
+            if (_page == null)
+                throw new InvalidOperationException("Page not initialized");
+                
+            await _page.EvaluateAsync(script);
         }
 
         public IPage GetPage() => _page!;

@@ -25,6 +25,10 @@ namespace AgenticAI.Core.ZeroCode
         private readonly IFrameContext _frameContext;
         private IFrameDetector? _frameDetector;
         
+        // Track last action time for duplicate prevention
+        private DateTime _lastActionTime = DateTime.MinValue;
+        private string _lastActionType = "";
+        
         /// <summary>
         /// Event fired when a new action is captured
         /// </summary>
@@ -139,15 +143,72 @@ namespace AgenticAI.Core.ZeroCode
             {
                 try
                 {
-                    string type = eventData.GetProperty("type").GetString() ?? "";
+                    // Extract enhanced action data
+                    string eventType = eventData.GetProperty("eventType").GetString() ?? "";
+                    string actionType = eventData.GetProperty("actionType").GetString() ?? "";
                     string selector = eventData.GetProperty("selector").GetString() ?? "";
-                    bool inIFrame = eventData.TryGetProperty("inIFrame", out var iframeFlag) && iframeFlag.GetBoolean();
-                    string? iframeSelector = eventData.TryGetProperty("iframeSelector", out var iframeSel) ? iframeSel.GetString() : null;
+                    
+                    // Get iframe context
+                    bool inIFrame = false;
+                    string? iframeSelector = null;
+                    if (eventData.TryGetProperty("iframe", out var iframeData))
+                    {
+                        inIFrame = iframeData.TryGetProperty("inIFrame", out var iframeFlag) && iframeFlag.GetBoolean();
+                        iframeSelector = iframeData.TryGetProperty("iframeSelector", out var iframeSel) ? iframeSel.GetString() : null;
+                    }
+                    
+                    // Handle navigation events
+                    if (eventType == "navigation")
+                    {
+                        string toUrl = eventData.TryGetProperty("toUrl", out var url) ? url.GetString() ?? "" : "";
+                        int waitTime = eventData.TryGetProperty("waitTime", out var wait) ? wait.GetInt32() : 0;
+                        
+                        // Add wait action if needed
+                        if (waitTime > 0)
+                        {
+                            var waitAction = new RecordedAction
+                            {
+                                ActionType = "Wait",
+                                Value = waitTime.ToString(),
+                                Description = $"Wait {waitTime} seconds",
+                                Timestamp = _recordedActions.Count
+                            };
+                            _recordedActions.Add(waitAction);
+                            OnActionCaptured?.Invoke(waitAction);
+                        }
+                        
+                        // Add navigation action
+                        var navAction = new RecordedAction
+                        {
+                            ActionType = "Navigate",
+                            Locator = toUrl,
+                            Value = toUrl,
+                            Description = $"Navigate to {toUrl}",
+                            Timestamp = _recordedActions.Count
+                        };
+                        _recordedActions.Add(navAction);
+                        Logger.Info($"📌 Captured Navigation: {toUrl}");
+                        OnActionCaptured?.Invoke(navAction);
+                        return Task.CompletedTask;
+                    }
+                    
+                    // Get value and text
+                    string? value = eventData.TryGetProperty("value", out var val) ? val.GetString() : null;
+                    string? text = null;
+                    if (eventData.TryGetProperty("element", out var elemData))
+                    {
+                        text = elemData.TryGetProperty("text", out var txt) ? txt.GetString() : null;
+                    }
+                    if (eventData.TryGetProperty("text", out var directText))
+                    {
+                        text = directText.GetString();
+                    }
                     
                     RecordedAction action = new RecordedAction
                     {
-                        ActionType = "Click",
+                        ActionType = CapitalizeFirst(actionType),
                         Locator = selector,
+                        Value = value,
                         Timestamp = _recordedActions.Count
                     };
 
@@ -187,44 +248,83 @@ namespace AgenticAI.Core.ZeroCode
                         OnActionCaptured?.Invoke(defaultAction);
                     }
 
-                    switch (type.ToLower())
+                    // Generate description based on action type
+                    switch (actionType.ToLower())
                     {
                         case "click":
-                            action.ActionType = "Click";
-                            string text = eventData.TryGetProperty("text", out var t) ? t.GetString() : "";
                             action.Description = $"Click on {selector}" + (string.IsNullOrEmpty(text) ? "" : $" (\"{text}\")");
                             break;
-                        case "fill":
-                            action.ActionType = "Type";
-                            action.Value = eventData.GetProperty("value").GetString();
+                        case "dblclick":
+                            action.Description = $"Double-click on {selector}";
+                            break;
+                        case "type":
                             action.Description = $"Type \"{action.Value}\" into {selector}";
                             break;
                         case "select":
-                            action.ActionType = "Select";
-                            action.Value = eventData.GetProperty("value").GetString();
-                            string optionText = eventData.TryGetProperty("text", out var ot) ? ot.GetString() : "";
-                            action.Description = $"Select \"{optionText}\" from {selector}";
+                            action.Description = $"Select \"{text ?? value}\" from {selector}";
                             break;
                         case "check":
-                            action.ActionType = "Check";
                             action.Description = $"Check {selector}";
                             break;
                         case "uncheck":
-                            action.ActionType = "Uncheck";
                             action.Description = $"Uncheck {selector}";
+                            break;
+                        case "pressenter":
+                            action.Description = $"Press Enter on {selector}";
+                            break;
+                        case "presstab":
+                            action.Description = $"Press Tab on {selector}";
+                            break;
+                        case "pressescape":
+                            action.Description = $"Press Escape on {selector}";
+                            break;
+                        case "submit":
+                            action.Description = $"Submit form {selector}";
+                            break;
+                        case "upload":
+                            action.Description = $"Upload file to {selector}";
+                            break;
+                        default:
+                            action.Description = $"{action.ActionType} on {selector}";
                             break;
                     }
 
-                    // Deduplicate rapid "fill" events for the same selector
-                    if (type == "fill" && _recordedActions.Count > 0)
+                    // Deduplicate rapid "type" events for the same selector (handled by debouncing in JS)
+                    if (actionType == "type" && _recordedActions.Count > 0)
                     {
                         var last = _recordedActions.Last();
                         if (last.ActionType == "Type" && last.Locator == selector)
                         {
+                            // Update existing action instead of adding duplicate
                             last.Value = action.Value;
                             last.Description = action.Description;
+                            last.Timestamp = _recordedActions.Count - 1;
+                            
+                            // Update overlay count
+                            if (_page != null)
+                            {
+                                _ = _page.EvaluateAsync($"if (window.__updateRecorderCount) window.__updateRecorderCount({_recordedActions.Count});");
+                            }
                             return Task.CompletedTask;
                         }
+                    }
+
+                    // CRITICAL FIX: Deduplicate browser actions (refresh, back, forward)
+                    // These can fire multiple times due to browser events
+                    if (actionType == "refresh" || actionType == "back" || actionType == "forward")
+                    {
+                        var timeSinceLastAction = DateTime.Now - _lastActionTime;
+                        
+                        // If same browser action within 2 seconds, it's a duplicate
+                        if (_lastActionType == actionType && timeSinceLastAction.TotalSeconds < 2)
+                        {
+                            Logger.Warning($"⚠️ Duplicate {actionType} action suppressed (received {timeSinceLastAction.TotalMilliseconds:F0}ms after previous)");
+                            return Task.CompletedTask; // Don't add duplicate
+                        }
+                        
+                        // Update tracking
+                        _lastActionTime = DateTime.Now;
+                        _lastActionType = actionType;
                     }
 
                     _recordedActions.Add(action);
@@ -249,21 +349,29 @@ namespace AgenticAI.Core.ZeroCode
                     Logger.Debug($"Record action error: {ex.Message}");
                 }
                 
+                
                 return Task.CompletedTask;
             });
 
-            // Load recorder control panel overlay
-            var overlayScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ZeroCode", "Resources", "RecorderOverlay.js");
-            if (File.Exists(overlayScriptPath))
-            {
-                var overlayScript = await File.ReadAllTextAsync(overlayScriptPath);
-                await _page.AddInitScriptAsync(overlayScript);
-                Logger.Info("✓ Recorder control panel loaded in browser");
-            }
+            // NOTE: Stop Recording overlay removed - users should stop from WebUI
+            // The overlay was causing issues:
+            // 1. Button clicks were being recorded as test steps
+            // 2. Button didn't reliably stop recording
+            // 3. Interfered with test recording process
             
-            // Use AddInitScript to inject tracking on EVERY page load/navigation
-            // This runs before ANY page code, on EVERY navigation
-            await _page.AddInitScriptAsync(@"
+            // Load the enhanced recorder script with advanced features
+            var enhancedRecorderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ZeroCode", "Resources", "recorder.enhanced.js");
+            if (File.Exists(enhancedRecorderPath))
+            {
+                var enhancedRecorderScript = await File.ReadAllTextAsync(enhancedRecorderPath);
+                await _page.AddInitScriptAsync(enhancedRecorderScript);
+                Logger.Info("✅ Enhanced recorder loaded with smart selectors, Shadow DOM, and iframe support");
+            }
+            else
+            {
+                // Fallback to inline enhanced recorder if file not found
+                Logger.Warning("Enhanced recorder script not found, using inline fallback");
+                await _page.AddInitScriptAsync(@"
 (function() {
     window.__getSelector = function(el) {
         if (!el) return '';
@@ -413,8 +521,9 @@ namespace AgenticAI.Core.ZeroCode
     console.log('RECORDER: Init script loaded, listeners attached' + (window.__isInIFrame() ? ' [INSIDE IFRAME]' : ' [MAIN FRAME]'));
 })();
 ");
-
-            Logger.Info("✅ Native action tracking enabled using AddInitScript with iframe detection");
+            }
+            
+            Logger.Info("✅ Enhanced action tracking enabled with element analysis and smart selectors");
         }
 
         /// <summary>
@@ -423,6 +532,31 @@ namespace AgenticAI.Core.ZeroCode
         public async Task<TestScenario> StopRecordingAsync()
         {
             Logger.Info("Stopping test recording...");
+            
+            // Flush any pending clicks in the browser (NOT stop recording again!)
+            if (_page != null)
+            {
+                try
+                {
+                    Logger.Info("Flushing pending recorder clicks...");
+                    // Call the JavaScript flush function (NOT __stopRecording to avoid loop)
+                    await _page.EvaluateAsync(@"() => { 
+                        if (window.RecorderController && window.RecorderController.clickTimeout) {
+                            clearTimeout(window.RecorderController.clickTimeout);
+                            if (window.RecorderController.pendingClickElement) {
+                                window.RecorderController.recordClick(window.RecorderController.pendingClickElement);
+                            }
+                        }
+                    }");
+                    
+                    // Give a small delay to ensure all actions are sent
+                    await Task.Delay(500);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warning($"Error flushing recorder actions: {ex.Message}");
+                }
+            }
             
             // Ensure all collections are initialized
             if (_scenario.Assertions == null)
@@ -438,10 +572,15 @@ namespace AgenticAI.Core.ZeroCode
             // Set timestamps
             _scenario.ModifiedAt = DateTime.Now;
             
+            // Add delay to allow any browser dialogs to be displayed
+            Logger.Info("Waiting for browser to complete any pending operations...");
+            await Task.Delay(1000);
+            
             if (_page != null)
             {
                 try
                 {
+                    Logger.Info("Closing browser page...");
                     await _page.CloseAsync();
                 }
                 catch (Exception ex)
@@ -611,6 +750,17 @@ namespace AgenticAI.Core.ZeroCode
                 Logger.Warning($"IFrame detection failed: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Helper method to capitalize first letter of a string
+        /// </summary>
+        private static string CapitalizeFirst(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+            
+            return char.ToUpper(input[0]) + input.Substring(1).ToLower();
         }
     }
 }

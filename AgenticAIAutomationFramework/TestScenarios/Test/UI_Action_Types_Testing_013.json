@@ -1,0 +1,62 @@
+{
+  "ScenarioId": "44da4f54-b4d8-4737-8176-506d75ee7bc8",
+  "Name": "UI_Action_Types_Testing_013",
+  "Description": "test refresh and browser back button",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T18:02:22.9765232+05:30",
+  "ModifiedAt": "2026-03-08T18:02:22.9782038+05:30"
+}

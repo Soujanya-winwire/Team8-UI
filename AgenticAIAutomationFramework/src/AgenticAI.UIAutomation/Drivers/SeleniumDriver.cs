@@ -7,15 +7,21 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Safari;
 using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium.Interactions;
 using SeleniumExtras.WaitHelpers;
 using SeleniumWebDriver = OpenQA.Selenium.IWebDriver;
 using SeleniumWebElement = OpenQA.Selenium.IWebElement;
+
 
 namespace AgenticAI.UIAutomation.Drivers
 {
     /// <summary>
     /// Selenium-based web driver implementation
+    /// ?? DEPRECATED: This driver is kept for backward compatibility only.
+    /// All functionality has been migrated to PlaywrightDriver with enhanced features.
+    /// Please use Playwright for new tests.
     /// </summary>
+    [Obsolete("SeleniumDriver is deprecated. Use PlaywrightDriver for better performance and reliability. This will be removed in a future version.")]
     public class SeleniumDriver : Interfaces.IWebDriver
     {
         private SeleniumWebDriver? _driver;
@@ -236,6 +242,111 @@ namespace AgenticAI.UIAutomation.Drivers
             return Task.CompletedTask;
         }
 
+        // Additional navigation methods
+        public Task RefreshAsync()
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+            _driver.Navigate().Refresh();
+            return Task.CompletedTask;
+        }
+
+        public Task GoBackAsync()
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+            _driver.Navigate().Back();
+            return Task.CompletedTask;
+        }
+
+        public Task GoForwardAsync()
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+            _driver.Navigate().Forward();
+            return Task.CompletedTask;
+        }
+
+        // Additional element interaction methods
+        public Task ClearAsync(string locator)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            var by = GetBy(locator, "auto");
+            var element = _driver.FindElement(by);
+            element.Clear();
+            return Task.CompletedTask;
+        }
+
+        public Task DoubleClickAsync(string locator)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            var by = GetBy(locator, "auto");
+            var element = _driver.FindElement(by);
+            new Actions(_driver).DoubleClick(element).Perform();
+            return Task.CompletedTask;
+        }
+
+        public Task RightClickAsync(string locator)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            var by = GetBy(locator, "auto");
+            var element = _driver.FindElement(by);
+            new Actions(_driver).ContextClick(element).Perform();
+            return Task.CompletedTask;
+        }
+
+        public Task PressKeyAsync(string locator, string key)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+
+            var by = GetBy(locator, "auto");
+            var element = _driver.FindElement(by);
+            element.SendKeys(key);
+            return Task.CompletedTask;
+        }
+
+        // Element state methods
+        public Task<bool> IsElementVisibleAsync(string locator)
+        {
+            try
+            {
+                if (_driver == null)
+                    return Task.FromResult(false);
+
+                var by = GetBy(locator, "auto");
+                var element = _driver.FindElement(by);
+                return Task.FromResult(element.Displayed);
+            }
+            catch
+            {
+                return Task.FromResult(false);
+            }
+        }
+
+        public Task<bool> IsElementEnabledAsync(string locator)
+        {
+            try
+            {
+                if (_driver == null)
+                    return Task.FromResult(false);
+
+                var by = GetBy(locator, "auto");
+                var element = _driver.FindElement(by);
+                return Task.FromResult(element.Enabled);
+            }
+            catch
+            {
+                return Task.FromResult(false);
+            }
+        }
+
         // IFrame handling methods
         public Task SwitchToFrameAsync(string frameLocator)
         {
@@ -313,6 +424,27 @@ namespace AgenticAI.UIAutomation.Drivers
                 // Try ID first
                 return By.Id(locator);
             }
+        }
+
+        // JavaScript execution methods for advanced scenarios
+        public async Task<T> ExecuteScriptAsync<T>(string script)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+                
+            var jsExecutor = (IJavaScriptExecutor)_driver;
+            var result = jsExecutor.ExecuteScript(script);
+            return (T)result;
+        }
+
+        public async Task ExecuteScriptAsync(string script)
+        {
+            if (_driver == null)
+                throw new InvalidOperationException("Driver not initialized");
+                
+            var jsExecutor = (IJavaScriptExecutor)_driver;
+            jsExecutor.ExecuteScript(script);
+            await Task.CompletedTask;
         }
 
         public SeleniumWebDriver GetDriver() => _driver!;

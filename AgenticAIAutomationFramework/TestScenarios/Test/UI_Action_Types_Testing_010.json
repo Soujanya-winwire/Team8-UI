@@ -1,0 +1,272 @@
+{
+  "ScenarioId": "7e6604b2-5072-47f5-9d78-8326d6f81485",
+  "Name": "UI_Action_Types_Testing_010",
+  "Description": "",
+  "Module": "Test",
+  "Tags": [
+    "Smoke",
+    "UIActionTypes1"
+  ],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Radio Button\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Radio Button\") (\"Radio Button\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[name=\"like\"]",
+      "Value": "on",
+      "Description": "Input on input[name=\"like\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "input[name=\"like\"]",
+      "Value": null,
+      "Description": "Check input[name=\"like\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[name=\"like\"]",
+      "Value": "on",
+      "Description": "Input on input[name=\"like\"]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Click on li.btn.btn-light (\"Buttons\")",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Buttons\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Rightclick",
+      "Locator": "button:has-text(\"Right Click Me\")",
+      "Value": null,
+      "Description": "Rightclick on button:has-text(\"Right Click Me\")",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Dblclick",
+      "Locator": "button:has-text(\"Double Click Me\")",
+      "Value": null,
+      "Description": "Double-click on button:has-text(\"Double Click Me\")",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Links\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Links\") (\"Links\")",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Home\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Home\") (\"Home\")",
+      "Metadata": {},
+      "Timestamp": 11
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Radio Button\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Radio Button\") (\"Radio Button\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[name=\"like\"]",
+        "Value": "on",
+        "Description": "Input on input[name=\"like\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "input[name=\"like\"]",
+        "Value": null,
+        "Description": "Check input[name=\"like\"]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[name=\"like\"]",
+        "Value": "on",
+        "Description": "Input on input[name=\"like\"]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Click on li.btn.btn-light (\"Buttons\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Buttons\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Buttons\") (\"Buttons\")",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Rightclick",
+        "Locator": "button:has-text(\"Right Click Me\")",
+        "Value": null,
+        "Description": "Rightclick on button:has-text(\"Right Click Me\")",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Dblclick",
+        "Locator": "button:has-text(\"Double Click Me\")",
+        "Value": null,
+        "Description": "Double-click on button:has-text(\"Double Click Me\")",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Links\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Links\") (\"Links\")",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Home\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Home\") (\"Home\")",
+        "Metadata": {},
+        "Timestamp": 11
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-08T17:27:50.7166103+05:30",
+  "ModifiedAt": "2026-03-08T17:27:50.7173155+05:30"
+}
