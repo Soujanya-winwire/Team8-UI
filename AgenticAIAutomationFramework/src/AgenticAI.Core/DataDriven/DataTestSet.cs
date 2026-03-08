@@ -1,4 +1,5 @@
 using System.Text.Json;
+using OfficeOpenXml;
 
 namespace AgenticAI.Core.DataDriven
 {
@@ -111,6 +112,59 @@ namespace AgenticAI.Core.DataDriven
                     }
                 }
                 result.Rows.Add(row);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Parse an Excel file into a DataTestSet
+        /// </summary>
+        public static DataTestSet ParseExcel(string filePath, string? worksheetName = null)
+        {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"Excel file not found: {filePath}");
+
+            // Set EPPlus license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var result = new DataTestSet();
+
+            using var package = new ExcelPackage(new FileInfo(filePath));
+            
+            // Get the worksheet - either specified one or the first one
+            var worksheet = string.IsNullOrWhiteSpace(worksheetName)
+                ? package.Workbook.Worksheets.FirstOrDefault()
+                : package.Workbook.Worksheets[worksheetName];
+
+            if (worksheet == null)
+                throw new InvalidDataException($"Worksheet not found: {worksheetName ?? "(first sheet)"}");
+
+            var rowCount = worksheet.Dimension?.Rows ?? 0;
+            var colCount = worksheet.Dimension?.Columns ?? 0;
+
+            if (rowCount < 2)
+                throw new InvalidDataException("Excel file must have at least a header row and one data row.");
+
+            // Read headers from first row
+            var headers = new List<string>();
+            for (int col = 1; col <= colCount; col++)
+            {
+                var header = worksheet.Cells[1, col].Text?.Trim() ?? $"Column{col}";
+                headers.Add(header);
+            }
+            result.Columns = headers;
+
+            // Read data rows
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var dataRow = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (int col = 1; col <= colCount; col++)
+                {
+                    var value = worksheet.Cells[row, col].Text?.Trim() ?? string.Empty;
+                    dataRow[headers[col - 1]] = value;
+                }
+                result.Rows.Add(dataRow);
             }
 
             return result;

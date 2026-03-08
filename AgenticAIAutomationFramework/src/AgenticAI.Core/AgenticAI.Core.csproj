@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Allure.NUnit" Version="2.12.1" />
     <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
+    <PackageReference Include="EPPlus" Version="7.0.0" />
     <PackageReference Include="ExtentReports" Version="5.0.2" />
     <PackageReference Include="Microsoft.Playwright" Version="1.41.0" />
     <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.41.0" />

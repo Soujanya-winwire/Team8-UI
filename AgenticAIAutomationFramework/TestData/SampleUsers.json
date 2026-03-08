@@ -1,0 +1,30 @@
+[
+  {
+    "username": "admin@example.com",
+    "password": "Admin123!",
+    "email": "admin@example.com",
+    "role": "Admin",
+    "expectedResult": "success"
+  },
+  {
+    "username": "user1@example.com",
+    "password": "User123!",
+    "email": "user1@example.com",
+    "role": "User",
+    "expectedResult": "success"
+  },
+  {
+    "username": "testuser@example.com",
+    "password": "Test123!",
+    "email": "testuser@example.com",
+    "role": "Tester",
+    "expectedResult": "success"
+  },
+  {
+    "username": "invalid@example.com",
+    "password": "wrongpassword",
+    "email": "invalid@example.com",
+    "role": "None",
+    "expectedResult": "failure"
+  }
+]

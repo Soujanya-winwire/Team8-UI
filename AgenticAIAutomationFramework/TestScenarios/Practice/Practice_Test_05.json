@@ -1,0 +1,395 @@
+{
+  "ScenarioId": "dd493259-9924-4308-9252-4a0d5ff3a94b",
+  "Name": "Practice_Test_05",
+  "Description": "",
+  "Module": "Practice",
+  "Tags": [],
+  "StartUrl": "https://rahulshettyacademy.com/AutomationPractice/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+      "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "#dropdown-class-example",
+      "Value": "option3",
+      "Description": "Select \"Option3\" from #dropdown-class-example",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#dropdown-class-example",
+      "Value": null,
+      "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[name=\"radioButton\"]",
+      "Value": null,
+      "Description": "Click on [name=\"radioButton\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=radioButton][value=radio3]",
+      "Value": null,
+      "Description": "Check [name=radioButton][value=radio3]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#checkBoxOption3",
+      "Value": null,
+      "Description": "Click on #checkBoxOption3",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "[name=checkBoxOption3][value=option3]",
+      "Value": null,
+      "Description": "Check [name=checkBoxOption3][value=option3]",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#name",
+      "Value": null,
+      "Description": "Click on #name",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#name",
+      "Value": "test",
+      "Description": "Type \"test\" into #name",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#confirmbtn",
+      "Value": null,
+      "Description": "Click on #confirmbtn",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#alertbtn",
+      "Value": null,
+      "Description": "Click on #alertbtn",
+      "Metadata": {},
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#alertbtn",
+      "Value": null,
+      "Description": "Click on #alertbtn",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#name",
+      "Value": null,
+      "Description": "Click on #name",
+      "Metadata": {},
+      "Timestamp": 13
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#name",
+      "Value": "test",
+      "Description": "Type \"test\" into #name",
+      "Metadata": {},
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#hide-textbox",
+      "Value": null,
+      "Description": "Click on #hide-textbox",
+      "Metadata": {},
+      "Timestamp": 15
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#show-textbox",
+      "Value": null,
+      "Description": "Click on #show-textbox",
+      "Metadata": {},
+      "Timestamp": 16
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#mousehover",
+      "Value": null,
+      "Description": "Click on #mousehover (\"Mouse Hover\")",
+      "Metadata": {},
+      "Timestamp": 17
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "text=\"Top\"",
+      "Value": null,
+      "Description": "Click on text=\"Top\" (\"Top\")",
+      "Metadata": {},
+      "Timestamp": 18
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Value": "https://rahulshettyacademy.com/AutomationPractice/",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "#dropdown-class-example",
+        "Value": "option3",
+        "Description": "Select \"Option3\" from #dropdown-class-example",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#dropdown-class-example",
+        "Value": null,
+        "Description": "Click on #dropdown-class-example (\"Select\nOption1\nOption2\nOption3\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[name=\"radioButton\"]",
+        "Value": null,
+        "Description": "Click on [name=\"radioButton\"]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=radioButton][value=radio3]",
+        "Value": null,
+        "Description": "Check [name=radioButton][value=radio3]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#checkBoxOption3",
+        "Value": null,
+        "Description": "Click on #checkBoxOption3",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "[name=checkBoxOption3][value=option3]",
+        "Value": null,
+        "Description": "Check [name=checkBoxOption3][value=option3]",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#name",
+        "Value": null,
+        "Description": "Click on #name",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#name",
+        "Value": "test",
+        "Description": "Type \"test\" into #name",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#confirmbtn",
+        "Value": null,
+        "Description": "Click on #confirmbtn",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#alertbtn",
+        "Value": null,
+        "Description": "Click on #alertbtn",
+        "Metadata": {},
+        "Timestamp": 11
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#alertbtn",
+        "Value": null,
+        "Description": "Click on #alertbtn",
+        "Metadata": {},
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#name",
+        "Value": null,
+        "Description": "Click on #name",
+        "Metadata": {},
+        "Timestamp": 13
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#name",
+        "Value": "test",
+        "Description": "Type \"test\" into #name",
+        "Metadata": {},
+        "Timestamp": 14
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 14,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#hide-textbox",
+        "Value": null,
+        "Description": "Click on #hide-textbox",
+        "Metadata": {},
+        "Timestamp": 15
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 15,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#show-textbox",
+        "Value": null,
+        "Description": "Click on #show-textbox",
+        "Metadata": {},
+        "Timestamp": 16
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 16,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "#mousehover",
+        "Value": null,
+        "Description": "Click on #mousehover (\"Mouse Hover\")",
+        "Metadata": {},
+        "Timestamp": 17
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 17,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "text=\"Top\"",
+        "Value": null,
+        "Description": "Click on text=\"Top\" (\"Top\")",
+        "Metadata": {},
+        "Timestamp": 18
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-07T23:39:48.4635034+05:30",
+  "ModifiedAt": "2026-03-07T23:39:48.4876207+05:30"
+}

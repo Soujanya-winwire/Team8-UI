@@ -1,0 +1,30 @@
+[
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@test.com",
+    "phone": "1234567890",
+    "address": "123 Main Street"
+  },
+  {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane.smith@test.com",
+    "phone": "9876543210",
+    "address": "456 Oak Avenue"
+  },
+  {
+    "firstName": "Robert",
+    "lastName": "Johnson",
+    "email": "robert.j@test.com",
+    "phone": "5551234567",
+    "address": "789 Pine Road"
+  },
+  {
+    "firstName": "Emily",
+    "lastName": "Williams",
+    "email": "emily.w@test.com",
+    "phone": "5559876543",
+    "address": "321 Elm Street"
+  }
+]
