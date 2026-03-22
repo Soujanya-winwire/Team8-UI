@@ -133,6 +133,103 @@ namespace AgenticAI.WebUI.Controllers
         }
 
         /// <summary>
+        /// Extract test data columns from Type actions in a scenario
+        /// Returns column names and structure for data-driven testing
+        /// </summary>
+        [HttpGet("{module}/{name}/testdata")]
+        public IActionResult GetScenarioTestDataStructure(string module, string name)
+        {
+            try
+            {
+                var manager = new ScenarioManager();
+                var scenario = manager.LoadScenario(name, module);
+                
+                if (scenario == null)
+                {
+                    return NotFound(new { success = false, error = "Scenario not found" });
+                }
+
+                // Extract columns from data-entry actions in recordings
+                var dataEntryActions = new List<RecordedAction>();
+                var dataEntryActionTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "type", "input", "fill", "select"
+                };
+                
+                // Check new Steps model first
+                if (scenario.Steps != null && scenario.Steps.Count > 0)
+                {
+                    dataEntryActions.AddRange(
+                        scenario.Steps
+                            .Where(s => s.StepType == "Action" && s.Action != null && 
+                                   dataEntryActionTypes.Contains(s.Action.ActionType ?? string.Empty))
+                            .Select(s => s.Action)
+                            .Where(a => a != null)
+                    );
+                }
+                
+                // Fallback to legacy Actions model
+                if (dataEntryActions.Count == 0 && scenario.Actions != null)
+                {
+                    dataEntryActions.AddRange(
+                        scenario.Actions
+                            .Where(a => dataEntryActionTypes.Contains(a.ActionType ?? string.Empty))
+                    );
+                }
+
+                if (dataEntryActions.Count == 0)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "No data-entry actions found, using default columns",
+                        columns = new[] { "testData", "expectedResult", "tag" },
+                        data = new object[] { }
+                    });
+                }
+
+                // Extract column names (prefer explicit ParameterName from recording metadata)
+                var columns = new List<string>();
+                foreach (var action in dataEntryActions)
+                {
+                    string columnName;
+                    if (action.Metadata != null && action.Metadata.TryGetValue("ParameterName", out var parameterName) && !string.IsNullOrWhiteSpace(parameterName))
+                    {
+                        columnName = parameterName.Trim();
+                    }
+                    else
+                    {
+                        columnName = ExtractFieldNameFromLocator(action.Locator, columns.Count + 1);
+                    }
+                    
+                    if (!columns.Contains(columnName, StringComparer.OrdinalIgnoreCase))
+                    {
+                        columns.Add(columnName);
+                    }
+                }
+
+                // Add standard columns if not already present
+                if (!columns.Contains("tag", StringComparer.OrdinalIgnoreCase))
+                    columns.Add("tag");
+
+                return Ok(new
+                {
+                    success = true,
+                    scenarioName = scenario.Name,
+                    module = module,
+                    columns = columns,
+                    typeActionCount = dataEntryActions.Count,
+                    data = new object[] { }  // Empty array for user to fill in
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to extract test data structure from scenario");
+                return BadRequest(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Create a new test scenario
         /// </summary>
         [HttpPost]
@@ -680,6 +777,141 @@ namespace AgenticAI.WebUI.Controllers
             {
                 return BadRequest(new { success = false, error = ex.Message });
             }
+        }
+
+        /// <summary>
+        /// Extract a clean field name from a locator string
+        /// Handles CSS selectors (#id, .class), XPath, and HTML attributes
+        /// Examples: 
+        ///   - #firstName → firstName
+        ///   - input[placeholder="first_name"] → first_name
+        ///   - input[name="email"] → email
+        ///   - //*[@id="userId"] → userId
+        /// </summary>
+        private string ExtractFieldNameFromLocator(string locator, int fieldIndex)
+        {
+            if (string.IsNullOrEmpty(locator))
+                return $"field_{fieldIndex}";
+
+            locator = locator.Trim();
+
+            // Handle CSS ID selector (#id)
+            if (locator.StartsWith("#"))
+            {
+                var idValue = locator.Substring(1).Split('[', '.', ' ')[0].Trim();
+                if (!string.IsNullOrEmpty(idValue))
+                    return NormalizeFieldName(idValue);
+            }
+
+            // Handle CSS class selector (.class)
+            if (locator.StartsWith("."))
+            {
+                var classValue = locator.Substring(1).Split('[', '.', ' ')[0].Trim();
+                if (!string.IsNullOrEmpty(classValue) && !classValue.Equals("form-control", StringComparison.OrdinalIgnoreCase))
+                    return NormalizeFieldName(classValue);
+            }
+
+            // Try to extract placeholder value from HTML attributes
+            var placeholderMatch = System.Text.RegularExpressions.Regex.Match(
+                locator, 
+                @"placeholder\s*=\s*[""']([^""']+)[""']",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (placeholderMatch.Success)
+            {
+                return NormalizeFieldName(placeholderMatch.Groups[1].Value);
+            }
+
+            // Try to extract name attribute value
+            var nameMatch = System.Text.RegularExpressions.Regex.Match(
+                locator, 
+                @"name\s*=\s*[""']([^""']+)[""']",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (nameMatch.Success)
+            {
+                return NormalizeFieldName(nameMatch.Groups[1].Value);
+            }
+
+            // Also support unquoted name attributes: [name=email]
+            var unquotedNameMatch = System.Text.RegularExpressions.Regex.Match(
+                locator,
+                @"name\s*=\s*([a-zA-Z0-9_\-@.]+)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (unquotedNameMatch.Success)
+            {
+                return NormalizeFieldName(unquotedNameMatch.Groups[1].Value);
+            }
+
+            // Try to extract id attribute value from XPath or HTML
+            var idMatch = System.Text.RegularExpressions.Regex.Match(
+                locator, 
+                @"id\s*=\s*[""']([^""']+)[""']|@id\s*=\s*[""']([^""']+)[""']",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (idMatch.Success)
+            {
+                var value = idMatch.Groups[1].Value ?? idMatch.Groups[2].Value;
+                if (!string.IsNullOrEmpty(value))
+                    return NormalizeFieldName(value);
+            }
+
+            // Try to extract data-testid value
+            var testidMatch = System.Text.RegularExpressions.Regex.Match(
+                locator, 
+                @"data-(?:testid|test|qa)\s*=\s*[""']([^""']+)[""']",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (testidMatch.Success)
+            {
+                return NormalizeFieldName(testidMatch.Groups[1].Value);
+            }
+
+            // Support unquoted data attributes: [data-test=username]
+            var unquotedDataMatch = System.Text.RegularExpressions.Regex.Match(
+                locator,
+                @"data-(?:testid|test|qa)\s*=\s*([a-zA-Z0-9_\-@.]+)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (unquotedDataMatch.Success)
+            {
+                return NormalizeFieldName(unquotedDataMatch.Groups[1].Value);
+            }
+
+            // Try aria-label text as semantic field name
+            var ariaLabelMatch = System.Text.RegularExpressions.Regex.Match(
+                locator,
+                @"aria-label\s*=\s*[""']([^""']+)[""']",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            if (ariaLabelMatch.Success)
+            {
+                return NormalizeFieldName(ariaLabelMatch.Groups[1].Value);
+            }
+
+            // Fallback to generic name
+            return $"field_{fieldIndex}";
+        }
+
+        /// <summary>
+        /// Normalize a field name to be clean and professional
+        /// </summary>
+        private string NormalizeFieldName(string fieldName)
+        {
+            if (string.IsNullOrEmpty(fieldName))
+                return fieldName;
+
+            var normalized = fieldName
+                .Trim()
+                .Replace("-", "_")
+                .Replace(" ", "_")
+                .ToLower();
+
+            if (normalized.Contains("@") || normalized.Contains("example.com") || normalized.Contains("email"))
+                return "email";
+
+            return normalized;
         }
     }
 }

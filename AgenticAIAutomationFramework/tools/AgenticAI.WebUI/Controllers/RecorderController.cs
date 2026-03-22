@@ -1,4 +1,5 @@
 using AgenticAI.Core.Configuration;
+using AgenticAI.Core.DataDriven;
 using AgenticAI.Core.Logging;
 using AgenticAI.Core.ZeroCode;
 using AgenticAI.Core.ZeroCode.Models;
@@ -130,6 +131,13 @@ namespace AgenticAI.WebUI.Controllers
                 scenario.CreatedAt = DateTime.Now;
                 scenario.ModifiedAt = null;
 
+                // Auto-generate safe assertions from recorded actions (non-breaking: preserve existing/manual assertions)
+                var autoAssertionCount = AppendAutoAssertionsFromActions(scenario);
+                if (autoAssertionCount > 0)
+                {
+                    Logger.Info($"Auto-generated {autoAssertionCount} assertion(s) for recorded actions in scenario '{scenario.Name}'");
+                }
+
                 // Save the scenario
                 try
                 {
@@ -243,7 +251,8 @@ namespace AgenticAI.WebUI.Controllers
                     assertion.Type,
                     assertion.Locator,
                     assertion.ExpectedValue,
-                    assertion.Description
+                    assertion.Description,
+                    assertion.ExecuteAfterActionIndex
                 );
 
                 return Ok(new
@@ -414,6 +423,152 @@ namespace AgenticAI.WebUI.Controllers
                 Logger.Error($"Self-test error: {ex.Message}");
                 return BadRequest(new { success = false, error = ex.Message });
             }
+        }
+
+        private static int AppendAutoAssertionsFromActions(TestScenario scenario)
+        {
+            if (scenario.Actions == null || scenario.Actions.Count == 0)
+            {
+                return 0;
+            }
+
+            scenario.Assertions ??= new List<Assertion>();
+
+            var existingKeys = new HashSet<string>(
+                scenario.Assertions.Select(GetAssertionDedupKey),
+                StringComparer.OrdinalIgnoreCase);
+
+            int addedCount = 0;
+
+            for (int actionIndex = 0; actionIndex < scenario.Actions.Count; actionIndex++)
+            {
+                var action = scenario.Actions[actionIndex];
+                var generated = BuildAutoAssertion(action, actionIndex);
+                if (generated == null)
+                {
+                    continue;
+                }
+
+                var key = GetAssertionDedupKey(generated);
+                if (existingKeys.Contains(key))
+                {
+                    continue;
+                }
+
+                scenario.Assertions.Add(generated);
+                existingKeys.Add(key);
+                addedCount++;
+            }
+
+            return addedCount;
+        }
+
+        private static Assertion? BuildAutoAssertion(RecordedAction action, int actionIndex)
+        {
+            var actionType = (action.ActionType ?? string.Empty).Trim().ToLowerInvariant();
+            var locator = action.Locator ?? string.Empty;
+            var value = action.Value;
+
+            switch (actionType)
+            {
+                case "navigate":
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        return null;
+                    }
+
+                    return new Assertion
+                    {
+                        Type = "UrlContains",
+                        ExpectedValue = GetStableUrlToken(value),
+                        Description = "Auto-verify navigation completed",
+                        ExecuteAfterActionIndex = actionIndex
+                    };
+
+                case "type":
+                case "input":
+                case "fill":
+                case "select":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        return null;
+                    }
+
+                    var expectedValue = BuildExpectedValueForValueAssertion(action, value);
+                    if (string.IsNullOrWhiteSpace(expectedValue))
+                    {
+                        return new Assertion
+                        {
+                            Type = "ElementVisible",
+                            Locator = locator,
+                            Description = $"Auto-verify {action.ActionType} target is visible",
+                            ExecuteAfterActionIndex = actionIndex
+                        };
+                    }
+
+                    return new Assertion
+                    {
+                        Type = "ValueEquals",
+                        Locator = locator,
+                        ExpectedValue = expectedValue,
+                        Description = $"Auto-verify value entered for {action.ActionType}",
+                        ExecuteAfterActionIndex = actionIndex
+                    };
+
+                case "wait":
+                case "waitforelement":
+                case "switchtoframe":
+                case "switchtodefaultcontent":
+                    return null;
+
+                default:
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        return null;
+                    }
+
+                    return new Assertion
+                    {
+                        Type = "ElementExists",
+                        Locator = locator,
+                        Description = $"Auto-verify target exists after {action.ActionType}",
+                        ExecuteAfterActionIndex = actionIndex
+                    };
+            }
+        }
+
+        private static string BuildExpectedValueForValueAssertion(RecordedAction action, string? fallbackValue)
+        {
+            if (action.Metadata != null &&
+                action.Metadata.TryGetValue("ParameterName", out var parameterName) &&
+                !string.IsNullOrWhiteSpace(parameterName))
+            {
+                return ParameterResolver.WrapAsPlaceholder(parameterName);
+            }
+
+            return fallbackValue ?? string.Empty;
+        }
+
+        private static string GetStableUrlToken(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var parsed))
+            {
+                var path = parsed.AbsolutePath?.TrimEnd('/') ?? string.Empty;
+                return string.IsNullOrWhiteSpace(path) || path == "/"
+                    ? parsed.Host
+                    : $"{parsed.Host}{path}";
+            }
+
+            return url;
+        }
+
+        private static string GetAssertionDedupKey(Assertion assertion)
+        {
+            return string.Join("|",
+                assertion.Type ?? string.Empty,
+                assertion.Locator ?? string.Empty,
+                assertion.ExpectedValue ?? string.Empty,
+                assertion.ExecuteAfterActionIndex?.ToString() ?? "none");
         }
     }
 

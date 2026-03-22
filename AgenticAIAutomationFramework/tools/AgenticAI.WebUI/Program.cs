@@ -54,6 +54,20 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/TestResults"
 });
 
+// Serve TestData directory for DDT sample data files
+var rootTestDataPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "TestData"));
+var localTestDataPath = Path.Combine(builder.Environment.ContentRootPath, "TestData");
+var testDataPath = Directory.Exists(rootTestDataPath) ? rootTestDataPath : localTestDataPath;
+
+if (Directory.Exists(testDataPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(testDataPath),
+        RequestPath = "/TestData"
+    });
+}
+
 app.UseRouting();
 app.UseAuthorization();
 

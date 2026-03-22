@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agentic AI - Test Management Platform</title>
+    <title>WinUITest - Advanced Data-Driven Testing Engine</title>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@7.0.0/dist/browser/signalr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -46,7 +46,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
+            width: 248px;
             background: white;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -54,36 +54,53 @@
         }
 
         .logo {
-            padding: 22px 18px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            padding: 10px 12px;
+            background: white;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 2px solid #e9d5ff;
+        }
+
+        .logo-image {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0;
+        }
+
+        .logo-image img {
+            max-height: 36px;
+            max-width: 176px;
+            object-fit: contain;
         }
 
         .logo h1 {
-            font-size: 1.35em;
-            margin-bottom: 4px;
+            display: none;
         }
 
         .logo p {
-            font-size: 0.8em;
-            opacity: 0.9;
+            display: none;
         }
 
         .nav-menu {
             flex: 1;
-            padding: 14px 0;
+            padding: 8px 0;
             overflow-y: auto;
         }
 
         .nav-item {
-            padding: 11px 22px;
+            padding: 9px 14px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: #4b5563;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .nav-item:hover {
@@ -107,14 +124,14 @@
         .main-content {
             flex: 1;
             overflow-y: auto;
-            padding: 14px;
+            padding: 10px;
         }
 
         .header {
             background: white;
             border-radius: 8px;
-            padding: 14px 18px;
-            margin-bottom: 14px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: space-between;
@@ -123,7 +140,7 @@
 
         .header h2 {
             color: var(--dark);
-            font-size: 1.3em;
+            font-size: 1.12em;
         }
 
         .header-actions {
@@ -135,8 +152,8 @@
         .card {
             background: white;
             border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 14px;
+            padding: 10px;
+            margin-bottom: 10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
@@ -144,8 +161,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
             border-bottom: 1px solid var(--border);
         }
 
@@ -159,18 +176,18 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 14px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .stat-card {
             background: white;
             border-radius: 6px;
-            padding: 12px;
+            padding: 9px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.2s;
         }
 
@@ -227,13 +244,13 @@
 
         /* Buttons */
         .btn {
-            padding: 7px 14px;
+            padding: 6px 11px;
             border: none;
             border-radius: 5px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 13px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -299,17 +316,17 @@
 
         th {
             text-align: left;
-            padding: 8px 12px;
+            padding: 6px 9px;
             font-weight: 600;
             color: var(--dark);
             border-bottom: 2px solid var(--border);
-            font-size: 13px;
+            font-size: 12px;
         }
 
         td {
-            padding: 8px 12px;
+            padding: 6px 9px;
             border-bottom: 1px solid #f3f4f6;
-            font-size: 13px;
+            font-size: 12px;
             vertical-align: middle;
         }
 
@@ -353,23 +370,23 @@
 
         /* Form Elements - COMPACT */
         .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: 600;
             color: var(--dark);
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .form-control {
             width: 100%;
-            padding: 8px 10px;
+            padding: 7px 9px;
             border: 2px solid var(--border);
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             transition: border-color 0.3s;
         }
 
@@ -391,20 +408,20 @@
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 10px;
         }
 
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
+            gap: 10px;
         }
 
         /* Test Execution Progress */
         .execution-status {
-            padding: 20px;
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             display: none;
         }
 
@@ -446,11 +463,11 @@
         .console {
             background: #1f2937;
             color: #f9fafb;
-            padding: 20px;
+            padding: 12px;
             border-radius: 8px;
             font-family: 'Courier New', monospace;
-            font-size: 13px;
-            max-height: 400px;
+            font-size: 12px;
+            max-height: 300px;
             overflow-y: auto;
         }
 
@@ -495,7 +512,7 @@
         .modal-content {
             background: white;
             border-radius: 16px;
-            padding: 30px;
+            padding: 18px;
             max-width: 800px;
             width: 90%;
             max-height: 90vh;
@@ -579,7 +596,7 @@
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 30px 12px;
         }
 
         .empty-state i {
@@ -653,11 +670,59 @@
         }
 
         .mt-20 {
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .mb-20 {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* View-specific compact density */
+        #results-view .card,
+        #datadriven-view .card {
+            margin-bottom: 8px;
+        }
+
+        #results-view .card-header,
+        #datadriven-view .card-header {
+            padding-bottom: 5px;
+            margin-bottom: 6px;
+        }
+
+        #results-view th,
+        #results-view td,
+        #datadriven-view th,
+        #datadriven-view td {
+            padding: 5px 8px;
+            font-size: 12px;
+        }
+
+        #results-view .btn,
+        #datadriven-view .btn {
+            padding: 5px 9px !important;
+            font-size: 11px !important;
+        }
+
+        #results-view .form-control,
+        #datadriven-view .form-control {
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+
+        #results-view .form-group,
+        #datadriven-view .form-group {
+            margin-bottom: 8px;
+        }
+
+        #results-view .empty-state,
+        #datadriven-view .empty-state {
+            padding: 20px 10px;
+        }
+
+        #results-view .console,
+        #datadriven-view .console {
+            max-height: 240px;
+            padding: 10px;
         }
 
         /* Toast Notifications */
@@ -1081,18 +1146,19 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo">
-                <h1>🎯 Agentic AI</h1>
-                <p>Test Management Platform</p>
+                <div class="logo-image">
+                    <svg width="220" height="50" viewBox="0 0 220 50" style="display: block;">
+                        <text x="5" y="38" font-family="Arial, sans-serif" font-size="32" font-weight="bold">
+                            <tspan fill="#003da5">WinUI</tspan><tspan fill="#dc2626">Test</tspan>
+                        </text>
+                    </svg>
+                </div>
             </div>
 
             <nav class="nav-menu">
                 <div class="nav-item active" onclick="showView('dashboard')">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
-                </div>
-                <div class="nav-item" onclick="showView('configuration')">
-                    <i class="fas fa-cog"></i>
-                    <span>Configuration</span>
                 </div>
                 <div class="nav-item" onclick="showView('record')">
                     <i class="fas fa-circle-dot"></i>
@@ -1106,13 +1172,29 @@
                     <i class="fas fa-play-circle"></i>
                     <span>Execute Tests</span>
                 </div>
+                <div class="nav-item" onclick="showView('datadriven')">
+                    <i class="fas fa-table"></i>
+                    <span>Data Driven Testing</span>
+                </div>
+                <div class="nav-item" onclick="showView('export')">
+                    <i class="fas fa-file-export"></i>
+                    <span>Script Export</span>
+                </div>
                 <div class="nav-item" onclick="showView('results')">
                     <i class="fas fa-chart-bar"></i>
                     <span>Test Results</span>
                 </div>
+                <div class="nav-item" onclick="showView('configuration')">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuration</span>
+                </div>
                 <div class="nav-item" onclick="showView('cicd')">
                     <i class="fas fa-rocket"></i>
                     <span>CI/CD</span>
+                </div>
+                <div class="nav-item" onclick="showView('aitestgen')">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Test Generator</span>
                 </div>
             </nav>
         </div>
@@ -1241,6 +1323,21 @@
             <div id="cicd-view" class="view-content hidden">
                 <!-- Content will be loaded dynamically -->
             </div>
+
+            <!-- AI Test Generator View -->
+            <div id="aitestgen-view" class="view-content hidden">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- Data Driven Testing View -->
+            <div id="datadriven-view" class="view-content hidden">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- Script Export View -->
+            <div id="export-view" class="view-content hidden">
+                <!-- Content will be loaded dynamically -->
+            </div>
         </div>
     </div>
 
@@ -1272,6 +1369,9 @@
     <script src="app.js"></script>
     <script src="scenario-editor.js"></script>
     <script src="cicd.js"></script>
+    <script src="data-engine.js"></script>
+    <script src="data-driven-testing.js"></script>
+    <script src="ddt-fixes.js"></script>
 </body>
 
 </html>

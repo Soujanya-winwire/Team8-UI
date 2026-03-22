@@ -176,7 +176,17 @@ function renderCompactStepsList() {
                         ${escapeHtml(action.locator)}
                     </td>
                     <td style="padding: 6px 10px; color: #6b7280; font-size: 11px; word-break: break-all; line-height: 1.3;">
-                        ${action.value ? escapeHtml(action.value) : '-'}
+                        ${(() => {
+                            if (!action.value) return '-';
+                            // Check if this field has parameter metadata for data-driven execution
+                            if (action.metadata && action.metadata.ParameterName) {
+                                const paramName = action.metadata.ParameterName;
+                                // Show placeholder with visual indicator
+                                return `<span style="color: #059669; font-weight: 600;">{{${escapeHtml(paramName)}}}</span>` +
+                                       `<span style="color: #94a3b8; font-size: 10px; margin-left: 4px;">(default: ${escapeHtml(action.value)})</span>`;
+                            }
+                            return escapeHtml(action.value);
+                        })()}
                     </td>
                     <td style="padding: 6px 10px; text-align: center;">
                         <div style="display: flex; gap: 3px; justify-content: center; align-items: center; flex-wrap: nowrap;">

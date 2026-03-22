@@ -1,24 +1,43 @@
 using AgenticAI.Core.Configuration;
+using AgenticAI.Core.DataDriven;
 using AgenticAI.Core.Enums;
 using AgenticAI.Core.Interfaces;
 using AgenticAI.Core.Logging;
 using AgenticAI.Core.Models;
 using AgenticAI.Core.ZeroCode.Models;
+using System.Text.RegularExpressions;
 
 namespace AgenticAI.Core.ZeroCode
 {
     /// <summary>
     /// Executes zero-code test scenarios
+    /// Supports runtime parameter resolution for data-driven testing
     /// </summary>
     public class ScenarioExecutor
     {
         private readonly IWebDriver _driver;
         private readonly FrameworkConfiguration _config;
+        
+        /// <summary>
+        /// Current dataset for resolving placeholders at runtime
+        /// Set by DataDrivenRunner before executing each iteration
+        /// </summary>
+        public Dictionary<string, string>? CurrentDataset { get; set; }
 
         public ScenarioExecutor(IWebDriver driver)
         {
             _driver = driver;
             _config = ConfigurationManager.Instance.FrameworkConfig;
+            CurrentDataset = null;
+        }
+        
+        /// <summary>
+        /// Set the current dataset for placeholder resolution
+        /// </summary>
+        /// <param name="dataset">Dictionary of parameter names to values</param>
+        public void SetDataset(Dictionary<string, string>? dataset)
+        {
+            CurrentDataset = dataset;
         }
 
         public async Task<TestCaseResult> ExecuteScenarioAsync(TestScenario scenario)
@@ -52,6 +71,13 @@ namespace AgenticAI.Core.ZeroCode
                     var urlToNavigate = !string.IsNullOrEmpty(scenario.StartUrl) 
                         ? scenario.StartUrl 
                         : _config.BaseUrl;
+                    
+                    // Resolve placeholders in StartUrl at runtime if CurrentDataset is available
+                    if (!string.IsNullOrEmpty(urlToNavigate) && CurrentDataset != null && CurrentDataset.Count > 0)
+                    {
+                        urlToNavigate = ParameterResolver.ResolveParameters(urlToNavigate, CurrentDataset);
+                        Logger.Debug($"Resolved StartUrl '{scenario.StartUrl}' → '{urlToNavigate}'");
+                    }
                     
                     if (!string.IsNullOrEmpty(urlToNavigate) && !hasNavigateStep)
                     {
@@ -97,6 +123,13 @@ namespace AgenticAI.Core.ZeroCode
                     var urlToNavigate = !string.IsNullOrEmpty(scenario.StartUrl) 
                         ? scenario.StartUrl 
                         : _config.BaseUrl;
+                    
+                    // Resolve placeholders in StartUrl at runtime if CurrentDataset is available
+                    if (!string.IsNullOrEmpty(urlToNavigate) && CurrentDataset != null && CurrentDataset.Count > 0)
+                    {
+                        urlToNavigate = ParameterResolver.ResolveParameters(urlToNavigate, CurrentDataset);
+                        Logger.Debug($"Resolved StartUrl '{scenario.StartUrl}' → '{urlToNavigate}'");
+                    }
 
                     if (!string.IsNullOrEmpty(urlToNavigate))
                     {
@@ -259,28 +292,69 @@ namespace AgenticAI.Core.ZeroCode
                 switch (actionType)
                 {
                     case "click":
+                        // ENHANCED: Scroll to element before clicking to ensure visibility
+                        try
+                        {
+                            await _driver.ScrollToAsync(action.Locator);
+                            Logger.Debug($"Scrolled to element before clicking: {action.Locator}");
+                        }
+                        catch (Exception scrollEx)
+                        {
+                            Logger.Debug($"Could not scroll to element before click: {scrollEx.Message}");
+                            // Don't fail on scroll, proceed with click anyway
+                        }
+                        
                         await _driver.ClickAsync(action.Locator);
+                        Logger.Info($"Successfully clicked on: {action.Locator}");
                         break;
 
                     case "type":
                     case "fill":
+                    case "input":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await _driver.TypeAsync(action.Locator, action.Value!);
+                            var resolvedValue = ResolveActionValueFromDataset(action);
+                                step.Description = $"Type \"{resolvedValue}\" into {action.Locator}";
+                            
+                            // ENHANCED: Scroll to input field before typing to ensure visibility
+                            try
+                            {
+                                await _driver.ScrollToAsync(action.Locator);
+                                Logger.Debug($"Scrolled to field before typing: {action.Locator}");
+                            }
+                            catch (Exception scrollEx)
+                            {
+                                Logger.Debug($"Could not scroll to field before typing: {scrollEx.Message}");
+                                // Don't fail on scroll, proceed with typing anyway
+                            }
+                            
+                            await _driver.TypeAsync(action.Locator, resolvedValue!);
+                            Logger.Info($"Successfully typed into: {action.Locator}");
                         }
                         break;
 
                     case "navigate":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await _driver.NavigateAsync(action.Value!);
+                            // Resolve placeholders at runtime if CurrentDataset is available
+                            var resolvedUrl = action.Value;
+                            if (CurrentDataset != null && CurrentDataset.Count > 0)
+                            {
+                                resolvedUrl = ParameterResolver.ResolveParameters(action.Value!, CurrentDataset);
+                                Logger.Debug($"Resolved URL '{action.Value}' → '{resolvedUrl}' for Navigate action");
+                            }
+                            
+                            await _driver.NavigateAsync(resolvedUrl!);
                         }
                         break;
 
                     case "select":
                         if (!string.IsNullOrEmpty(action.Value))
                         {
-                            await _driver.SelectOptionAsync(action.Locator, action.Value!);
+                            var resolvedOption = ResolveActionValueFromDataset(action);
+                                step.Description = $"Select \"{resolvedOption}\" from {action.Locator}";
+                            
+                            await _driver.SelectOptionAsync(action.Locator, resolvedOption!);
                         }
                         break;
 
@@ -564,6 +638,161 @@ namespace AgenticAI.Core.ZeroCode
             }
         }
 
+        private string ResolveActionValueFromDataset(RecordedAction action)
+        {
+            var originalValue = action.Value ?? string.Empty;
+
+            if (CurrentDataset == null || CurrentDataset.Count == 0)
+                return originalValue;
+
+            if (action.Metadata != null && action.Metadata.TryGetValue("ParameterName", out var paramName))
+            {
+                if (TryGetDatasetValue(paramName, out var mappedByMetadata))
+                {
+                    Logger.Debug($"Resolved parameter '{paramName}' → '{mappedByMetadata}' for {action.ActionType} action");
+                    return mappedByMetadata;
+                }
+            }
+
+            if (ParameterResolver.ContainsPlaceholders(originalValue))
+            {
+                var resolvedPlaceholderValue = ParameterResolver.ResolveParameters(originalValue, CurrentDataset);
+                Logger.Debug($"Resolved placeholder '{originalValue}' → '{resolvedPlaceholderValue}' for {action.ActionType} action");
+                return resolvedPlaceholderValue;
+            }
+
+            var inferredName = ParameterResolver.InferParameterName(action.Locator ?? string.Empty, action.ActionType ?? "Type");
+            if (!string.IsNullOrWhiteSpace(inferredName) && TryGetDatasetValue(inferredName, out var mappedByLocator))
+            {
+                Logger.Debug($"Resolved locator-inferred parameter '{inferredName}' → '{mappedByLocator}' for {action.ActionType} action");
+                return mappedByLocator;
+            }
+
+            if (TryGetDatasetValue(originalValue, out var mappedByRawValue))
+            {
+                Logger.Debug($"Resolved raw value-key '{originalValue}' → '{mappedByRawValue}' for {action.ActionType} action");
+                return mappedByRawValue;
+            }
+
+            if (TryResolveAliasOrCompositeValue(action, out var mappedByAlias))
+            {
+                Logger.Debug($"Resolved alias/composite mapping for '{action.ActionType}' → '{mappedByAlias}'");
+                return mappedByAlias;
+            }
+
+            return originalValue;
+        }
+
+        private bool TryResolveAliasOrCompositeValue(RecordedAction action, out string resolvedValue)
+        {
+            resolvedValue = string.Empty;
+
+            if (CurrentDataset == null || CurrentDataset.Count == 0)
+                return false;
+
+            var metadataKey = action.Metadata != null && action.Metadata.TryGetValue("ParameterName", out var meta)
+                ? meta
+                : string.Empty;
+
+            var inferredKey = ParameterResolver.InferParameterName(action.Locator ?? string.Empty, action.ActionType ?? "Type") ?? string.Empty;
+            var originalValue = action.Value ?? string.Empty;
+            var locator = (action.Locator ?? string.Empty).ToLowerInvariant();
+
+            var normalizedCandidates = new List<string>
+            {
+                NormalizeDatasetKey(metadataKey),
+                NormalizeDatasetKey(inferredKey),
+                NormalizeDatasetKey(originalValue)
+            }.Where(v => !string.IsNullOrWhiteSpace(v)).Distinct().ToList();
+
+            // Common semantic aliases
+            if (normalizedCandidates.Any(k => k.Contains("nameexamplecom") || k == "email" || k.Contains("email")) ||
+                locator.Contains("name@example.com") || locator.Contains("email"))
+            {
+                if (TryGetDatasetValue("email", out var emailValue))
+                {
+                    resolvedValue = emailValue;
+                    return true;
+                }
+            }
+
+            if (normalizedCandidates.Any(k => k == "fullname" || k == "name") || locator.Contains("full name"))
+            {
+                if (TryGetDatasetValue("fullName", out var directFullName))
+                {
+                    resolvedValue = directFullName;
+                    return true;
+                }
+
+                var hasFirstName = TryGetDatasetValue("first_name", out var firstName) || TryGetDatasetValue("firstName", out firstName);
+                var hasLastName = TryGetDatasetValue("last_name", out var lastName) || TryGetDatasetValue("lastName", out lastName);
+
+                if (hasFirstName || hasLastName)
+                {
+                    resolvedValue = $"{firstName} {lastName}".Trim();
+                    if (!string.IsNullOrWhiteSpace(resolvedValue))
+                        return true;
+                }
+            }
+
+            if (normalizedCandidates.Any(k => k == "currentaddress" || k == "address") || locator.Contains("current address"))
+            {
+                if (TryGetDatasetValue("current_address", out var currentAddress) ||
+                    TryGetDatasetValue("currentAddress", out currentAddress) ||
+                    TryGetDatasetValue("address", out currentAddress))
+                {
+                    resolvedValue = currentAddress;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryGetDatasetValue(string key, out string value)
+        {
+            value = string.Empty;
+
+            if (CurrentDataset == null || CurrentDataset.Count == 0 || string.IsNullOrWhiteSpace(key))
+                return false;
+
+            if (CurrentDataset.TryGetValue(key, out var exactValue))
+            {
+                value = exactValue;
+                return true;
+            }
+
+            var directCaseInsensitive = CurrentDataset
+                .FirstOrDefault(kv => string.Equals(kv.Key, key, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(directCaseInsensitive.Key))
+            {
+                value = directCaseInsensitive.Value;
+                return true;
+            }
+
+            var normalizedKey = NormalizeDatasetKey(key);
+            var normalizedMatch = CurrentDataset
+                .FirstOrDefault(kv => NormalizeDatasetKey(kv.Key) == normalizedKey);
+
+            if (!string.IsNullOrWhiteSpace(normalizedMatch.Key))
+            {
+                value = normalizedMatch.Value;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static string NormalizeDatasetKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return string.Empty;
+
+            var withoutSymbols = Regex.Replace(key, "[^a-zA-Z0-9]", string.Empty);
+            return withoutSymbols.ToLowerInvariant();
+        }
+
         private async Task ExecuteAssertionAsync(Assertion assertion, TestCaseResult testResult, bool isLastStep = false)
         {
             var step = new TestStepResult
@@ -572,6 +801,14 @@ namespace AgenticAI.Core.ZeroCode
                 Description = assertion.Description ?? $"Verify {assertion.Type}",
                 StartTime = DateTime.Now
             };
+            
+            // Resolve placeholders in ExpectedValue at runtime if CurrentDataset is available
+            var resolvedExpectedValue = assertion.ExpectedValue;
+            if (!string.IsNullOrEmpty(assertion.ExpectedValue) && CurrentDataset != null && CurrentDataset.Count > 0)
+            {
+                resolvedExpectedValue = ParameterResolver.ResolveParameters(assertion.ExpectedValue!, CurrentDataset);
+                Logger.Debug($"Resolved assertion ExpectedValue '{assertion.ExpectedValue}' → '{resolvedExpectedValue}'");
+            }
 
             try
             {
@@ -597,51 +834,51 @@ namespace AgenticAI.Core.ZeroCode
 
                     case "textequals":
                         var actualText = await _driver.GetTextAsync(assertion.Locator);
-                        if (actualText != assertion.ExpectedValue)
+                        if (actualText != resolvedExpectedValue)
                         {
-                            throw new Exception($"Text mismatch. Expected: '{assertion.ExpectedValue}', Actual: '{actualText}'");
+                            throw new Exception($"Text mismatch. Expected: '{resolvedExpectedValue}', Actual: '{actualText}'");
                         }
-                        Logger.Info($"Text equals assertion passed. Expected: '{assertion.ExpectedValue}', Actual: '{actualText}'");
+                        Logger.Info($"Text equals assertion passed. Expected: '{resolvedExpectedValue}', Actual: '{actualText}'");
                         break;
 
                     case "textcontains":
                         var text = await _driver.GetTextAsync(assertion.Locator);
-                        if (!text.Contains(assertion.ExpectedValue ?? ""))
+                        if (!text.Contains(resolvedExpectedValue ?? ""))
                         {
-                            throw new Exception($"Text does not contain expected value. Expected text to contain: '{assertion.ExpectedValue}', but actual text was: '{text}'");
+                            throw new Exception($"Text does not contain expected value. Expected text to contain: '{resolvedExpectedValue}', but actual text was: '{text}'");
                         }
-                        Logger.Info($"Text contains assertion passed. Expected to contain: '{assertion.ExpectedValue}', Actual text: '{text}'");
+                        Logger.Info($"Text contains assertion passed. Expected to contain: '{resolvedExpectedValue}', Actual text: '{text}'");
                         break;
 
                     case "textnotcontains":
                         var textNotContains = await _driver.GetTextAsync(assertion.Locator);
-                        if (textNotContains.Contains(assertion.ExpectedValue ?? ""))
+                        if (textNotContains.Contains(resolvedExpectedValue ?? ""))
                         {
-                            throw new Exception($"Text contains unexpected value. Expected text to NOT contain: '{assertion.ExpectedValue}', but actual text was: '{textNotContains}'");
+                            throw new Exception($"Text contains unexpected value. Expected text to NOT contain: '{resolvedExpectedValue}', but actual text was: '{textNotContains}'");
                         }
                         break;
 
                     case "urlcontains":
                         var currentUrl = await _driver.GetCurrentUrlAsync();
-                        if (!currentUrl.Contains(assertion.ExpectedValue ?? ""))
+                        if (!currentUrl.Contains(resolvedExpectedValue ?? ""))
                         {
-                            throw new Exception($"URL does not contain expected value: {assertion.ExpectedValue}");
+                            throw new Exception($"URL does not contain expected value: {resolvedExpectedValue}");
                         }
                         break;
 
                     case "titleequals":
                         var title = await _driver.GetTitleAsync();
-                        if (title != assertion.ExpectedValue)
+                        if (title != resolvedExpectedValue)
                         {
-                            throw new Exception($"Title mismatch. Expected: {assertion.ExpectedValue}, Actual: {title}");
+                            throw new Exception($"Title mismatch. Expected: {resolvedExpectedValue}, Actual: {title}");
                         }
                         break;
 
                     case "titlecontains":
                         var titleContains = await _driver.GetTitleAsync();
-                        if (!titleContains.Contains(assertion.ExpectedValue ?? ""))
+                        if (!titleContains.Contains(resolvedExpectedValue ?? ""))
                         {
-                            throw new Exception($"Title does not contain expected value. Expected: {assertion.ExpectedValue}, Actual title: {titleContains}");
+                            throw new Exception($"Title does not contain expected value. Expected: {resolvedExpectedValue}, Actual title: {titleContains}");
                         }
                         break;
 

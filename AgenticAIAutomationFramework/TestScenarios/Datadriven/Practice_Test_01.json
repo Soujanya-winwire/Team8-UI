@@ -1,0 +1,605 @@
+{
+  "ScenarioId": "badd6a9e-994d-438f-8768-d6f00966c127",
+  "Name": "Practice_Test_01",
+  "Description": "",
+  "Module": "Datadriven",
+  "Tags": [],
+  "StartUrl": "https://demoqa.com/automation-practice-form",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/automation-practice-form",
+      "Value": "https://demoqa.com/automation-practice-form",
+      "Description": "Navigate to https://demoqa.com/automation-practice-form",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"First Name\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"First Name\"]",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"First Name\"]",
+      "Value": "test",
+      "Description": "Type \"test\" into input[placeholder=\"First Name\"]",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"Last Name\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"Last Name\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"Last Name\"]",
+      "Value": "test",
+      "Description": "Type \"test\" into input[placeholder=\"Last Name\"]",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"name@example.com\"]",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail.com",
+      "Description": "Type \"test@gmail.com\" into input[placeholder=\"name@example.com\"]",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[name=\"gender\"]",
+      "Value": "Male",
+      "Description": "Input on input[name=\"gender\"]",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "input[name=\"gender\"]",
+      "Value": null,
+      "Description": "Check input[name=\"gender\"]",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[name=\"gender\"]",
+      "Value": "Male",
+      "Description": "Input on input[name=\"gender\"]",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"Mobile Number\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"Mobile Number\"]",
+      "Metadata": {},
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"Mobile Number\"]",
+      "Value": "9028783903",
+      "Description": "Type \"9028783903\" into input[placeholder=\"Mobile Number\"]",
+      "Metadata": {},
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input.form-control",
+      "Value": null,
+      "Description": "Click on input.form-control",
+      "Metadata": {},
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "select",
+      "Value": null,
+      "Description": "Click on select (\"JanuaryFebruaryMarchAprilMayJuneJulyAugustSeptembe\")",
+      "Metadata": {},
+      "Timestamp": 13
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "select",
+      "Value": "3",
+      "Description": "Select \"April\" from select",
+      "Metadata": {},
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "select",
+      "Value": null,
+      "Description": "Click on select (\"JanuaryFebruaryMarchAprilMayJuneJulyAugustSeptembe\")",
+      "Metadata": {},
+      "Timestamp": 15
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "select",
+      "Value": null,
+      "Description": "Click on select (\"19001901190219031904190519061907190819091910191119\")",
+      "Metadata": {},
+      "Timestamp": 16
+    },
+    {
+      "ActionType": "Select",
+      "Locator": "select",
+      "Value": "2020",
+      "Description": "Select \"2020\" from select",
+      "Metadata": {},
+      "Timestamp": 17
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "select",
+      "Value": null,
+      "Description": "Click on select (\"19001901190219031904190519061907190819091910191119\")",
+      "Metadata": {},
+      "Timestamp": 18
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[aria-label=\"Choose Friday, April 17th, 2020\"]",
+      "Value": null,
+      "Description": "Click on [aria-label=\"Choose Friday, April 17th, 2020\"] (\"17\")",
+      "Metadata": {},
+      "Timestamp": 19
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input.form-check-input",
+      "Value": "3",
+      "Description": "Input on input.form-check-input",
+      "Metadata": {},
+      "Timestamp": 20
+    },
+    {
+      "ActionType": "Check",
+      "Locator": "input.form-check-input",
+      "Value": null,
+      "Description": "Check input.form-check-input",
+      "Metadata": {},
+      "Timestamp": 21
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input.form-check-input",
+      "Value": "3",
+      "Description": "Input on input.form-check-input",
+      "Metadata": {},
+      "Timestamp": 22
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input.form-control",
+      "Value": null,
+      "Description": "Click on input.form-control",
+      "Metadata": {},
+      "Timestamp": 23
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "Value": null,
+      "Description": "Click on textarea[placeholder=\"Current Address\"]",
+      "Metadata": {},
+      "Timestamp": 24
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "Value": "test",
+      "Description": "Type \"test\" into textarea[placeholder=\"Current Address\"]",
+      "Metadata": {},
+      "Timestamp": 25
+    },
+    {
+      "ActionType": "Submit",
+      "Locator": "form",
+      "Value": null,
+      "Description": "Submit form form",
+      "Metadata": {},
+      "Timestamp": 26
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "button:has-text(\"Submit\")",
+      "Value": null,
+      "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+      "Metadata": {},
+      "Timestamp": 27
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/automation-practice-form",
+        "Value": "https://demoqa.com/automation-practice-form",
+        "Description": "Navigate to https://demoqa.com/automation-practice-form",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"First Name\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"First Name\"]",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"First Name\"]",
+        "Value": "test",
+        "Description": "Type \"test\" into input[placeholder=\"First Name\"]",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"Last Name\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"Last Name\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"Last Name\"]",
+        "Value": "test",
+        "Description": "Type \"test\" into input[placeholder=\"Last Name\"]",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"name@example.com\"]",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail.com",
+        "Description": "Type \"test@gmail.com\" into input[placeholder=\"name@example.com\"]",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[name=\"gender\"]",
+        "Value": "Male",
+        "Description": "Input on input[name=\"gender\"]",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "input[name=\"gender\"]",
+        "Value": null,
+        "Description": "Check input[name=\"gender\"]",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[name=\"gender\"]",
+        "Value": "Male",
+        "Description": "Input on input[name=\"gender\"]",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"Mobile Number\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"Mobile Number\"]",
+        "Metadata": {},
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"Mobile Number\"]",
+        "Value": "9028783903",
+        "Description": "Type \"9028783903\" into input[placeholder=\"Mobile Number\"]",
+        "Metadata": {},
+        "Timestamp": 11
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input.form-control",
+        "Value": null,
+        "Description": "Click on input.form-control",
+        "Metadata": {},
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "select",
+        "Value": null,
+        "Description": "Click on select (\"JanuaryFebruaryMarchAprilMayJuneJulyAugustSeptembe\")",
+        "Metadata": {},
+        "Timestamp": 13
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 14,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "select",
+        "Value": "3",
+        "Description": "Select \"April\" from select",
+        "Metadata": {},
+        "Timestamp": 14
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 15,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "select",
+        "Value": null,
+        "Description": "Click on select (\"JanuaryFebruaryMarchAprilMayJuneJulyAugustSeptembe\")",
+        "Metadata": {},
+        "Timestamp": 15
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 16,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "select",
+        "Value": null,
+        "Description": "Click on select (\"19001901190219031904190519061907190819091910191119\")",
+        "Metadata": {},
+        "Timestamp": 16
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 17,
+      "Action": {
+        "ActionType": "Select",
+        "Locator": "select",
+        "Value": "2020",
+        "Description": "Select \"2020\" from select",
+        "Metadata": {},
+        "Timestamp": 17
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 18,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "select",
+        "Value": null,
+        "Description": "Click on select (\"19001901190219031904190519061907190819091910191119\")",
+        "Metadata": {},
+        "Timestamp": 18
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 19,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[aria-label=\"Choose Friday, April 17th, 2020\"]",
+        "Value": null,
+        "Description": "Click on [aria-label=\"Choose Friday, April 17th, 2020\"] (\"17\")",
+        "Metadata": {},
+        "Timestamp": 19
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 20,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input.form-check-input",
+        "Value": "3",
+        "Description": "Input on input.form-check-input",
+        "Metadata": {},
+        "Timestamp": 20
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 21,
+      "Action": {
+        "ActionType": "Check",
+        "Locator": "input.form-check-input",
+        "Value": null,
+        "Description": "Check input.form-check-input",
+        "Metadata": {},
+        "Timestamp": 21
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 22,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input.form-check-input",
+        "Value": "3",
+        "Description": "Input on input.form-check-input",
+        "Metadata": {},
+        "Timestamp": 22
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 23,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input.form-control",
+        "Value": null,
+        "Description": "Click on input.form-control",
+        "Metadata": {},
+        "Timestamp": 23
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 24,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "Value": null,
+        "Description": "Click on textarea[placeholder=\"Current Address\"]",
+        "Metadata": {},
+        "Timestamp": 24
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 25,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "Value": "test",
+        "Description": "Type \"test\" into textarea[placeholder=\"Current Address\"]",
+        "Metadata": {},
+        "Timestamp": 25
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 26,
+      "Action": {
+        "ActionType": "Submit",
+        "Locator": "form",
+        "Value": null,
+        "Description": "Submit form form",
+        "Metadata": {},
+        "Timestamp": 26
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 27,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "button:has-text(\"Submit\")",
+        "Value": null,
+        "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+        "Metadata": {},
+        "Timestamp": 27
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-09T00:12:39.4611392+05:30",
+  "ModifiedAt": "2026-03-09T00:12:39.4619519+05:30"
+}

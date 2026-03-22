@@ -1,0 +1,1094 @@
+{
+  "ScenarioId": "52840858-f2a2-4e6d-9d26-2c04b2f734f1",
+  "Name": "LoginTest",
+  "Description": "tewszdczs",
+  "Module": "Login",
+  "Tags": [],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Click on li.btn.btn-light (\"Check Box\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Click on li.btn.btn-light (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Rightclick",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Rightclick on li.btn.btn-light",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Click on li.btn.btn-light (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Text Box\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"Full Name\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"Full Name\"]",
+      "Metadata": {},
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"Full Name\"]",
+      "Value": "test",
+      "Description": "Type \"test\" into input[placeholder=\"Full Name\"]",
+      "Metadata": {
+        "ParameterName": "fullName"
+      },
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"name@example.com\"]",
+      "Metadata": {},
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail.com",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 13
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail.com",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "Value": null,
+      "Description": "Click on textarea[placeholder=\"Current Address\"]",
+      "Metadata": {},
+      "Timestamp": 15
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "Value": "curreent address",
+      "Description": "Type \"curreent address\" into textarea[placeholder=\"Current Address\"]",
+      "Metadata": {
+        "ParameterName": "currentAddress"
+      },
+      "Timestamp": 16
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "textarea.form-control",
+      "Value": null,
+      "Description": "Click on textarea.form-control",
+      "Metadata": {},
+      "Timestamp": 17
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "textarea.form-control",
+      "Value": "permanent address",
+      "Description": "Type \"permanent address\" into textarea.form-control",
+      "Metadata": {
+        "ParameterName": "value"
+      },
+      "Timestamp": 18
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "button:has-text(\"Submit\")",
+      "Value": null,
+      "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+      "Metadata": {},
+      "Timestamp": 19
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Web Tables\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Web Tables\") (\"Web Tables\")",
+      "Metadata": {},
+      "Timestamp": 20
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "path",
+      "Value": null,
+      "Description": "Click on path",
+      "Metadata": {},
+      "Timestamp": 21
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"Department\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"Department\"]",
+      "Metadata": {},
+      "Timestamp": 22
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"Department\"]",
+      "Value": "Insurance1",
+      "Description": "Type \"Insurance1\" into input[placeholder=\"Department\"]",
+      "Metadata": {
+        "ParameterName": "department"
+      },
+      "Timestamp": 23
+    },
+    {
+      "ActionType": "Submit",
+      "Locator": "form",
+      "Value": null,
+      "Description": "Submit form form",
+      "Metadata": {},
+      "Timestamp": 24
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "button:has-text(\"Submit\")",
+      "Value": null,
+      "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+      "Metadata": {},
+      "Timestamp": 25
+    }
+  ],
+  "Assertions": [
+    {
+      "Type": "UrlContains",
+      "Locator": "",
+      "ExpectedValue": "demoqa.com",
+      "Description": "Auto-verify navigation completed",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "a:has-text(\"Elements\")",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "li.btn.btn-light",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "li.btn.btn-light",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "li.btn.btn-light",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Rightclick",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "li.btn.btn-light",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "a:has-text(\"Text Box\")",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "input[placeholder=\"Full Name\"]",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"Full Name\"]",
+      "ExpectedValue": "{{fullName}}",
+      "Description": "Auto-verify value entered for Type",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "ExpectedValue": "{{nameexamplecom}}",
+      "Description": "Auto-verify value entered for Input",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "ExpectedValue": "{{nameexamplecom}}",
+      "Description": "Auto-verify value entered for Input",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "ExpectedValue": "{{nameexamplecom}}",
+      "Description": "Auto-verify value entered for Input",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "ExpectedValue": "{{nameexamplecom}}",
+      "Description": "Auto-verify value entered for Input",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "ExpectedValue": "{{nameexamplecom}}",
+      "Description": "Auto-verify value entered for Input",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "ExpectedValue": "{{currentAddress}}",
+      "Description": "Auto-verify value entered for Type",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "textarea.form-control",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "textarea.form-control",
+      "ExpectedValue": "{{value}}",
+      "Description": "Auto-verify value entered for Type",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "button:has-text(\"Submit\")",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "a:has-text(\"Web Tables\")",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "path",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "input[placeholder=\"Department\"]",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ValueEquals",
+      "Locator": "input[placeholder=\"Department\"]",
+      "ExpectedValue": "{{department}}",
+      "Description": "Auto-verify value entered for Type",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "form",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Submit",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementExists",
+      "Locator": "button:has-text(\"Submit\")",
+      "ExpectedValue": null,
+      "Description": "Auto-verify target exists after Click",
+      "ExecuteAfterActionIndex": null
+    }
+  ],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Click on li.btn.btn-light (\"Check Box\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Click on li.btn.btn-light (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Rightclick",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Rightclick on li.btn.btn-light",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Click on li.btn.btn-light (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Text Box\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"Full Name\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"Full Name\"]",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"Full Name\"]",
+        "Value": "test",
+        "Description": "Type \"test\" into input[placeholder=\"Full Name\"]",
+        "Metadata": {
+          "ParameterName": "fullName"
+        },
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"name@example.com\"]",
+        "Metadata": {},
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 11
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail.com",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 13
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 14,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail.com",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 14
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 15,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "Value": null,
+        "Description": "Click on textarea[placeholder=\"Current Address\"]",
+        "Metadata": {},
+        "Timestamp": 15
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 16,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "Value": "curreent address",
+        "Description": "Type \"curreent address\" into textarea[placeholder=\"Current Address\"]",
+        "Metadata": {
+          "ParameterName": "currentAddress"
+        },
+        "Timestamp": 16
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 17,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "textarea.form-control",
+        "Value": null,
+        "Description": "Click on textarea.form-control",
+        "Metadata": {},
+        "Timestamp": 17
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 18,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "textarea.form-control",
+        "Value": "permanent address",
+        "Description": "Type \"permanent address\" into textarea.form-control",
+        "Metadata": {
+          "ParameterName": "value"
+        },
+        "Timestamp": 18
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 19,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "button:has-text(\"Submit\")",
+        "Value": null,
+        "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+        "Metadata": {},
+        "Timestamp": 19
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 20,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Web Tables\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Web Tables\") (\"Web Tables\")",
+        "Metadata": {},
+        "Timestamp": 20
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 21,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "path",
+        "Value": null,
+        "Description": "Click on path",
+        "Metadata": {},
+        "Timestamp": 21
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 22,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"Department\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"Department\"]",
+        "Metadata": {},
+        "Timestamp": 22
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 23,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"Department\"]",
+        "Value": "Insurance1",
+        "Description": "Type \"Insurance1\" into input[placeholder=\"Department\"]",
+        "Metadata": {
+          "ParameterName": "department"
+        },
+        "Timestamp": 23
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 24,
+      "Action": {
+        "ActionType": "Submit",
+        "Locator": "form",
+        "Value": null,
+        "Description": "Submit form form",
+        "Metadata": {},
+        "Timestamp": 24
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 25,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "button:has-text(\"Submit\")",
+        "Value": null,
+        "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+        "Metadata": {},
+        "Timestamp": 25
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 26,
+      "Action": null,
+      "Assertion": {
+        "Type": "UrlContains",
+        "Locator": "",
+        "ExpectedValue": "demoqa.com",
+        "Description": "Auto-verify navigation completed",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 27,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "a:has-text(\"Elements\")",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 28,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "li.btn.btn-light",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 29,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "li.btn.btn-light",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 30,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "li.btn.btn-light",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Rightclick",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 31,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "li.btn.btn-light",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 32,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "a:has-text(\"Text Box\")",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 33,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "input[placeholder=\"Full Name\"]",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 34,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"Full Name\"]",
+        "ExpectedValue": "{{fullName}}",
+        "Description": "Auto-verify value entered for Type",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 35,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 36,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "ExpectedValue": "{{nameexamplecom}}",
+        "Description": "Auto-verify value entered for Input",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 37,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "ExpectedValue": "{{nameexamplecom}}",
+        "Description": "Auto-verify value entered for Input",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 38,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "ExpectedValue": "{{nameexamplecom}}",
+        "Description": "Auto-verify value entered for Input",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 39,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "ExpectedValue": "{{nameexamplecom}}",
+        "Description": "Auto-verify value entered for Input",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 40,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "ExpectedValue": "{{nameexamplecom}}",
+        "Description": "Auto-verify value entered for Input",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 41,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 42,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "ExpectedValue": "{{currentAddress}}",
+        "Description": "Auto-verify value entered for Type",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 43,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "textarea.form-control",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 44,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "textarea.form-control",
+        "ExpectedValue": "{{value}}",
+        "Description": "Auto-verify value entered for Type",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 45,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "button:has-text(\"Submit\")",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 46,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "a:has-text(\"Web Tables\")",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 47,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "path",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 48,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "input[placeholder=\"Department\"]",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 49,
+      "Action": null,
+      "Assertion": {
+        "Type": "ValueEquals",
+        "Locator": "input[placeholder=\"Department\"]",
+        "ExpectedValue": "{{department}}",
+        "Description": "Auto-verify value entered for Type",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 50,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "form",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Submit",
+        "ExecuteAfterActionIndex": null
+      }
+    },
+    {
+      "StepType": "Assertion",
+      "Order": 51,
+      "Action": null,
+      "Assertion": {
+        "Type": "ElementExists",
+        "Locator": "button:has-text(\"Submit\")",
+        "ExpectedValue": null,
+        "Description": "Auto-verify target exists after Click",
+        "ExecuteAfterActionIndex": null
+      }
+    }
+  ],
+  "CreatedAt": "2026-03-15T06:57:35.5643243+05:30",
+  "ModifiedAt": "2026-03-15T06:57:35.5654069+05:30"
+}

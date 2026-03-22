@@ -1,0 +1,79 @@
+{
+  "ScenarioId": "test-param-mapping",
+  "Name": "Parameter_Mapping_Test",
+  "Description": "Test scenario with {{}} parameter syntax",
+  "Module": "DataDriven",
+  "Tags": ["test", "parameters"],
+  "StartUrl": "https://example.com/login",
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://example.com/login",
+      "Value": "https://example.com/login",
+      "Description": "Navigate to login page"
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#userEmail",
+      "Value": "{{email}}",
+      "Description": "Type email"
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#userName",
+      "Value": "{{username}}",
+      "Description": "Type username"
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#password",
+      "Value": "{{password}}",
+      "Description": "Type password"
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://example.com/login",
+        "Value": "https://example.com/login",
+        "Description": "Navigate to login page"
+      }
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#userEmail",
+        "Value": "{{email}}",
+        "Description": "Type email"
+      }
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#userName",
+        "Value": "{{username}}",
+        "Description": "Type username"
+      }
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "#password",
+        "Value": "{{password}}",
+        "Description": "Type password"
+      }
+    }
+  ],
+  "CreatedAt": "2026-03-09T00:00:00",
+  "ModifiedAt": null
+}

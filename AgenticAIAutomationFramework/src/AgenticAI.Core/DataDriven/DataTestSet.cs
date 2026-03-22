@@ -171,18 +171,47 @@ namespace AgenticAI.Core.DataDriven
         }
 
         /// <summary>
-        /// Substitute ${ColumnName} placeholders in a string with values from the given row
+        /// Substitute ${ColumnName} or {{ColumnName}} placeholders in a string with values from the given row
+        /// Uses regex to detect and replace placeholders
+        /// Supports both ${} and {{}} syntax for backward compatibility
+        /// Examples:
+        ///   "{{email}}" → "bob@test.com"
+        ///   "User: {{username}}" → "User: bobuser"
+        ///   "${password}" → "pass123"
         /// </summary>
         public static string SubstitutePlaceholders(string template, Dictionary<string, string> row)
         {
-            if (string.IsNullOrEmpty(template))
+            if (string.IsNullOrEmpty(template) || row == null || row.Count == 0)
                 return template;
 
-            foreach (var kvp in row)
-            {
-                template = template.Replace($"${{{kvp.Key}}}", kvp.Value,
-                    StringComparison.OrdinalIgnoreCase);
-            }
+            // Use regex to find and replace {{variable}} placeholders
+            template = System.Text.RegularExpressions.Regex.Replace(
+                template,
+                @"\{\{(\w+)\}\}",
+                match =>
+                {
+                    string paramName = match.Groups[1].Value;
+                    // Case-insensitive lookup
+                    var key = row.Keys.FirstOrDefault(k => k.Equals(paramName, StringComparison.OrdinalIgnoreCase));
+                    return key != null ? row[key] : match.Value; // Keep original if not found
+                },
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+
+            // Also support ${variable} syntax for backward compatibility
+            template = System.Text.RegularExpressions.Regex.Replace(
+                template,
+                @"\$\{(\w+)\}",
+                match =>
+                {
+                    string paramName = match.Groups[1].Value;
+                    // Case-insensitive lookup
+                    var key = row.Keys.FirstOrDefault(k => k.Equals(paramName, StringComparison.OrdinalIgnoreCase));
+                    return key != null ? row[key] : match.Value; // Keep original if not found
+                },
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+
             return template;
         }
 

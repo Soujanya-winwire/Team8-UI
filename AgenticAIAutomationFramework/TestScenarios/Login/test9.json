@@ -1,0 +1,469 @@
+{
+  "ScenarioId": "9ac9e1ce-ed04-4f51-b0d4-4e11cd1f1729",
+  "Name": "test9",
+  "Description": "test",
+  "Module": "Login",
+  "Tags": [],
+  "StartUrl": "https://demoqa.com/",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://demoqa.com/",
+      "Value": "https://demoqa.com/",
+      "Description": "Navigate to https://demoqa.com/",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Elements\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Click on li.btn.btn-light (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "li.btn.btn-light",
+      "Value": null,
+      "Description": "Click on li.btn.btn-light (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "div.row",
+      "Value": null,
+      "Description": "Click on div.row (\"Elements Text BoxCheck BoxRadio ButtonWeb TablesBu\")",
+      "Metadata": {},
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "a:has-text(\"Text Box\")",
+      "Value": null,
+      "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"Full Name\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"Full Name\"]",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "input[placeholder=\"Full Name\"]",
+      "Value": "test",
+      "Description": "Type \"test\" into input[placeholder=\"Full Name\"]",
+      "Metadata": {
+        "ParameterName": "fullName"
+      },
+      "Timestamp": 7
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": null,
+      "Description": "Click on input[placeholder=\"name@example.com\"]",
+      "Metadata": {},
+      "Timestamp": 8
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 9
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 10
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 11
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail.com",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 12
+    },
+    {
+      "ActionType": "Input",
+      "Locator": "input[placeholder=\"name@example.com\"]",
+      "Value": "test@gmail.com",
+      "Description": "Input on input[placeholder=\"name@example.com\"]",
+      "Metadata": {
+        "ParameterName": "nameexamplecom"
+      },
+      "Timestamp": 13
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "Value": null,
+      "Description": "Click on textarea[placeholder=\"Current Address\"]",
+      "Metadata": {},
+      "Timestamp": 14
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "textarea[placeholder=\"Current Address\"]",
+      "Value": "test",
+      "Description": "Type \"test\" into textarea[placeholder=\"Current Address\"]",
+      "Metadata": {
+        "ParameterName": "currentAddress"
+      },
+      "Timestamp": 15
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "textarea.form-control",
+      "Value": null,
+      "Description": "Click on textarea.form-control",
+      "Metadata": {},
+      "Timestamp": 16
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "textarea.form-control",
+      "Value": "sdcdfvdfvdfvdf",
+      "Description": "Type \"sdcdfvdfvdfvdf\" into textarea.form-control",
+      "Metadata": {
+        "ParameterName": "value"
+      },
+      "Timestamp": 17
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "button:has-text(\"Submit\")",
+      "Value": null,
+      "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+      "Metadata": {},
+      "Timestamp": 18
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 19
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://demoqa.com/",
+        "Value": "https://demoqa.com/",
+        "Description": "Navigate to https://demoqa.com/",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Elements\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Elements\") (\"Elements\")",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Click on li.btn.btn-light (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "li.btn.btn-light",
+        "Value": null,
+        "Description": "Click on li.btn.btn-light (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "div.row",
+        "Value": null,
+        "Description": "Click on div.row (\"Elements Text BoxCheck BoxRadio ButtonWeb TablesBu\")",
+        "Metadata": {},
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "a:has-text(\"Text Box\")",
+        "Value": null,
+        "Description": "Click on a:has-text(\"Text Box\") (\"Text Box\")",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"Full Name\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"Full Name\"]",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "input[placeholder=\"Full Name\"]",
+        "Value": "test",
+        "Description": "Type \"test\" into input[placeholder=\"Full Name\"]",
+        "Metadata": {
+          "ParameterName": "fullName"
+        },
+        "Timestamp": 7
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 8,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": null,
+        "Description": "Click on input[placeholder=\"name@example.com\"]",
+        "Metadata": {},
+        "Timestamp": 8
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 9,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 9
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 10,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 10
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 11,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 11
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 12,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail.com",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 12
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 13,
+      "Action": {
+        "ActionType": "Input",
+        "Locator": "input[placeholder=\"name@example.com\"]",
+        "Value": "test@gmail.com",
+        "Description": "Input on input[placeholder=\"name@example.com\"]",
+        "Metadata": {
+          "ParameterName": "nameexamplecom"
+        },
+        "Timestamp": 13
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 14,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "Value": null,
+        "Description": "Click on textarea[placeholder=\"Current Address\"]",
+        "Metadata": {},
+        "Timestamp": 14
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 15,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "textarea[placeholder=\"Current Address\"]",
+        "Value": "test",
+        "Description": "Type \"test\" into textarea[placeholder=\"Current Address\"]",
+        "Metadata": {
+          "ParameterName": "currentAddress"
+        },
+        "Timestamp": 15
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 16,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "textarea.form-control",
+        "Value": null,
+        "Description": "Click on textarea.form-control",
+        "Metadata": {},
+        "Timestamp": 16
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 17,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "textarea.form-control",
+        "Value": "sdcdfvdfvdfvdf",
+        "Description": "Type \"sdcdfvdfvdfvdf\" into textarea.form-control",
+        "Metadata": {
+          "ParameterName": "value"
+        },
+        "Timestamp": 17
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 18,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "button:has-text(\"Submit\")",
+        "Value": null,
+        "Description": "Click on button:has-text(\"Submit\") (\"Submit\")",
+        "Metadata": {},
+        "Timestamp": 18
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 19,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 19
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-15T02:12:05.7552935+05:30",
+  "ModifiedAt": "2026-03-15T02:12:05.7557894+05:30"
+}

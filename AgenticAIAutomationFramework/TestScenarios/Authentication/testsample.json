@@ -1,0 +1,195 @@
+{
+  "ScenarioId": "64ce6cf3-2077-4ac4-87e9-f0a4ed2bbafe",
+  "Name": "testsample",
+  "Description": "",
+  "Module": "Authentication",
+  "Tags": [
+    "smoke"
+  ],
+  "StartUrl": "https://www.saucedemo.com",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Navigate",
+      "Locator": "https://www.saucedemo.com",
+      "Value": "https://www.saucedemo.com",
+      "Description": "Navigate to https://www.saucedemo.com",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"username\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"username\"]",
+      "Metadata": {},
+      "Timestamp": 1
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"username\"]",
+      "Value": "admin",
+      "Description": "Type \"admin\" into [data-test=\"username\"]",
+      "Metadata": {
+        "ParameterName": "username"
+      },
+      "Timestamp": 2
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"password\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"password\"]",
+      "Metadata": {},
+      "Timestamp": 3
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "[data-test=\"password\"]",
+      "Value": "sauce",
+      "Description": "Type \"sauce\" into [data-test=\"password\"]",
+      "Metadata": {
+        "ParameterName": "password"
+      },
+      "Timestamp": 4
+    },
+    {
+      "ActionType": "Submit",
+      "Locator": "form",
+      "Value": null,
+      "Description": "Submit form form",
+      "Metadata": {},
+      "Timestamp": 5
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "[data-test=\"login-button\"]",
+      "Value": null,
+      "Description": "Click on [data-test=\"login-button\"]",
+      "Metadata": {},
+      "Timestamp": 6
+    },
+    {
+      "ActionType": "Refresh",
+      "Locator": "",
+      "Value": null,
+      "Description": "Refresh on ",
+      "Metadata": {},
+      "Timestamp": 7
+    }
+  ],
+  "Assertions": [],
+  "Steps": [
+    {
+      "StepType": "Action",
+      "Order": 0,
+      "Action": {
+        "ActionType": "Navigate",
+        "Locator": "https://www.saucedemo.com",
+        "Value": "https://www.saucedemo.com",
+        "Description": "Navigate to https://www.saucedemo.com",
+        "Metadata": {},
+        "Timestamp": 0
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 1,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"username\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"username\"]",
+        "Metadata": {},
+        "Timestamp": 1
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 2,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"username\"]",
+        "Value": "admin",
+        "Description": "Type \"admin\" into [data-test=\"username\"]",
+        "Metadata": {
+          "ParameterName": "username"
+        },
+        "Timestamp": 2
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 3,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"password\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"password\"]",
+        "Metadata": {},
+        "Timestamp": 3
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 4,
+      "Action": {
+        "ActionType": "Type",
+        "Locator": "[data-test=\"password\"]",
+        "Value": "sauce",
+        "Description": "Type \"sauce\" into [data-test=\"password\"]",
+        "Metadata": {
+          "ParameterName": "password"
+        },
+        "Timestamp": 4
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 5,
+      "Action": {
+        "ActionType": "Submit",
+        "Locator": "form",
+        "Value": null,
+        "Description": "Submit form form",
+        "Metadata": {},
+        "Timestamp": 5
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 6,
+      "Action": {
+        "ActionType": "Click",
+        "Locator": "[data-test=\"login-button\"]",
+        "Value": null,
+        "Description": "Click on [data-test=\"login-button\"]",
+        "Metadata": {},
+        "Timestamp": 6
+      },
+      "Assertion": null
+    },
+    {
+      "StepType": "Action",
+      "Order": 7,
+      "Action": {
+        "ActionType": "Refresh",
+        "Locator": "",
+        "Value": null,
+        "Description": "Refresh on ",
+        "Metadata": {},
+        "Timestamp": 7
+      },
+      "Assertion": null
+    }
+  ],
+  "CreatedAt": "2026-03-15T02:09:18.4390711+05:30",
+  "ModifiedAt": "2026-03-15T02:09:18.4640114+05:30"
+}

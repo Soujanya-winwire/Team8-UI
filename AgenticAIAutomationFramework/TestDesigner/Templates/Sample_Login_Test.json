@@ -1,0 +1,66 @@
+{
+  "ScenarioId": "7f3d1926-3198-49ab-bdf5-1870e1f60c14",
+  "Name": "Sample_Login_Test",
+  "Description": "Sample login test scenario",
+  "Module": "Authentication",
+  "Tags": [
+    "smoke",
+    "login"
+  ],
+  "StartUrl": "https://example.com/login",
+  "IsSkipped": false,
+  "SkipReason": null,
+  "Actions": [
+    {
+      "ActionType": "Type",
+      "Locator": "#username",
+      "Value": "testuser",
+      "Description": "Enter username",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Type",
+      "Locator": "#password",
+      "Value": "password123",
+      "Description": "Enter password",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "Click",
+      "Locator": "#loginButton",
+      "Value": null,
+      "Description": "Click login button",
+      "Metadata": {},
+      "Timestamp": 0
+    },
+    {
+      "ActionType": "WaitForElement",
+      "Locator": "#dashboard",
+      "Value": "10",
+      "Description": "Wait for dashboard",
+      "Metadata": {},
+      "Timestamp": 0
+    }
+  ],
+  "Assertions": [
+    {
+      "Type": "UrlContains",
+      "Locator": "",
+      "ExpectedValue": "dashboard",
+      "Description": "Verify redirected to dashboard",
+      "ExecuteAfterActionIndex": null
+    },
+    {
+      "Type": "ElementVisible",
+      "Locator": "#welcomeMessage",
+      "ExpectedValue": null,
+      "Description": "Verify welcome message is visible",
+      "ExecuteAfterActionIndex": null
+    }
+  ],
+  "Steps": [],
+  "CreatedAt": "2026-03-16T19:41:03.6779237+05:30",
+  "ModifiedAt": null
+}

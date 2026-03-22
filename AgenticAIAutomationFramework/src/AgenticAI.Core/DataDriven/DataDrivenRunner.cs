@@ -2,6 +2,8 @@ using AgenticAI.Core.Interfaces;
 using AgenticAI.Core.Logging;
 using AgenticAI.Core.ZeroCode;
 using AgenticAI.Core.ZeroCode.Models;
+using System;
+using System.Text.RegularExpressions;
 
 namespace AgenticAI.Core.DataDriven
 {
@@ -43,6 +45,9 @@ namespace AgenticAI.Core.DataDriven
 
                 var driver = await _driverFactory();
                 var executor = new ScenarioExecutor(driver);
+                
+                // Set the current dataset for runtime parameter resolution
+                executor.SetDataset(row);
 
                 try
                 {
@@ -104,6 +109,9 @@ namespace AgenticAI.Core.DataDriven
         /// </summary>
         private static TestScenario BindScenarioToRow(TestScenario scenario, Dictionary<string, string> row)
         {
+            var stepInputActionIndex = 0;
+            var legacyInputActionIndex = 0;
+
             var bound = new TestScenario
             {
                 ScenarioId = Guid.NewGuid().ToString(),
@@ -127,12 +135,15 @@ namespace AgenticAI.Core.DataDriven
 
                 if (step.StepType == "Action" && step.Action != null)
                 {
+                    var boundAction = BindActionToRow(step.Action, row, ref stepInputActionIndex);
+
                     boundStep.Action = new RecordedAction
                     {
-                        ActionType = step.Action.ActionType,
-                        Locator = DataSetReader.SubstitutePlaceholders(step.Action.Locator, row),
-                        Value = DataSetReader.SubstitutePlaceholders(step.Action.Value ?? string.Empty, row),
-                        Description = step.Action.Description
+                        ActionType = boundAction.ActionType,
+                        Locator = boundAction.Locator,
+                        Value = boundAction.Value,
+                        Description = boundAction.Description,
+                        Metadata = boundAction.Metadata
                     };
                 }
                 else if (step.StepType == "Assertion" && step.Assertion != null)
@@ -153,12 +164,15 @@ namespace AgenticAI.Core.DataDriven
             // Clone legacy Actions
             foreach (var action in scenario.Actions)
             {
+                var boundAction = BindActionToRow(action, row, ref legacyInputActionIndex);
+
                 bound.Actions.Add(new RecordedAction
                 {
-                    ActionType = action.ActionType,
-                    Locator = DataSetReader.SubstitutePlaceholders(action.Locator, row),
-                    Value = DataSetReader.SubstitutePlaceholders(action.Value ?? string.Empty, row),
-                    Description = action.Description
+                    ActionType = boundAction.ActionType,
+                    Locator = boundAction.Locator,
+                    Value = boundAction.Value,
+                    Description = boundAction.Description,
+                    Metadata = boundAction.Metadata
                 });
             }
 
@@ -176,6 +190,190 @@ namespace AgenticAI.Core.DataDriven
             }
 
             return bound;
+        }
+
+        private static RecordedAction BindActionToRow(RecordedAction action, Dictionary<string, string> row, ref int inputActionIndex)
+        {
+            var actionType = (action.ActionType ?? string.Empty).Trim().ToLowerInvariant();
+            var substitutedLocator = DataSetReader.SubstitutePlaceholders(action.Locator, row);
+            var originalValue = action.Value ?? string.Empty;
+            var substitutedValue = DataSetReader.SubstitutePlaceholders(originalValue, row);
+            var metadata = new Dictionary<string, string>(action.Metadata ?? new Dictionary<string, string>());
+
+            if (IsDataEntryAction(actionType) && row.Count > 0)
+            {
+                if (metadata.TryGetValue("ParameterName", out var parameterName) &&
+                    TryGetRowValue(row, parameterName, out var metadataMappedValue))
+                {
+                    substitutedValue = metadataMappedValue;
+                }
+                else
+                {
+                    var inferredName = ParameterResolver.InferParameterName(substitutedLocator ?? string.Empty, actionType);
+                    if (!string.IsNullOrWhiteSpace(inferredName) && TryGetRowValue(row, inferredName, out var inferredMappedValue))
+                    {
+                        metadata["ParameterName"] = inferredName;
+                        substitutedValue = inferredMappedValue;
+                    }
+                    else if (TryGetRowValue(row, originalValue, out var rawValueMapped))
+                    {
+                        metadata["ParameterName"] = originalValue;
+                        substitutedValue = rawValueMapped;
+                    }
+                        else
+                        {
+                            // Priority 4: Fuzzy match — check if any column name appears in the locator
+                            // or if the locator fragments appear in column names (case-insensitive).
+                            // This covers: column "username" matching locator "#username", "[name=user_name]",
+                            // "[data-testid=usernameInput]", etc.
+                            var fuzzyKey = !string.IsNullOrWhiteSpace(substitutedLocator)
+                                ? FindBestColumnMatch(substitutedLocator, row)
+                                : null;
+
+                            if (fuzzyKey != null && TryGetRowValue(row, fuzzyKey, out var fuzzyMappedValue))
+                            {
+                                metadata["ParameterName"] = fuzzyKey;
+                                substitutedValue = fuzzyMappedValue;
+                            }
+                            else if (!ParameterResolver.ContainsPlaceholders(originalValue) &&
+                                     string.Equals(substitutedValue, originalValue, StringComparison.Ordinal))
+                            {
+                                    // Priority 5 (safe fallback): only auto-map when there is exactly one
+                                    // data column; otherwise keep the original value to avoid random
+                                    // cross-column assignment.
+                                    if (row.Count == 1)
+                                    {
+                                        var selectedKey = row.Keys.First();
+                                        substitutedValue = row[selectedKey] ?? string.Empty;
+                                        metadata["ParameterName"] = selectedKey;
+                                        inputActionIndex++;
+                                    }
+                            }
+                        }
+                }
+            }
+
+                return new RecordedAction
+            {
+                ActionType = action.ActionType,
+                Locator = substitutedLocator,
+                Value = substitutedValue,
+                Description = action.Description,
+                Metadata = metadata
+            };
+        }
+
+        private static bool IsDataEntryAction(string actionType)
+        {
+            return actionType == "type" || actionType == "fill" || actionType == "input" || actionType == "select";
+        }
+
+            /// <summary>
+            /// Attempts to find the best-matching column name from the row by comparing normalised
+            /// column names against the text fragments extracted from a CSS selector or XPath.
+            ///
+            /// Matching precedence (highest → lowest):
+            ///   1. Exact normalised match: locator contains the normalised column name as a whole token
+            ///   2. Partial match: normalised column name is a substring of any locator token, or vice-versa
+            ///
+            /// Examples:
+            ///   column "username"  — locator "#username"              → token "username"  → exact match
+            ///   column "email"     — locator "[name=userEmail]"        → token "useremail" → partial match ("email" in "useremail")
+            ///   column "firstName" — locator "[data-testid=firstName]" → token "firstname" → exact match
+            ///   column "password"  — locator "input[type=password]"    → token "password"  → exact match
+            /// </summary>
+            private static string? FindBestColumnMatch(string locator, Dictionary<string, string> row)
+            {
+                if (string.IsNullOrWhiteSpace(locator) || row.Count == 0)
+                    return null;
+
+                // Extract meaningful tokens from the locator by removing CSS/XPath punctuation.
+                // "#userEmail" → "userEmail", "[name=first_name]" → "first_name", etc.
+                var tokenPattern = Regex.Matches(locator, @"[a-zA-Z][a-zA-Z0-9_\-]*");
+                var locatorTokens = tokenPattern
+                    .Cast<Match>()
+                    .Select(m => Normalize(m.Value))
+                    .Where(t => t.Length > 1)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                // Skip noise tokens that appear in almost every locator
+                var noise = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "input", "button", "select", "textarea", "form", "div", "span",
+                    "class", "id", "type", "name", "value", "aria", "label", "data",
+                    "testid", "test", "qa", "placeholder", "text", "nth", "child"
+                };
+
+                string? bestKey = null;
+                int bestScore = 0;
+
+                foreach (var col in row.Keys)
+                {
+                    var colNorm = Normalize(col);
+                    if (string.IsNullOrWhiteSpace(colNorm) || noise.Contains(colNorm))
+                        continue;
+
+                    int score = 0;
+
+                    // Score 3: a locator token exactly equals the normalised column name
+                    if (locatorTokens.Contains(colNorm))
+                    {
+                        score = 3;
+                    }
+                    else
+                    {
+                        foreach (var token in locatorTokens)
+                        {
+                            if (noise.Contains(token)) continue;
+
+                            // Score 2: column name is a substring of a locator token or vice-versa
+                            if (token.Contains(colNorm, StringComparison.OrdinalIgnoreCase) ||
+                                colNorm.Contains(token, StringComparison.OrdinalIgnoreCase))
+                            {
+                                score = Math.Max(score, 2);
+                            }
+                        }
+                    }
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestKey = col;
+                    }
+                }
+
+                // Only accept a match with a meaningful score
+                return bestScore >= 2 ? bestKey : null;
+            }
+
+            /// <summary>
+            /// Normalise a name/token to a lowercase, separator-free form for fuzzy comparison.
+            /// E.g. "first_name" → "firstname", "userEmail" → "useremail"
+            /// </summary>
+            private static string Normalize(string s)
+                => Regex.Replace(s, @"[-_\s]", string.Empty).ToLowerInvariant();
+
+        private static bool TryGetRowValue(Dictionary<string, string> row, string key, out string value)
+        {
+            value = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(key) || row.Count == 0)
+                return false;
+
+            if (row.TryGetValue(key, out var directValue))
+            {
+                value = directValue;
+                return true;
+            }
+
+            var caseInsensitive = row.FirstOrDefault(kv => string.Equals(kv.Key, key, StringComparison.OrdinalIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(caseInsensitive.Key))
+            {
+                value = caseInsensitive.Value;
+                return true;
+            }
+
+            return false;
         }
 
         private static string FormatRow(Dictionary<string, string> row)

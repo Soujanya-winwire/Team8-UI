@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Agentic AI - Zero-Code Test Designer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            min-height: calc(100vh - 140px);
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 1px solid #e5e7eb;
+            padding: 20px;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .action-list {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f9fafb;
+        }
+
+        .action-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .action-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-type {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .action-details {
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-preview {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .scenario-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .scenario-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .scenario-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>?? Zero-Code Test Designer</h1>
+            <p>Create and manage automated tests without writing code</p>
+        </div>
+
+        <div class='content'>
+            <div class='sidebar'>
+                <div class='form-group'>
+                    <label>?? Quick Actions</label>
+                    <button class='btn btn-primary' style='width: 100%; margin-bottom: 10px;' onclick='showTab("create")'>
+                        ? Create New Test
+                    </button>
+                    <button class='btn btn-success' style='width: 100%; margin-bottom: 10px;' onclick='startRecording()'>
+                        ?? Record Test
+                    </button>
+                    <button class='btn btn-secondary' style='width: 100%; margin-bottom: 10px;' onclick='showTab("scenarios")'>
+                        ?? View Scenarios
+                    </button>
+                    <button class='btn btn-secondary' style='width: 100%;' onclick='showTab("config")'>
+                        ?? Configuration
+                    </button>
+                </div>
+
+                <div class='form-group' style='margin-top: 30px;'>
+                    <label>?? Statistics</label>
+                    <div style='background: white; padding: 15px; border-radius: 8px;'>
+                        <div style='margin-bottom: 10px;'>
+                            <strong>Total Scenarios:</strong> <span id='totalScenarios'>0</span>
+                        </div>
+                        <div style='margin-bottom: 10px;'>
+                            <strong>Modules:</strong> <span id='totalModules'>0</span>
+                        </div>
+                        <div>
+                            <strong>Last Updated:</strong> <span id='lastUpdated'>Never</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='main-content'>
+                <!-- Create Test Tab -->
+                <div id='create-tab' class='tab-content active'>
+                    <div class='section'>
+                        <h2>Create New Test Scenario</h2>
+                        
+                        <div class='grid-2'>
+                            <div class='form-group'>
+                                <label>Scenario Name *</label>
+                                <input type='text' id='scenarioName' placeholder='e.g., Login Test'>
+                            </div>
+                            <div class='form-group'>
+                                <label>Module *</label>
+                                <input type='text' id='scenarioModule' placeholder='e.g., Authentication'>
+                            </div>
+                        </div>
+
+                        <div class='form-group'>
+                            <label>Description</label>
+                            <textarea id='scenarioDescription' rows='3' placeholder='Describe what this test does...'></textarea>
+                        </div>
+
+                        <div class='form-group'>
+                            <label>Start URL *</label>
+                            <input type='text' id='startUrl' placeholder='https://example.com'>
+                        </div>
+
+                        <div class='form-group'>
+                            <label>Tags (comma-separated)</label>
+                            <input type='text' id='scenarioTags' placeholder='smoke, regression, login'>
+                        </div>
+
+                        <h3 style='margin-top: 30px; margin-bottom: 15px;'>Test Actions</h3>
+                        
+                        <div class='toolbar'>
+                            <button class='btn btn-primary btn-small' onclick='addAction("Click")'>? Click</button>
+                            <button class='btn btn-primary btn-small' onclick='addAction("Type")'>? Type</button>
+                            <button class='btn btn-primary btn-small' onclick='addAction("Navigate")'>? Navigate</button>
+                            <button class='btn btn-primary btn-small' onclick='addAction("Wait")'>? Wait</button>
+                            <button class='btn btn-primary btn-small' onclick='addAction("WaitForElement")'>? Wait For Element</button>
+                        </div>
+
+                        <div id='actionsList' class='action-list'></div>
+
+                        <h3 style='margin-top: 30px; margin-bottom: 15px;'>Assertions</h3>
+                        
+                        <div class='toolbar'>
+                            <button class='btn btn-success btn-small' onclick='addAssertion("ElementVisible")'>? Element Visible</button>
+                            <button class='btn btn-success btn-small' onclick='addAssertion("TextEquals")'>? Text Equals</button>
+                            <button class='btn btn-success btn-small' onclick='addAssertion("TextContains")'>? Text Contains</button>
+                            <button class='btn btn-success btn-small' onclick='addAssertion("UrlContains")'>? URL Contains</button>
+                        </div>
+
+                        <div id='assertionsList' class='action-list'></div>
+
+                        <div class='toolbar' style='margin-top: 30px;'>
+                            <button class='btn btn-success' onclick='saveScenario()'>?? Save Scenario</button>
+                            <button class='btn btn-primary' onclick='previewCode()'>??? Preview Code</button>
+                            <button class='btn btn-secondary' onclick='clearForm()'>??? Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenarios Tab -->
+                <div id='scenarios-tab' class='tab-content'>
+                    <div class='section'>
+                        <h2>Test Scenarios</h2>
+                        <div class='toolbar'>
+                            <input type='text' id='searchScenarios' placeholder='?? Search scenarios...' style='flex: 1; max-width: 400px;'>
+                            <button class='btn btn-primary' onclick='loadScenarios()'>?? Refresh</button>
+                        </div>
+                        <div id='scenariosList'></div>
+                    </div>
+                </div>
+
+                <!-- Configuration Tab -->
+                <div id='config-tab' class='tab-content'>
+                    <div class='section'>
+                        <h2>Framework Configuration</h2>
+                        
+                        <div class='alert alert-info'>
+                            <strong>?? Configuration Guide:</strong> Update these settings to control how tests execute. 
+                            Changes are saved to <code>Configuration/frameworkConfig.json</code>
+                        </div>
+
+                        <div class='grid-2'>
+                            <div class='form-group'>
+                                <label>Automation Framework</label>
+                                <select id='configFramework'>
+                                    <option value='Playwright'>Playwright</option>
+                                    <option value='Selenium'>Selenium</option>
+                                </select>
+                            </div>
+
+                            <div class='form-group'>
+                                <label>Browser</label>
+                                <select id='configBrowser'>
+                                    <option value='Chrome'>Chrome</option>
+                                    <option value='Firefox'>Firefox</option>
+                                    <option value='Edge'>Edge</option>
+                                    <option value='Safari'>Safari</option>
+                                </select>
+                            </div>
+
+                            <div class='form-group'>
+                                <label>Operating System</label>
+                                <select id='configOS'>
+                                    <option value='Windows'>Windows</option>
+                                    <option value='MacOS'>MacOS</option>
+                                    <option value='Linux'>Linux</option>
+                                </select>
+                            </div>
+
+                            <div class='form-group'>
+                                <label>Environment</label>
+                                <select id='configEnvironment'>
+                                    <option value='Dev'>Dev</option>
+                                    <option value='QA'>QA</option>
+                                    <option value='UAT'>UAT</option>
+                                    <option value='Staging'>Staging</option>
+                                    <option value='Prod'>Prod</option>
+                                </select>
+                            </div>
+
+                            <div class='form-group'>
+                                <label>Execution Mode</label>
+                                <select id='configExecutionMode'>
+                                    <option value='Sequential'>Sequential</option>
+                                    <option value='Parallel'>Parallel</option>
+                                </select>
+                            </div>
+
+                            <div class='form-group'>
+                                <label>Parallel Workers</label>
+                                <input type='number' id='configParallelWorkers' value='4' min='1' max='20'>
+                            </div>
+                        </div>
+
+                        <div class='grid-2'>
+                            <div class='form-group'>
+                                <label style='display: flex; align-items: center; gap: 10px;'>
+                                    <input type='checkbox' id='configHeadless'> Headless Mode
+                                </label>
+                            </div>
+
+                            <div class='form-group'>
+                                <label style='display: flex; align-items: center; gap: 10px;'>
+                                    <input type='checkbox' id='configEnableVideo' checked> Enable Video Recording
+                                </label>
+                            </div>
+
+                            <div class='form-group'>
+                                <label style='display: flex; align-items: center; gap: 10px;'>
+                                    <input type='checkbox' id='configEnableScreenshots' checked> Enable Screenshots
+                                </label>
+                            </div>
+
+                            <div class='form-group'>
+                                <label style='display: flex; align-items: center; gap: 10px;'>
+                                    <input type='checkbox' id='configSelfHealing' checked> Enable Self-Healing
+                                </label>
+                            </div>
+                        </div>
+
+                        <h3 style='margin-top: 30px; margin-bottom: 15px;'>Environment URLs</h3>
+                        
+                        <div class='grid-2'>
+                            <div class='form-group'>
+                                <label>Dev Base URL</label>
+                                <input type='text' id='devBaseUrl' placeholder='https://dev.example.com'>
+                            </div>
+                            <div class='form-group'>
+                                <label>Dev API URL</label>
+                                <input type='text' id='devApiUrl' placeholder='https://api-dev.example.com'>
+                            </div>
+                            <div class='form-group'>
+                                <label>QA Base URL</label>
+                                <input type='text' id='qaBaseUrl' placeholder='https://qa.example.com'>
+                            </div>
+                            <div class='form-group'>
+                                <label>QA API URL</label>
+                                <input type='text' id='qaApiUrl' placeholder='https://api-qa.example.com'>
+                            </div>
+                            <div class='form-group'>
+                                <label>Prod Base URL</label>
+                                <input type='text' id='prodBaseUrl' placeholder='https://www.example.com'>
+                            </div>
+                            <div class='form-group'>
+                                <label>Prod API URL</label>
+                                <input type='text' id='prodApiUrl' placeholder='https://api.example.com'>
+                            </div>
+                        </div>
+
+                        <button class='btn btn-success' onclick='saveConfiguration()'>?? Save Configuration</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let actions = [];
+        let assertions = [];
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        function addAction(actionType) {
+            const locator = prompt(`Enter locator for ${actionType}:`, '#id or //xpath');
+            if (!locator) return;
+
+            let value = null;
+            if (actionType === 'Type') {
+                value = prompt('Enter text to type:');
+            } else if (actionType === 'Navigate') {
+                value = prompt('Enter URL to navigate to:');
+            } else if (actionType === 'Wait' || actionType === 'WaitForElement') {
+                value = prompt('Enter timeout in seconds:', '5');
+            }
+
+            const action = {
+                actionType: actionType,
+                locator: locator,
+                value: value,
+                description: `${actionType} on ${locator}`,
+                timestamp: actions.length
+            };
+
+            actions.push(action);
+            renderActions();
+        }
+
+        function renderActions() {
+            const list = document.getElementById('actionsList');
+            list.innerHTML = '';
+
+            actions.forEach((action, index) => {
+                const div = document.createElement('div');
+                div.className = 'action-item';
+                div.innerHTML = `
+                    <div>
+                        <div class='action-type'>${action.actionType}</div>
+                        <div class='action-details'>Locator: ${action.locator}${action.value ? ' | Value: ' + action.value : ''}</div>
+                    </div>
+                    <div class='action-buttons'>
+                        <button class='btn btn-secondary btn-small' onclick='moveAction(${index}, -1)'>?</button>
+                        <button class='btn btn-secondary btn-small' onclick='moveAction(${index}, 1)'>?</button>
+                        <button class='btn btn-danger btn-small' onclick='removeAction(${index})'>?</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addAssertion(assertionType) {
+            const locator = prompt(`Enter locator for ${assertionType}:`, '#id or //xpath');
+            if (!locator) return;
+
+            let expectedValue = null;
+            if (assertionType !== 'ElementVisible') {
+                expectedValue = prompt('Enter expected value:');
+            }
+
+            const assertion = {
+                type: assertionType,
+                locator: locator,
+                expectedValue: expectedValue,
+                description: `Verify ${assertionType}`
+            };
+
+            assertions.push(assertion);
+            renderAssertions();
+        }
+
+        function renderAssertions() {
+            const list = document.getElementById('assertionsList');
+            list.innerHTML = '';
+
+            assertions.forEach((assertion, index) => {
+                const div = document.createElement('div');
+                div.className = 'action-item';
+                div.innerHTML = `
+                    <div>
+                        <div class='action-type'>${assertion.type}</div>
+                        <div class='action-details'>Locator: ${assertion.locator}${assertion.expectedValue ? ' | Expected: ' + assertion.expectedValue : ''}</div>
+                    </div>
+                    <div class='action-buttons'>
+                        <button class='btn btn-danger btn-small' onclick='removeAssertion(${index})'>?</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function moveAction(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= actions.length) return;
+
+            [actions[index], actions[newIndex]] = [actions[newIndex], actions[index]];
+            actions.forEach((a, i) => a.timestamp = i);
+            renderActions();
+        }
+
+        function removeAction(index) {
+            actions.splice(index, 1);
+            renderActions();
+        }
+
+        function removeAssertion(index) {
+            assertions.splice(index, 1);
+            renderAssertions();
+        }
+
+        function saveScenario() {
+            const scenario = {
+                name: document.getElementById('scenarioName').value,
+                module: document.getElementById('scenarioModule').value || 'Default',
+                description: document.getElementById('scenarioDescription').value,
+                startUrl: document.getElementById('startUrl').value,
+                tags: document.getElementById('scenarioTags').value.split(',').map(t => t.trim()).filter(t => t),
+                actions: actions,
+                assertions: assertions
+            };
+
+            if (!scenario.name || !scenario.startUrl) {
+                alert('Please fill in required fields: Scenario Name and Start URL');
+                return;
+            }
+
+            const json = JSON.stringify(scenario, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${scenario.module}/${scenario.name.replace(/[^a-z0-9]/gi, '_')}.json`;
+            a.click();
+
+            alert('? Scenario saved! Copy the downloaded file to: TestScenarios/' + scenario.module + '/');
+            clearForm();
+        }
+
+        function clearForm() {
+            document.getElementById('scenarioName').value = '';
+            document.getElementById('scenarioModule').value = '';
+            document.getElementById('scenarioDescription').value = '';
+            document.getElementById('startUrl').value = '';
+            document.getElementById('scenarioTags').value = '';
+            actions = [];
+            assertions = [];
+            renderActions();
+            renderAssertions();
+        }
+
+        function previewCode() {
+            const scenario = {
+                name: document.getElementById('scenarioName').value,
+                actions: actions,
+                assertions: assertions
+            };
+
+            const code = generateCSharpCode(scenario);
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            modal.innerHTML = `
+                <div style='background: white; padding: 40px; border-radius: 16px; max-width: 800px; max-height: 80vh; overflow-y: auto;'>
+                    <h2 style='margin-bottom: 20px;'>Generated C# Code Preview</h2>
+                    <div class='code-preview'>${escapeHtml(code)}</div>
+                    <button class='btn btn-secondary' style='margin-top: 20px;' onclick='this.parentElement.parentElement.remove()'>Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function generateCSharpCode(scenario) {
+            let code = `[Test]\n`;
+            code += `[TestModule("${scenario.module || 'Default'}")]\n`;
+            code += `public async Task ${scenario.name.replace(/[^a-z0-9]/gi, '_')}()\n{\n`;
+            
+            scenario.actions.forEach(action => {
+                switch(action.actionType) {
+                    case 'Click':
+                        code += `    await Driver.ClickAsync("${action.locator}");\n`;
+                        break;
+                    case 'Type':
+                        code += `    await Driver.TypeAsync("${action.locator}", "${action.value}");\n`;
+                        break;
+                    case 'Navigate':
+                        code += `    await Driver.NavigateAsync("${action.value}");\n`;
+                        break;
+                    case 'Wait':
+                        code += `    await Task.Delay(${action.value}000);\n`;
+                        break;
+                }
+            });
+
+            scenario.assertions.forEach(assertion => {
+                switch(assertion.type) {
+                    case 'ElementVisible':
+                        code += `    var element = await Driver.FindElementAsync("${assertion.locator}");\n`;
+                        code += `    Assert.IsTrue(await element.IsVisibleAsync());\n`;
+                        break;
+                    case 'TextEquals':
+                        code += `    var text = await Driver.GetTextAsync("${assertion.locator}");\n`;
+                        code += `    Assert.AreEqual("${assertion.expectedValue}", text);\n`;
+                        break;
+                }
+            });
+
+            code += `}\n`;
+            return code;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+        }
+
+        function startRecording() {
+            alert('?? Test Recording Feature\n\nTo record a test:\n\n1. Run: dotnet run --project tools/TestRecorder\n2. The browser will open in recording mode\n3. Perform your test actions\n4. Close the browser when done\n5. The test will be saved automatically');
+        }
+
+        function loadScenarios() {
+            // This would connect to a backend API to load scenarios
+            document.getElementById('scenariosList').innerHTML = `
+                <div class='alert alert-info'>
+                    <strong>?? To view your scenarios:</strong><br>
+                    Scenarios are stored in <code>TestScenarios/</code> directory organized by module.
+                </div>
+            `;
+        }
+
+        function saveConfiguration() {
+            const config = {
+                automationFramework: document.getElementById('configFramework').value,
+                browser: document.getElementById('configBrowser').value,
+                operatingSystem: document.getElementById('configOS').value,
+                environment: document.getElementById('configEnvironment').value,
+                executionMode: document.getElementById('configExecutionMode').value,
+                parallelWorkers: parseInt(document.getElementById('configParallelWorkers').value),
+                headless: document.getElementById('configHeadless').checked,
+                enableVideo: document.getElementById('configEnableVideo').checked,
+                enableScreenshots: document.getElementById('configEnableScreenshots').checked,
+                enableSelfHealing: document.getElementById('configSelfHealing').checked
+            };
+
+            const json = JSON.stringify(config, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'frameworkConfig.json';
+            a.click();
+
+            alert('? Configuration saved! Copy the downloaded file to: Configuration/frameworkConfig.json');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderActions();
+            renderAssertions();
+            loadScenarios();
+        });
+    </script>
+</body>
+</html>

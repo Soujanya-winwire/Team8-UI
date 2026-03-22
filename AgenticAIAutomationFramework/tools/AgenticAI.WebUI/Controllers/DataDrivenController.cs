@@ -140,6 +140,173 @@ namespace AgenticAI.WebUI.Controllers
         }
 
         /// <summary>
+        /// Execute a test scenario in parallel for each data row (bounded concurrency)
+        /// </summary>
+        [HttpPost("execute-parallel")]
+        public async Task<IActionResult> ExecuteParallel([FromBody] DataDrivenParallelExecuteRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.ScenarioName))
+                    return BadRequest(new { success = false, error = "ScenarioName is required." });
+                if (string.IsNullOrWhiteSpace(request.Module))
+                    return BadRequest(new { success = false, error = "Module is required." });
+                if (string.IsNullOrWhiteSpace(request.DataContent))
+                    return BadRequest(new { success = false, error = "DataContent is required." });
+
+                var manager = new ScenarioManager();
+                var scenario = manager.LoadScenario(request.ScenarioName, request.Module);
+
+                if (scenario == null)
+                    return NotFound(new
+                    {
+                        success = false,
+                        error = $"Scenario '{request.ScenarioName}' not found in module '{request.Module}'"
+                    });
+
+                var dataSet = ParseDataSet(request.DataFormat, request.DataContent);
+                if (dataSet.RowCount == 0)
+                    return BadRequest(new { success = false, error = "Data set contains no rows." });
+
+                var concurrency = Math.Max(1, Math.Min(request.Concurrency, 10));
+                var semaphore = new SemaphoreSlim(concurrency, concurrency);
+                var results = new List<DataDrivenResult>();
+                var sync = new object();
+
+                Log.Information("DataDriven parallel execute: scenario={Scenario}, rows={Rows}, concurrency={Concurrency}", request.ScenarioName, dataSet.RowCount, concurrency);
+
+                var tasks = dataSet.Rows.Select((row, rowIndex) => Task.Run(async () =>
+                {
+                    await semaphore.WaitAsync();
+                    try
+                    {
+                        var rowSet = new DataTestSet
+                        {
+                            Columns = new List<string>(dataSet.Columns),
+                            Rows = new List<Dictionary<string, string>> { new Dictionary<string, string>(row) }
+                        };
+
+                        var runner = new DataDrivenRunner(async () =>
+                        {
+                            var driver = await WebDriverFactory.CreateDriverAsync();
+                            return (IWebDriver)driver;
+                        });
+
+                        var rowResults = await runner.RunAsync(scenario, rowSet);
+                        var rowResult = rowResults.FirstOrDefault() ?? new DataDrivenResult
+                        {
+                            RowIndex = rowIndex,
+                            DataRow = new Dictionary<string, string>(row),
+                            Result = new Core.Models.TestCaseResult
+                            {
+                                TestCaseId = scenario.ScenarioId,
+                                TestCaseName = scenario.Name,
+                                Module = scenario.Module,
+                                Tags = scenario.Tags,
+                                StartTime = DateTime.Now,
+                                EndTime = DateTime.Now,
+                                Status = Core.Enums.TestStatus.Failed,
+                                ErrorMessage = "Parallel execution returned no result for row."
+                            }
+                        };
+
+                        rowResult.RowIndex = rowIndex;
+                        rowResult.DataRow = new Dictionary<string, string>(row);
+
+                        lock (sync)
+                        {
+                            results.Add(rowResult);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var failureResult = new DataDrivenResult
+                        {
+                            RowIndex = rowIndex,
+                            DataRow = new Dictionary<string, string>(row),
+                            Result = new Core.Models.TestCaseResult
+                            {
+                                TestCaseId = scenario.ScenarioId,
+                                TestCaseName = scenario.Name,
+                                Module = scenario.Module,
+                                Tags = scenario.Tags,
+                                StartTime = DateTime.Now,
+                                EndTime = DateTime.Now,
+                                Status = Core.Enums.TestStatus.Failed,
+                                ErrorMessage = ex.Message,
+                                StackTrace = ex.StackTrace
+                            }
+                        };
+
+                        lock (sync)
+                        {
+                            results.Add(failureResult);
+                        }
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }));
+
+                await Task.WhenAll(tasks);
+
+                var orderedResults = results.OrderBy(r => r.RowIndex).ToList();
+
+                await SaveDataDrivenResultsToHistory(orderedResults, scenario, new DataDrivenExecuteRequest
+                {
+                    ScenarioName = request.ScenarioName,
+                    Module = request.Module,
+                    DataFormat = request.DataFormat,
+                    DataContent = request.DataContent
+                });
+
+                var resultDtos = orderedResults.Select(r => new
+                {
+                    rowIndex = r.RowIndex,
+                    rowNumber = r.RowIndex + 1,
+                    dataRow = r.DataRow,
+                    testCaseName = r.Result.TestCaseName,
+                    status = r.Result.Status.ToString(),
+                    startTime = r.Result.StartTime.ToString("o"),
+                    endTime = r.Result.EndTime.ToString("o"),
+                    duration = r.Result.EndTime != default && r.Result.StartTime != default
+                        ? (r.Result.EndTime - r.Result.StartTime).TotalSeconds.ToString("F2") + "s"
+                        : "0s",
+                    errorMessage = r.Result.ErrorMessage,
+                    steps = r.Result.Steps.Select(s => new
+                    {
+                        stepName = s.StepName,
+                        description = s.Description,
+                        status = s.Status.ToString(),
+                        errorMessage = s.ErrorMessage,
+                        screenshotPath = s.ScreenshotPath
+                    }).ToList()
+                }).ToList();
+
+                int passed = orderedResults.Count(r => r.Result.Status == Core.Enums.TestStatus.Passed);
+                int failed = orderedResults.Count(r => r.Result.Status != Core.Enums.TestStatus.Passed);
+
+                return Ok(new
+                {
+                    success = true,
+                    scenarioName = request.ScenarioName,
+                    module = request.Module,
+                    totalRows = dataSet.RowCount,
+                    concurrency,
+                    passed,
+                    failed,
+                    results = resultDtos
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "DataDriven parallel execute error");
+                return BadRequest(new { success = false, error = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Save each data-driven test result to execution history
         /// </summary>
         private async Task SaveDataDrivenResultsToHistory(
@@ -175,9 +342,8 @@ namespace AgenticAI.WebUI.Controllers
                 
                 foreach (var result in results)
                 {
-                    // Format the test name to include row number and data
-                    var dataInfo = string.Join(", ", result.DataRow.Take(2).Select(kv => $"{kv.Key}={kv.Value}"));
-                    var testName = $"{scenario.Name} [Row {result.RowIndex + 1}: {dataInfo}]";
+                    // Professional data-driven naming: include DDT tag and iteration number
+                    var testName = $"{scenario.Name} [DDT • Iteration {result.RowIndex + 1}]";
                     
                     // Calculate duration
                     var durationSeconds = 0.0;
@@ -312,5 +478,15 @@ namespace AgenticAI.WebUI.Controllers
         /// <summary>CSV or JSON</summary>
         public string DataFormat { get; set; } = "CSV";
         public string DataContent { get; set; } = string.Empty;
+    }
+
+    public class DataDrivenParallelExecuteRequest
+    {
+        public string ScenarioName { get; set; } = string.Empty;
+        public string Module { get; set; } = string.Empty;
+        public string DataFormat { get; set; } = "CSV";
+        public string DataContent { get; set; } = string.Empty;
+        public int Concurrency { get; set; } = 3;
+        public string Strategy { get; set; } = "run-all";
     }
 }

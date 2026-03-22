@@ -1,3 +1,102 @@
+// AI Test Generator View Loader
+function loadAITestGenView() {
+    const view = document.getElementById('aitestgen-view');
+    view.innerHTML = `
+        <div class="header">
+            <h2><i class="fas fa-robot"></i> AI Test Generator</h2>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Generate Tests from URL</div>
+            </div>
+            <div class="form-group">
+                <label for="ai-url-input">Website URL</label>
+                <input type="text" class="form-control" id="ai-url-input" placeholder="Enter website URL...">
+            </div>
+            <button class="btn btn-primary" id="ai-analyze-btn"><i class="fas fa-search"></i> Analyze</button>
+            <button class="btn btn-secondary" id="ai-generate-btn" disabled><i class="fas fa-magic"></i> Generate Test Cases</button>
+            <div id="ai-progress-loader" style="display:none;margin-top:10px;">
+                <div class="spinner"></div>
+                <span>Analyzing...</span>
+            </div>
+            <div id="ai-results-panel" style="margin-top:20px;"></div>
+        </div>
+    `;
+
+    // Event listeners and backend integration
+    const analyzeBtn = document.getElementById('ai-analyze-btn');
+    const generateBtn = document.getElementById('ai-generate-btn');
+    const urlInput = document.getElementById('ai-url-input');
+    const loader = document.getElementById('ai-progress-loader');
+    const resultsPanel = document.getElementById('ai-results-panel');
+
+    let extractedElements = [];
+
+    analyzeBtn.onclick = async () => {
+        const url = urlInput.value.trim();
+        if (!url) {
+            showWarning('Please enter a website URL.');
+            return;
+        }
+        loader.style.display = 'block';
+        resultsPanel.innerHTML = '';
+        generateBtn.disabled = true;
+        try {
+            const response = await fetch('http://localhost:8000/aitestgen/analyze-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+            const data = await response.json();
+            loader.style.display = 'none';
+            if (data.success && data.elements) {
+                extractedElements = data.elements;
+                resultsPanel.innerHTML = `<pre>${JSON.stringify(data.elements, null, 2)}</pre>`;
+                generateBtn.disabled = false;
+            } else {
+                resultsPanel.innerHTML = '<span class="text-danger">Failed to analyze URL.</span>';
+            }
+        } catch (err) {
+            loader.style.display = 'none';
+            resultsPanel.innerHTML = '<span class="text-danger">Error analyzing URL.</span>';
+        }
+    };
+
+    generateBtn.onclick = async () => {
+        loader.style.display = 'block';
+        resultsPanel.innerHTML = '';
+        try {
+            const response = await fetch('http://localhost:8000/aitestgen/generate-tests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ elements: extractedElements })
+            });
+            const data = await response.json();
+            loader.style.display = 'none';
+            if (data.success && data.test_cases) {
+                // Format test cases in a friendly way
+                let html = '';
+                data.test_cases.forEach(tc => {
+                    html += `<div class="test-case-card">
+                        <h5>${tc.name || tc.id}</h5>
+                        <ul>`;
+                    tc.steps.forEach(step => {
+                        html += `<li>${step}</li>`;
+                    });
+                    html += `</ul>
+                        <div><b>Expected:</b> ${tc.expected}</div>
+                    </div><hr/>`;
+                });
+                resultsPanel.innerHTML = html;
+            } else {
+                resultsPanel.innerHTML = '<span class="text-danger">Failed to generate test cases.</span>';
+            }
+        } catch (err) {
+            loader.style.display = 'none';
+            resultsPanel.innerHTML = '<span class="text-danger">Error generating test cases.</span>';
+        }
+    };
+}
 // API Configuration
 const API_BASE_URL = '/api';
 
@@ -26,8 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 // SignalR Initialization
 async function initializeSignalR() {
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("/testExecutionHub")
-        .withAutomaticReconnect()
+        .withUrl("/testExecutionHub", {
+            transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents | signalR.HttpTransportType.LongPolling
+        })
+        .withAutomaticReconnect([0, 2000, 5000, 10000])
+        .configureLogging(signalR.LogLevel.None)
         .build();
 
     connection.on("ReceiveRecordedAction", (action) => {
@@ -48,11 +150,30 @@ async function initializeSignalR() {
         displayTestResult(result);
     });
 
+    connection.onreconnecting(() => {
+        console.warn('SignalR reconnecting...');
+    });
+
+    connection.onreconnected(() => {
+        console.log('? SignalR reconnected');
+    });
+
+    connection.onclose(() => {
+        console.warn('SignalR disconnected. Retrying in background...');
+        window.setTimeout(() => {
+            if (connection && connection.state === signalR.HubConnectionState.Disconnected) {
+                connection.start().catch(() => {
+                    console.warn('SignalR retry failed. UI continues without real-time updates.');
+                });
+            }
+        }, 3000);
+    });
+
     try {
         await connection.start();
         console.log("? SignalR Connected");
     } catch (err) {
-        console.error("? SignalR Connection Error:", err);
+        console.warn("SignalR not connected at startup:", err?.message || err);
         showWarning('Real-time updates unavailable. Some features may not work.');
     }
 }
@@ -65,7 +186,19 @@ function showView(viewName) {
     });
 
     // Show selected view
-    document.getElementById(`${viewName}-view`).classList.remove('hidden');
+    const targetView = document.getElementById(`${viewName}-view`);
+    if (!targetView) {
+        console.error(`View not found: ${viewName}-view`);
+        const dashboardView = document.getElementById('dashboard-view');
+        if (dashboardView) {
+            dashboardView.classList.remove('hidden');
+            loadDashboard();
+        }
+        showError(`View '${viewName}' is not available.`);
+        return;
+    }
+
+    targetView.classList.remove('hidden');
 
     // Update active nav item (only if event is available)
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -90,35 +223,49 @@ function showView(viewName) {
 
     currentView = viewName;
 
-    // Load view-specific content
-    switch (viewName) {
-        case 'dashboard':
-            loadDashboard();
-            break;
-        case 'record':
-            loadRecordView();
-            break;
-        case 'scenarios':
-            loadScenariosView();
-            break;
-        case 'create':
-            loadCreateView();
-            break;
-        case 'execute':
-            loadExecuteView();
-            break;
-        case 'results':
-            loadResultsView();
-            break;
-        case 'configuration':
-            loadConfigurationView();
-            break;
-        case 'cicd':
-            loadCICDView();
-            break;
-        case 'documentation':
-            loadDocumentationView();
-            break;
+    try {
+        // Load view-specific content
+        switch (viewName) {
+            case 'dashboard':
+                loadDashboard();
+                break;
+            case 'record':
+                loadRecordView();
+                break;
+            case 'scenarios':
+                loadScenariosView();
+                break;
+            case 'create':
+                loadCreateView();
+                break;
+            case 'aitestgen':
+                loadAITestGenView();
+                break;
+            case 'execute':
+                loadExecuteView();
+                break;
+            case 'results':
+                loadResultsView();
+                break;
+            case 'configuration':
+                loadConfigurationView();
+                break;
+            case 'cicd':
+                loadCICDView();
+                break;
+            case 'datadriven':
+                initDataDrivenTestingView();
+                break;
+            case 'export':
+                loadExportView();
+                break;
+            case 'documentation':
+                loadDocumentationView();
+                break;
+        }
+    } catch (error) {
+        console.error(`Failed to load view '${viewName}':`, error);
+        showError(`Failed to load ${viewName} view: ${error.message}`);
     }
 }
 
@@ -269,14 +416,10 @@ function displayTestResultsPieChart(stats) {
             labels: labels,
             datasets: [{
                 data: chartData,
-                backgroundColor: colors,
-                borderWidth: 2,
-                borderColor: '#ffffff'
+                backgroundColor: colors
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: true,
             plugins: {
                 legend: {
                     display: false
@@ -976,6 +1119,7 @@ function clearCreateForm() {
 let currentActions = [];
 let currentAssertions = [];
 let isRecording = false;
+let exportScenarioCache = [];
 
 // Record Test View (NEW)
 async function loadRecordView() {
@@ -996,71 +1140,51 @@ async function loadRecordView() {
             <h2><i class="fas fa-video"></i> Interactive Test Recorder</h2>
         </div>
 
-        <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15)); border: 2px solid var(--primary-color); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);">
-            <div style="text-align: center; padding: 25px;">
-                <i class="fas fa-circle-dot" style="font-size: 3.5em; color: var(--primary-color); margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(102, 126, 234, 0.3));"></i>
-                <h3 style="color: #1f2937; margin-bottom: 15px; font-size: 1.6em; font-weight: 700;">True Record & Playback Experience</h3>
-                <p style="color: #374151; line-height: 1.8; font-size: 1.05em; font-weight: 500;">
-                    Simply interact with your application in the browser - all actions are automatically recorded!
-                    No need to manually enter XPath or element IDs.
-                </p>
-            </div>
-        </div>
-
-        <!-- Interactive Test Recorder -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title" style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-video" style="color: var(--primary-color);"></i>
+                    <i class="fas fa-circle-dot" style="color: var(--primary-color);"></i>
                     <span>Record Your Test</span>
                 </div>
             </div>
 
-            <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.08)); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid var(--success-color); box-shadow: 0 4px 8px rgba(16, 185, 129, 0.15);">
-                <strong style="color: #047857; font-size: 1.1em; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                    <i class="fas fa-lightbulb" style="color: #10b981;"></i> How It Works:
-                </strong>
-                <ul style="margin-top: 10px; padding-left: 30px; line-height: 2; color: #1f2937; font-weight: 500;">
-                    <li>Browser opens automatically for you</li>
-                    <li>Interact with your application naturally</li>
-                    <li>All actions are captured automatically</li>
-                    <li>Save complete test scenario when done</li>
-                </ul>
+            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
+                Enter scenario details, click Start Recording, perform actions in the opened browser, then click Stop Recording to save your scenario.
             </div>
 
             <form id="assisted-record-form" onsubmit="startAssistedRecording(event)">
-                <div class="grid-2">
-                    <div class="form-group">
+                <div class="grid-2" style="gap: 10px;">
+                    <div class="form-group" style="margin-bottom: 10px;">
                         <label>Scenario Name *</label>
                         <input type="text" class="form-control" id="record-name" 
                                placeholder="e.g., Login_Test" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 10px;">
                         <label>Module *</label>
                         <input type="text" class="form-control" id="record-module" 
                                placeholder="e.g., Authentication" required>
                     </div>
                 </div>
-                
-                <div class="form-group">
+
+                <div class="form-group" style="margin-bottom: 10px;">
                     <label>Description</label>
-                    <textarea class="form-control" id="record-description" 
+                    <textarea class="form-control" id="record-description" rows="2"
                               placeholder="What does this test do?"></textarea>
                 </div>
-                
-                <div class="form-group">
+
+                <div class="form-group" style="margin-bottom: 10px;">
                     <label>Start URL *</label>
                     <input type="url" class="form-control" id="record-url" 
                            placeholder="https://your-application-url.com" required>
                 </div>
-                
-                <div class="form-group">
+
+                <div class="form-group" style="margin-bottom: 12px;">
                     <label>Tags (comma-separated)</label>
                     <input type="text" class="form-control" id="record-tags" 
                            placeholder="smoke, regression">
                 </div>
 
-                <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <button type="submit" class="btn btn-success" id="start-recording-btn" ${isRecording ? 'disabled' : ''}>
                         <i class="fas fa-circle-dot"></i> Start Recording
                     </button>
@@ -1071,115 +1195,83 @@ async function loadRecordView() {
                 </div>
             </form>
 
-            <div id="recording-status" class="hidden" style="margin-top: 20px; padding: 15px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border-left: 4px solid var(--danger-color);">
+            <div id="recording-status" class="hidden" style="margin-top: 12px; padding: 12px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border-left: 4px solid var(--danger-color);">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="spinner" style="width: 20px; height: 20px; margin: 0;"></div>
-                    <strong style="color: var(--danger-color);">?? Recording in progress...</strong>
+                    <strong style="color: var(--danger-color);">Recording in progress...</strong>
                 </div>
-                <p style="margin-top: 10px; color: #6b7280;">
-                    Perform your test actions in the opened browser window. 
-                    Click "Stop Recording" when done.
+                <p style="margin-top: 8px; color: #6b7280;">
+                    Perform your test actions in the opened browser window and click Stop Recording when done.
                 </p>
             </div>
-        </div>
 
-        <!-- How It Works Card -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-lightbulb"></i> How Interactive Recording Works</div>
-            </div>
+            <div id="recording-script-tools" class="hidden" style="margin-top:12px;padding:14px;border:1px solid var(--border);border-radius:8px;background:#f8fafc;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <div style="font-weight:600;color:#1f2937;"><i class="fas fa-code"></i> Generate Scripts from Recorded Scenario</div>
+                    <span class="badge badge-info" id="recorded-scenario-badge">No scenario selected</span>
+                </div>
 
-            <div style="padding: 20px;">
-                <h4 style="color: var(--primary-color); margin-bottom: 20px;">
-                    <i class="fas fa-list-ol"></i> Simple 5-Step Process
-                </h4>
-                <ol style="line-height: 2.5; padding-left: 20px; font-size: 1.05em;">
-                    <li><strong>Fill in scenario details</strong> - Give your test a name and description</li>
-                    <li><strong>Click "Start Recording"</strong> - Browser opens automatically</li>
-                    <li><strong>Interact with your application</strong> - Click, type, navigate naturally</li>
-                    <li><strong>All actions are captured</strong> - No manual XPath or element selection needed</li>
-                    <li><strong>Click "Stop Recording"</strong> - Test scenario is saved and ready to execute!</li>
-                </ol>
-            </div>
+                <div class="grid-2" style="margin-top:10px;">
+                    <div class="form-group">
+                        <label>Framework</label>
+                        <select class="form-control" id="script-framework" onchange="updateScriptLanguageOptions()">
+                            <option value="playwright">Playwright</option>
+                            <option value="selenium">Selenium</option>
+                            <option value="cypress">Cypress</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select class="form-control" id="script-language">
+                            <option value="csharp">C#</option>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                        </select>
+                    </div>
+                </div>
 
-            <div style="margin-top: 30px; padding: 20px; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
-                <h4 style="margin-bottom: 15px;"><i class="fas fa-bullseye"></i> Why Use Interactive Recording?</h4>
-                <div class="grid-3">
-                    <div>
-                        <strong style="color: var(--primary-color);">? 10x Faster</strong>
-                        <p style="color: #6b7280; margin-top: 5px;">
-                            Record in 2 minutes vs. 30 minutes manual creation
-                        </p>
-                    </div>
-                    <div>
-                        <strong style="color: var(--primary-color);">?? No Technical Skills Needed</strong>
-                        <p style="color: #6b7280; margin-top: 5px;">
-                            Just click and type - locators generated automatically
-                        </p>
-                    </div>
-                    <div>
-                        <strong style="color: var(--primary-color);">? Accurate</strong>
-                        <p style="color: #6b7280; margin-top: 5px;">
-                            Records exactly what you do - no mistakes
-                        </p>
-                    </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary" onclick="generateRecordedScenarioScript()">
+                        <i class="fas fa-wand-magic-sparkles"></i> Generate Script
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="downloadGeneratedScript()">
+                        <i class="fas fa-download"></i> Download Script
+                    </button>
+                </div>
+
+                <div id="generated-script-panel" class="hidden" style="margin-top:10px;">
+                    <div style="font-weight:600;margin-bottom:6px;color:#334155;"><i class="fas fa-file-code"></i> Generated Test Script</div>
+                    <pre id="generated-script-content" style="max-height:220px;overflow:auto;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:6px;font-size:12px;line-height:1.4;"></pre>
+                </div>
+
+                <div id="advanced-concepts-panel" class="hidden" style="margin-top:10px;">
+                    <div style="font-weight:600;margin-bottom:6px;color:#334155;"><i class="fas fa-lightbulb"></i> Advanced Concepts & Derived Test Cases</div>
+                    <div id="advanced-concepts-content" style="display:grid;gap:8px;"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Tips Card -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-lightbulb"></i> Tips for Best Results</div>
-            </div>
-            
-            <div style="padding: 20px;">
-                <div class="grid-2">
-                    <div>
-                        <h4 style="color: var(--success-color); margin-bottom: 15px;">
-                            <i class="fas fa-check-circle"></i> Do's
-                        </h4>
-                        <ul style="line-height: 2; padding-left: 20px;">
-                            <li>Perform actions naturally and slowly</li>
-                            <li>Wait for pages to load completely</li>
-                            <li>Use clear, descriptive test names</li>
-                            <li>Group related tests in same module</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 style="color: var(--danger-color); margin-bottom: 15px;">
-                            <i class="fas fa-times-circle"></i> Don'ts
-                        </h4>
-                        <ul style="line-height: 2; padding-left: 20px;">
-                            <li>Don't click too fast - give time to record</li>
-                            <li>Don't switch tabs during recording</li>
-                            <li>Don't close browser manually</li>
-                            <li>Don't use browser extensions that interfere</li>
-                        </ul>
-                    </div>
+        <div id="recording-live-actions" class="hidden mt-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-list"></i> Recorded Actions (Live)</div>
+                    <span class="badge badge-primary" id="live-action-count">0 steps</span>
                 </div>
-            </div>
-            <div id="recording-live-actions" class="hidden mt-20">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title"><i class="fas fa-list"></i> Recorded Actions (Live)</div>
-                        <span class="badge badge-primary" id="live-action-count">0 steps</span>
-                    </div>
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px;">#</th>
-                                    <th>Action</th>
-                                    <th>Locator</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody id="live-actions-body">
-                                <!-- Actions will be added here in real-time -->
-                            </tbody>
-                        </table>
-                    </div>
+                <div style="max-height: 340px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 44px;">#</th>
+                                <th>Step</th>
+                                <th>Locator</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="live-actions-body">
+                            <!-- Actions will be added here in real-time -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1187,13 +1279,64 @@ async function loadRecordView() {
 
     // Reset live actions
     window.recordedActions = [];
+    window.liveAutoAssertions = [];
+    generatedScriptCache = null;
+    updateScriptLanguageOptions();
 }
 
 let recordedActions = [];
+let liveAutoAssertions = [];
+let lastRecordedScenario = null;
+let generatedScriptCache = null;
+
+function updateScriptLanguageOptions() {
+    const framework = document.getElementById('script-framework')?.value;
+    const languageSelect = document.getElementById('script-language');
+    if (!languageSelect) return;
+
+    let options = [];
+    if (framework === 'selenium') {
+        options = [{ value: 'csharp', label: 'C#' }];
+    } else if (framework === 'cypress') {
+        options = [
+            { value: 'javascript', label: 'JavaScript' },
+            { value: 'typescript', label: 'TypeScript' }
+        ];
+    } else {
+        options = [
+            { value: 'csharp', label: 'C#' },
+            { value: 'python', label: 'Python' },
+            { value: 'javascript', label: 'JavaScript' },
+            { value: 'typescript', label: 'TypeScript' }
+        ];
+    }
+
+    languageSelect.innerHTML = options.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+}
+
+function setRecordedScenarioForGeneration(name, module) {
+    if (!name || !module) return;
+
+    lastRecordedScenario = { name, module };
+    const badge = document.getElementById('recorded-scenario-badge');
+    if (badge) {
+        badge.textContent = `${name} (${module})`;
+    }
+
+    const toolsPanel = document.getElementById('recording-script-tools');
+    if (toolsPanel) {
+        toolsPanel.classList.remove('hidden');
+    }
+}
 
 function updateRecordingTable(action) {
     if (!window.recordedActions) window.recordedActions = [];
     window.recordedActions.push(action);
+    if (!window.liveAutoAssertions) window.liveAutoAssertions = [];
+
+    const rowIndex = window.recordedActions.length - 1;
+    const autoAssertion = inferAutoAssertionFromAction(action, rowIndex);
+    window.liveAutoAssertions[rowIndex] = autoAssertion;
 
     const container = document.getElementById('recording-live-actions');
     if (container) container.classList.remove('hidden');
@@ -1204,17 +1347,187 @@ function updateRecordingTable(action) {
     const body = document.getElementById('live-actions-body');
     if (body) {
         const row = document.createElement('tr');
+        const actionType = getRecordedActionField(action, 'actionType');
+        const locator = getRecordedActionField(action, 'locator') || '-';
+        const value = getRecordedActionField(action, 'value') || '-';
+
+        const stepCell = autoAssertion
+            ? `<div style="display:flex; flex-direction:column; gap:4px;">
+                    <div><span class="badge badge-info">${escapeHtml(actionType || 'Action')}</span></div>
+                    <div id="auto-assertion-preview-${rowIndex}" style="display:flex; flex-direction:column; gap:4px; padding:6px 8px; border-radius:6px; background:#f8fafc; border:1px solid #e2e8f0;">
+                        <span style="font-size:12px; color:#475569;" title="${escapeHtml(formatAutoAssertionPreview(autoAssertion))}">Assert: ${escapeHtml(formatAutoAssertionPreview(autoAssertion))}</span>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="btn btn-secondary btn-small" style="padding:4px 8px; font-size:11px;" onclick="editLiveAutoAssertion(${rowIndex})">Edit</button>
+                            <label style="display:flex; align-items:center; gap:4px; margin:0; font-size:11px; color:#475569;">
+                                <input type="checkbox" ${autoAssertion.enabled ? 'checked' : ''} onchange="toggleLiveAutoAssertion(${rowIndex}, this.checked)"> Use
+                            </label>
+                        </div>
+                    </div>
+               </div>`
+            : `<span class="badge badge-info">${escapeHtml(actionType || 'Action')}</span>`;
+
         row.innerHTML = `
             <td>${window.recordedActions.length}</td>
-            <td><span class="badge badge-info">${action.actionType}</span></td>
-            <td style="font-family: monospace; font-size: 0.85em; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${action.locator}">${action.locator}</td>
-            <td>${action.value || '-'}</td>
+            <td style="min-width: 220px;">${stepCell}</td>
+            <td style="font-family: monospace; font-size: 0.85em; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(locator)}">${escapeHtml(locator)}</td>
+            <td>${escapeHtml(value)}</td>
         `;
         body.appendChild(row);
 
         // Auto-scroll to bottom
         const scrollContainer = body.parentElement.parentElement;
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+}
+
+function getRecordedActionField(action, fieldName) {
+    if (!action || !fieldName) return '';
+    const camel = fieldName.charAt(0).toLowerCase() + fieldName.slice(1);
+    const pascal = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+    return action[camel] ?? action[pascal] ?? '';
+}
+
+function inferAutoAssertionFromAction(action, actionIndex) {
+    const actionTypeRaw = (getRecordedActionField(action, 'actionType') || '').trim();
+    const actionType = actionTypeRaw.toLowerCase();
+    const locator = getRecordedActionField(action, 'locator') || '';
+    const value = getRecordedActionField(action, 'value') || '';
+    const metadata = action?.metadata || action?.Metadata || {};
+    const parameterName = metadata.ParameterName || metadata.parameterName || '';
+
+    if (actionType === 'navigate') {
+        if (!value) return null;
+        return {
+            type: 'UrlContains',
+            locator: '',
+            expectedValue: getStableUrlToken(value),
+            description: 'Auto-verify navigation completed',
+            executeAfterActionIndex: actionIndex,
+            enabled: true
+        };
+    }
+
+    if (['type', 'input', 'fill', 'select'].includes(actionType)) {
+        if (!locator) return null;
+        const expectedValue = parameterName ? `{{${parameterName}}}` : value;
+
+        if (!expectedValue) {
+            return {
+                type: 'ElementVisible',
+                locator,
+                expectedValue: '',
+                description: `Auto-verify ${actionTypeRaw || 'input'} target is visible`,
+                executeAfterActionIndex: actionIndex,
+                enabled: true
+            };
+        }
+
+        return {
+            type: 'ValueEquals',
+            locator,
+            expectedValue,
+            description: `Auto-verify value entered for ${actionTypeRaw || 'input'}`,
+            executeAfterActionIndex: actionIndex,
+            enabled: true
+        };
+    }
+
+    if (['wait', 'waitforelement', 'switchtoframe', 'switchtodefaultcontent'].includes(actionType)) {
+        return null;
+    }
+
+    if (!locator) return null;
+    return {
+        type: 'ElementExists',
+        locator,
+        expectedValue: '',
+        description: `Auto-verify target exists after ${actionTypeRaw || 'action'}`,
+        executeAfterActionIndex: actionIndex,
+        enabled: true
+    };
+}
+
+function getStableUrlToken(url) {
+    try {
+        const parsed = new URL(url);
+        const path = (parsed.pathname || '').replace(/\/$/, '');
+        return !path || path === '/' ? parsed.host : `${parsed.host}${path}`;
+    } catch {
+        return url;
+    }
+}
+
+function formatAutoAssertionPreview(assertion) {
+    if (!assertion) return '-';
+    if (assertion.type === 'UrlContains') {
+        return `${assertion.type}(${assertion.expectedValue || '-'})`;
+    }
+
+    if (assertion.expectedValue) {
+        return `${assertion.type}(${assertion.locator || '-'}, ${assertion.expectedValue})`;
+    }
+
+    return `${assertion.type}(${assertion.locator || '-'})`;
+}
+
+function toggleLiveAutoAssertion(index, enabled) {
+    if (!window.liveAutoAssertions || !window.liveAutoAssertions[index]) return;
+    window.liveAutoAssertions[index].enabled = !!enabled;
+}
+
+function editLiveAutoAssertion(index) {
+    if (!window.liveAutoAssertions || !window.liveAutoAssertions[index]) return;
+
+    const assertion = window.liveAutoAssertions[index];
+    const updatedLocator = prompt('Edit assertion locator (leave empty for URL assertions):', assertion.locator || '');
+    if (updatedLocator === null) return;
+
+    let updatedExpectedValue = assertion.expectedValue || '';
+    const lowerType = (assertion.type || '').toLowerCase();
+    if (lowerType !== 'elementvisible' && lowerType !== 'elementexists') {
+        const expectedPrompt = prompt('Edit expected value:', assertion.expectedValue || '');
+        if (expectedPrompt === null) return;
+        updatedExpectedValue = expectedPrompt;
+    }
+
+    const updatedType = prompt('Edit assertion type (ElementExists, ElementVisible, ValueEquals, UrlContains):', assertion.type || '');
+    if (updatedType === null) return;
+
+    assertion.locator = updatedLocator || '';
+    assertion.expectedValue = updatedExpectedValue || '';
+    assertion.type = updatedType || assertion.type;
+
+    const preview = document.getElementById(`auto-assertion-preview-${index}`);
+    if (preview) {
+        const previewLabel = preview.querySelector('span');
+        if (previewLabel) {
+            const text = formatAutoAssertionPreview(assertion);
+            previewLabel.textContent = text;
+            previewLabel.title = text;
+        }
+    }
+}
+
+async function syncLiveAutoAssertionsToRecorder() {
+    if (!window.liveAutoAssertions || window.liveAutoAssertions.length === 0) return;
+
+    const assertionsToSync = window.liveAutoAssertions.filter(a => a && a.enabled);
+    for (const assertion of assertionsToSync) {
+        try {
+            await fetch(`${API_BASE_URL}/recorder/assertion`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: assertion.type,
+                    locator: assertion.locator || '',
+                    expectedValue: assertion.expectedValue || null,
+                    description: assertion.description || null,
+                    executeAfterActionIndex: assertion.executeAfterActionIndex
+                })
+            });
+        } catch (error) {
+            console.warn('Failed to sync live auto-assertion:', error);
+        }
     }
 }
 
@@ -1256,6 +1569,7 @@ async function startAssistedRecording(event) {
 
             // Clear previous actions
             window.recordedActions = [];
+            window.liveAutoAssertions = [];
             const body = document.getElementById('live-actions-body');
             if (body) body.innerHTML = '';
             const countEl = document.getElementById('live-action-count');
@@ -1297,6 +1611,8 @@ async function stopRecording() {
         stopBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Stopping...';
         stopBtn.disabled = true;
 
+        await syncLiveAutoAssertionsToRecorder();
+
         const response = await fetch(`${API_BASE_URL}/recorder/stop`, {
             method: 'POST'
         });
@@ -1308,6 +1624,7 @@ async function stopRecording() {
 
         if (data.success) {
             isRecording = false;
+            window.liveAutoAssertions = [];
             document.getElementById('start-recording-btn').disabled = false;
             document.getElementById('stop-recording-btn').disabled = true;
             document.getElementById('recording-status').classList.add('hidden');
@@ -1320,6 +1637,11 @@ async function stopRecording() {
             const scenarioName = data.scenario?.name ||
                 data.scenarioName ||
                 'Test Scenario';
+            const scenarioModule = data.scenario?.module ||
+                document.getElementById('record-module')?.value ||
+                'Default';
+
+            setRecordedScenarioForGeneration(scenarioName, scenarioModule);
 
             showSuccess(`Recording saved! ${actionCount} action(s) captured.`);
 
@@ -1356,6 +1678,366 @@ async function stopRecording() {
 
         // Show user-friendly error
         showError('Failed to stop recording. Please check if the browser window is still open.');
+    }
+}
+
+async function generateRecordedScenarioScript() {
+    if (!lastRecordedScenario?.name || !lastRecordedScenario?.module) {
+        showError('Record and save a scenario first, then generate script.');
+        return;
+    }
+
+    const framework = document.getElementById('script-framework')?.value || 'playwright';
+    const language = document.getElementById('script-language')?.value || 'csharp';
+
+    try {
+        showLoading('Generating script from recorded scenario...');
+
+        const response = await fetch(`${API_BASE_URL}/scriptgeneration/from-recorded-scenario`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                scenarioName: lastRecordedScenario.name,
+                module: lastRecordedScenario.module,
+                framework,
+                language,
+                includeProjectFiles: false
+            })
+        });
+
+        const data = await response.json();
+        hideLoading();
+
+        if (!data.success) {
+            showError(data.error || 'Failed to generate script');
+            return;
+        }
+
+        generatedScriptCache = {
+            content: data.outputs?.testScript || '',
+            fileName: data.generation?.suggestedFileName || `${lastRecordedScenario.name}.txt`,
+            pageObject: data.outputs?.pageObject || '',
+            metadata: data.generation
+        };
+
+        const panel = document.getElementById('generated-script-panel');
+        const content = document.getElementById('generated-script-content');
+        if (panel && content) {
+            content.textContent = generatedScriptCache.content;
+            panel.classList.remove('hidden');
+        }
+
+        const advancedPanel = document.getElementById('advanced-concepts-panel');
+        const advancedContent = document.getElementById('advanced-concepts-content');
+        if (advancedPanel && advancedContent) {
+            const testCases = (data.derivedTestCases || []).map(tc => `
+                <div style="padding:10px;border:1px solid #cbd5e1;border-radius:6px;background:#ffffff;">
+                    <div style="font-weight:600;color:#1e293b;">${tc.name}</div>
+                    <div style="font-size:0.88em;color:#475569;">${tc.objective}</div>
+                    <div style="font-size:0.8em;color:#64748b;margin-top:4px;">Priority: ${tc.priority} • Type: ${tc.type}</div>
+                </div>
+            `).join('');
+
+            const concepts = (data.advancedConcepts || []).map(ac => `
+                <div style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;">
+                    <div style="font-weight:600;color:#0f172a;">${ac.concept}</div>
+                    <div style="font-size:0.88em;color:#334155;">${ac.value}</div>
+                    <div style="font-size:0.78em;color:#64748b;margin-top:4px;">Impact: ${ac.impact}</div>
+                </div>
+            `).join('');
+
+            advancedContent.innerHTML = `
+                <div style="font-weight:600;color:#1e293b;">Derived Test Cases</div>
+                ${testCases || '<div style="color:#64748b;">No derived test cases generated.</div>'}
+                <div style="font-weight:600;color:#1e293b;margin-top:8px;">Advanced Concepts</div>
+                ${concepts || '<div style="color:#64748b;">No recommendations generated.</div>'}
+            `;
+            advancedPanel.classList.remove('hidden');
+        }
+
+        showSuccess('Script generated successfully from recorded scenario.');
+    } catch (error) {
+        hideLoading();
+        showError('Failed to generate script: ' + error.message);
+    }
+}
+
+function downloadGeneratedScript() {
+    if (!generatedScriptCache?.content) {
+        showError('Generate a script first, then download.');
+        return;
+    }
+
+    const blob = new Blob([generatedScriptCache.content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = generatedScriptCache.fileName || 'generated-test-script.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+async function loadExportView() {
+    const view = document.getElementById('export-view');
+    if (!view) return;
+
+    try {
+        view.innerHTML = `
+        <div class="header">
+            <h2><i class="fas fa-file-export"></i> Script Export</h2>
+            <p style="color:#6b7280;margin-top:6px;">Export selected scenarios as runnable automation project based on framework.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-sliders"></i> Export Configuration</div>
+            </div>
+            <div style="padding:16px;">
+                <div class="grid-3" style="gap:12px;">
+                    <div class="form-group">
+                        <label>Framework</label>
+                        <select class="form-control" id="export-framework" onchange="onExportFrameworkChange()">
+                            <option value="Playwright" selected>Playwright</option>
+                            <option value="Selenium">Selenium</option>
+                            <option value="Cypress">Cypress</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select class="form-control" id="export-language"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Project Name</label>
+                        <input class="form-control" id="export-project-name" value="AutomationTests" />
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:4px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="export-all-frameworks" onchange="toggleExportMode()" />
+                        Export all frameworks (Selenium + Playwright + Cypress)
+                    </label>
+                </div>
+
+                <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="export-page-objects" checked /> Page Objects</label>
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="export-config" checked /> Configuration</label>
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="export-readme" checked /> README</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-20">
+            <div class="card-header">
+                <div class="card-title"><i class="fas fa-list-check"></i> Select Scenarios</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <button class="btn btn-secondary btn-sm" onclick="toggleSelectAllExportScenarios(true)">Select All</button>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleSelectAllExportScenarios(false)">Clear</button>
+                    <span class="badge badge-info" id="export-selection-count">0 selected</span>
+                </div>
+            </div>
+            <div style="padding:16px;max-height:360px;overflow:auto;" id="export-scenarios-list">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading scenarios...</div>
+            </div>
+        </div>
+
+        <div class="card mt-20">
+            <div style="padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div style="color:#64748b;">Framework-based export creates a downloadable ZIP project.</div>
+                <button class="btn btn-success" onclick="exportScriptsByFramework()" id="export-download-btn">
+                    <i class="fas fa-download"></i> Export ZIP
+                </button>
+            </div>
+        </div>
+    `;
+
+        await onExportFrameworkChange();
+        await loadExportScenarios();
+        toggleExportMode();
+    } catch (error) {
+        console.error('Failed to render Script Export view:', error);
+        view.innerHTML = `
+            <div class="header">
+                <h2><i class="fas fa-file-export"></i> Script Export</h2>
+            </div>
+            <div class="card">
+                <div style="padding:16px;color:#dc2626;">
+                    <strong>Unable to load Script Export view.</strong>
+                    <div style="margin-top:8px;color:#7f1d1d;">${error.message || 'Unexpected error occurred while rendering export view.'}</div>
+                </div>
+            </div>
+        `;
+        showError('Script Export view failed to load. Check browser console for details.');
+    }
+}
+
+function toggleExportMode() {
+    const exportAll = document.getElementById('export-all-frameworks')?.checked === true;
+    const frameworkEl = document.getElementById('export-framework');
+    const languageEl = document.getElementById('export-language');
+    const button = document.getElementById('export-download-btn');
+
+    if (frameworkEl) frameworkEl.disabled = exportAll;
+    if (languageEl) languageEl.disabled = exportAll;
+    if (button) {
+        button.innerHTML = exportAll
+            ? '<i class="fas fa-download"></i> Export All Frameworks ZIP'
+            : '<i class="fas fa-download"></i> Export ZIP';
+    }
+}
+
+async function onExportFrameworkChange() {
+    const framework = document.getElementById('export-framework')?.value;
+    const languageSelect = document.getElementById('export-language');
+    if (!framework || !languageSelect) return;
+
+    languageSelect.innerHTML = '<option value="">Loading...</option>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/export/languages/${framework}`);
+        const data = await response.json();
+        const languages = data.languages || [];
+
+        languageSelect.innerHTML = languages
+            .map(l => `<option value="${l}">${l}</option>`)
+            .join('');
+    } catch (error) {
+        languageSelect.innerHTML = '<option value="CSharp">CSharp</option>';
+        console.error('Failed to load export languages:', error);
+    }
+}
+
+async function loadExportScenarios() {
+    const container = document.getElementById('export-scenarios-list');
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/scenarios`);
+        const data = await response.json();
+        exportScenarioCache = data.scenarios || [];
+
+        if (!exportScenarioCache.length) {
+            container.innerHTML = '<div style="color:#64748b;">No scenarios found. Record or create scenarios first.</div>';
+            updateExportSelectionCount();
+            return;
+        }
+
+        container.innerHTML = exportScenarioCache.map((scenario, index) => `
+            <label style="display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;cursor:pointer;">
+                <input type="checkbox" class="export-scenario-check" value="${index}" onchange="updateExportSelectionCount()" />
+                <div style="flex:1;">
+                    <div style="font-weight:600;color:#1e293b;">${scenario.name || 'Unnamed'}</div>
+                    <div style="font-size:0.85em;color:#64748b;">Module: ${scenario.module || 'Default'} • Actions: ${scenario.actionCount || scenario.actions?.length || 0}</div>
+                </div>
+            </label>
+        `).join('');
+
+        updateExportSelectionCount();
+    } catch (error) {
+        container.innerHTML = '<div style="color:#dc2626;">Failed to load scenarios for export.</div>';
+        console.error('Failed to load export scenarios:', error);
+    }
+}
+
+function toggleSelectAllExportScenarios(selectAll) {
+    document.querySelectorAll('.export-scenario-check').forEach(cb => {
+        cb.checked = selectAll;
+    });
+    updateExportSelectionCount();
+}
+
+function updateExportSelectionCount() {
+    const selectedCount = document.querySelectorAll('.export-scenario-check:checked').length;
+    const label = document.getElementById('export-selection-count');
+    if (label) {
+        label.textContent = `${selectedCount} selected`;
+    }
+}
+
+function getSelectedExportScenarios() {
+    const selectedIndexes = Array.from(document.querySelectorAll('.export-scenario-check:checked'))
+        .map(cb => parseInt(cb.value, 10))
+        .filter(idx => !Number.isNaN(idx));
+
+    return selectedIndexes
+        .map(idx => exportScenarioCache[idx])
+        .filter(Boolean);
+}
+
+async function exportScriptsByFramework() {
+    const selectedScenarios = getSelectedExportScenarios();
+    if (!selectedScenarios.length) {
+        showWarning('Select at least one scenario to export.');
+        return;
+    }
+
+    const exportAllFrameworks = document.getElementById('export-all-frameworks')?.checked === true;
+    const framework = document.getElementById('export-framework')?.value || 'Playwright';
+    const language = document.getElementById('export-language')?.value || 'CSharp';
+    const projectName = document.getElementById('export-project-name')?.value?.trim() || 'AutomationTests';
+
+    const button = document.getElementById('export-download-btn');
+    const originalHtml = button?.innerHTML;
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+    }
+
+    try {
+        const endpoint = exportAllFrameworks
+            ? `${API_BASE_URL}/export/export-multiple`
+            : `${API_BASE_URL}/export/export-zip`;
+
+        const payload = exportAllFrameworks
+            ? {
+                scenarios: selectedScenarios,
+                language
+            }
+            : {
+                scenarios: selectedScenarios,
+                format: framework,
+                language,
+                projectName,
+                includePageObjects: document.getElementById('export-page-objects')?.checked ?? true,
+                includeConfiguration: document.getElementById('export-config')?.checked ?? true,
+                includeReadme: document.getElementById('export-readme')?.checked ?? true
+            };
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({ error: 'Export failed' }));
+            throw new Error(err.error || 'Export failed');
+        }
+
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = downloadUrl;
+        anchor.download = exportAllFrameworks
+            ? `${projectName}_AllFrameworks_${new Date().toISOString().split('T')[0]}.zip`
+            : `${projectName}_${framework}_${new Date().toISOString().split('T')[0]}.zip`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+
+        showSuccess(exportAllFrameworks
+            ? 'Export complete: all framework projects downloaded.'
+            : `Export complete: ${framework} project downloaded.`);
+    } catch (error) {
+        showError('Export failed: ' + error.message);
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = originalHtml || '<i class="fas fa-download"></i> Export ZIP';
+        }
     }
 }
 
@@ -1437,54 +2119,6 @@ async function loadExecuteView() {
             </div>
             <div class="console" id="console-output">
                 <div class="console-line">Ready to execute tests...</div>
-            </div>
-        </div>
-
-        <!-- DATA-DRIVEN EXECUTION -->
-        <div class="card" style="border:2px solid var(--info-color);box-shadow:0 8px 24px rgba(59,130,246,0.15);">
-            <div class="card-header" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(37,99,235,0.04));border-radius:12px 12px 0 0;">
-                <div class="card-title" style="display:flex;align-items:center;gap:10px;color:var(--info-color);">
-                    <i class="fas fa-table"></i>
-                    <span>Data-Driven Execution</span>
-                </div>
-                <span class="badge badge-info"><i class="fas fa-flask"></i> CSV / JSON</span>
-            </div>
-            <div style="padding:4px 0 16px;">
-                <p style="color:#6b7280;font-size:0.92em;line-height:1.7;margin-bottom:18px;">
-                    Run a scenario once per data row. Use <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">\${ColumnName}</code>
-                    placeholders in your scenario action values (e.g. <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">\${username}</code>).
-                </p>
-                <div class="grid-2">
-                    <div class="form-group"><label>Module</label><select class="form-control" id="dd-module" onchange="loadDDScenarios()"><option value="">Select Module</option></select></div>
-                    <div class="form-group"><label>Scenario</label><select class="form-control" id="dd-scenario"><option value="">Select Scenario</option></select></div>
-                </div>
-                <div class="grid-2">
-                    <div class="form-group"><label>Data Format</label><select class="form-control" id="dd-format"><option value="CSV">CSV (comma-separated)</option><option value="JSON">JSON (array of objects)</option></select></div>
-                    <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
-                        <input type="file" id="dd-file-upload" accept=".csv,.json" style="display:none;" onchange="handleDDFileUpload(event)">
-                        <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('dd-file-upload').click()">
-                            <i class="fas fa-file-upload"></i> Upload File
-                        </button>
-                        <button class="btn btn-secondary" style="flex:1;" onclick="loadSampleData()">
-                            <i class="fas fa-magic"></i> Example
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group"><label>Data (paste CSV/JSON or upload a file)</label>
-                    <textarea class="form-control" id="dd-data" rows="6" placeholder="username,password&#10;user1,pass1&#10;user2,pass2"></textarea>
-                </div>
-                <div id="dd-preview-area" class="hidden" style="margin-bottom:16px;padding:14px;background:#f0f9ff;border-radius:8px;border-left:4px solid var(--info-color);">
-                    <div style="font-weight:600;color:var(--info-color);margin-bottom:8px;"><i class="fas fa-columns"></i> Preview</div>
-                    <div id="dd-preview-content"></div>
-                </div>
-                <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                    <button class="btn" style="background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;" onclick="previewDataSet()"><i class="fas fa-eye"></i> Preview Data</button>
-                    <button class="btn btn-primary" id="dd-execute-btn" onclick="executeDataDriven()"><i class="fas fa-play"></i> Execute Data-Driven Test</button>
-                </div>
-                <div id="dd-results-area" class="hidden" style="margin-top:20px;">
-                    <div id="dd-summary-bar" style="padding:14px;border-radius:8px;margin-bottom:16px;"></div>
-                    <div id="dd-results-table"></div>
-                </div>
             </div>
         </div>
     `;
@@ -2077,9 +2711,6 @@ async function loadResultsView() {
                 <button class="btn btn-secondary" onclick="refreshTestResults()">
                     <i class="fas fa-sync"></i> Refresh
                 </button>
-                <button class="btn btn-primary" onclick="exportTestResults()">
-                    <i class="fas fa-download"></i> Export
-                </button>
             </div>
         </div>
 
@@ -2136,8 +2767,8 @@ async function loadResultsView() {
                     <i class="fas fa-times"></i> Clear All
                 </button>
             </div>
-            <div style="padding: 0 25px 25px 25px;">
-                <div class="grid-4" style="gap: 15px;">
+            <div style="padding: 0 10px 10px 10px;">
+                <div class="grid-4" style="gap: 10px;">
                     <div class="form-group" style="margin: 0;">
                         <label>Status</label>
                         <select class="form-control" id="filter-status" onchange="applyTestFilters()">
@@ -2179,7 +2810,14 @@ async function loadResultsView() {
                     <i class="fas fa-history"></i> Execution History
                 </div>
                 <div id="bulk-actions-toolbar" style="display: flex; gap: 10px;">
-                    <button class="btn btn-danger" onclick="deleteSelectedTests()">
+                    <span class="badge badge-info" id="selected-results-count">0 selected</span>
+                    <button class="btn btn-secondary" id="export-html-btn" onclick="exportSelectedResultsAsHtml()" disabled>
+                        <i class="fas fa-file-code"></i> Export as HTML
+                    </button>
+                    <button class="btn btn-primary" id="export-extent-btn" onclick="exportSelectedResultsAsExtent()" disabled>
+                        <i class="fas fa-chart-bar"></i> Extent Report
+                    </button>
+                    <button class="btn btn-danger" id="delete-selected-btn" onclick="deleteSelectedTests()" disabled>
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
@@ -2376,47 +3014,27 @@ async function refreshTestResults() {
     showSuccess('Test results refreshed');
 }
 
-// Export test results to CSV
-function exportTestResults() {
-    if (filteredTestHistory.length === 0) {
-        showWarning('No data to export');
-        return;
+function getProfessionalResultName(rawName) {
+    const name = (rawName || '').trim();
+    if (!name) return 'Unknown';
+
+    // Already in modern DDT format
+    if (/\[\s*DDT\s*[•\-]?\s*Iteration\s*\d+\s*\]/i.test(name)) {
+        return name;
     }
 
-    // CSV headers
-    const headers = ['Test Name', 'Status', 'Duration (s)', 'Browser', 'Environment', 'Executed At', 'Module'];
+    // Convert legacy names like:
+    // "test9 [Row 2: key=value, key2=value2]" or "test9 [Row 2]"
+    // to "test9 [DDT • Iteration 2]"
+    const legacyRowMatch = name.match(/^(.*?)\s*\[\s*row\s*(\d+)\s*(?::[^\]]*)?\]\s*$/i);
+    if (legacyRowMatch) {
+        const scenarioName = (legacyRowMatch[1] || '').trim();
+        const iteration = legacyRowMatch[2];
+        return `${scenarioName} [DDT • Iteration ${iteration}]`;
+    }
 
-    // CSV rows
-    const rows = filteredTestHistory.map(item => [
-        item.scenarioName || 'Unknown',
-        item.status || 'Unknown',
-        item.duration || '0',
-        item.browser || 'Chrome',
-        item.environment || 'QA',
-        item.executedAt ? new Date(item.executedAt).toISOString() : '',
-        item.module || 'N/A'
-    ]);
-
-    // Combine headers and rows
-    const csvContent = [
-        headers.join(','),
-        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
-
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-
-    link.setAttribute('href', url);
-    link.setAttribute('download', `test-results-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    showSuccess(`Exported ${filteredTestHistory.length} test results to CSV`);
+    // If no explicit row marker, keep original name and append DDT tag for clarity
+    return `${name} [DDT]`;
 }
 
 // Show empty state
@@ -2532,9 +3150,11 @@ function displayResultsHistory(historyList) {
                                            data-test-id="${item.scenarioName}_${item.executedAt}"
                                            onchange="handleCheckboxChange()">
                                 </td>
-                                <td><strong>${escapeHtml(item.scenarioName)}</strong></td>
                                 <td>
-                                    <span class="badge" style="background-color: ${statusBadgeColor}; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                    <div style="font-weight:600;color:#111827;line-height:1.35;">${escapeHtml(getProfessionalResultName(item.scenarioName))}</div>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background-color: ${statusBadgeColor}; color: white; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 600;">
                                         ${escapeHtml(item.status.toUpperCase())}
                                     </span>
                                 </td>
@@ -2544,14 +3164,14 @@ function displayResultsHistory(historyList) {
                                 <td style="font-size: 0.9em;">${formattedDate}</td>
                                 <td>
                                     ${hasEvidence ? `
-                                        <button class="btn btn-primary btn-sm" onclick="viewEvidence(${index})" style="padding: 6px 16px; font-size: 13px;">
+                                        <button class="btn btn-primary btn-sm" onclick="viewEvidence(${index})" style="padding: 4px 10px; font-size: 11px;">
                                             <i class="fas fa-eye"></i> View
                                         </button>
                                     ` : '-'}
                                 </td>
                                 <td>
                                     ${hasLogs ? `
-                                        <button class="btn btn-primary btn-sm" onclick="viewLogs(${index})" style="padding: 6px 16px; font-size: 13px;">
+                                        <button class="btn btn-primary btn-sm" onclick="viewLogs(${index})" style="padding: 4px 10px; font-size: 11px;">
                                             <i class="fas fa-file-alt"></i> View
                                         </button>
                                     ` : '-'}
@@ -2564,19 +3184,19 @@ function displayResultsHistory(historyList) {
         </div>
         
         <!-- Pagination Controls -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 8px; background: #f9fafb; border-radius: 8px;">
             <div style="color: #6b7280; font-size: 14px;">
                 Showing ${paginatedHistory.length} of ${totalRecords} records
             </div>
             <div style="display: flex; gap: 5px;">
                 <button onclick="goToPage(1)" 
                         ${currentPage === 1 ? 'disabled' : ''}
-                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        style="padding: 6px 9px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
                     <i class="fas fa-angle-double-left"></i>
                 </button>
                 <button onclick="goToPage(${currentPage - 1})" 
                         ${currentPage === 1 ? 'disabled' : ''}
-                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        style="padding: 6px 9px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
                     <i class="fas fa-angle-left"></i> Previous
                 </button>
                 
@@ -2584,12 +3204,12 @@ function displayResultsHistory(historyList) {
                 
                 <button onclick="goToPage(${currentPage + 1})" 
                         ${currentPage === totalPages ? 'disabled' : ''}
-                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        style="padding: 6px 9px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
                     Next <i class="fas fa-angle-right"></i>
                 </button>
                 <button onclick="goToPage(${totalPages})" 
                         ${currentPage === totalPages ? 'disabled' : ''}
-                        style="padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                        style="padding: 6px 9px; border: 1px solid #d1d5db; background: white; border-radius: 4px; cursor: pointer; ${currentPage === totalPages ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
                     <i class="fas fa-angle-double-right"></i>
                 </button>
             </div>
@@ -2600,6 +3220,7 @@ function displayResultsHistory(historyList) {
 
     // Store history data globally for access by view functions
     window.testResultsHistory = historyList;
+    handleCheckboxChange();
 }
 
 // Generate page number buttons
@@ -2649,8 +3270,136 @@ function toggleSelectAllResults(checkbox) {
 }
 
 function handleCheckboxChange() {
-    // Delete button is always visible, so no need to toggle display
-    // This function can be used for other UI updates if needed in the future
+    const checked = document.querySelectorAll('.result-checkbox:checked').length;
+    const countLabel = document.getElementById('selected-results-count');
+    if (countLabel) {
+        countLabel.textContent = `${checked} selected`;
+    }
+
+    const exportHtmlBtn = document.getElementById('export-html-btn');
+    const exportExtentBtn = document.getElementById('export-extent-btn');
+    const deleteBtn = document.getElementById('delete-selected-btn');
+
+    if (exportHtmlBtn) exportHtmlBtn.disabled = checked === 0;
+    if (exportExtentBtn) exportExtentBtn.disabled = checked === 0;
+    if (deleteBtn) deleteBtn.disabled = checked === 0;
+}
+
+function getSelectedResultItems() {
+    const checkboxes = document.querySelectorAll('.result-checkbox:checked');
+    const indices = Array.from(checkboxes)
+        .map(cb => parseInt(cb.value, 10))
+        .filter(idx => !Number.isNaN(idx));
+
+    return indices
+        .map(index => window.testResultsHistory?.[index])
+        .filter(item => !!item);
+}
+
+function getSelectedTestIdentifiers() {
+    return getSelectedResultItems().map(item => ({
+        scenarioName: item.scenarioName,
+        executedAt: item.executedAt
+    }));
+}
+
+async function downloadFromResponse(response, fallbackName) {
+    const disposition = response.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i);
+    const fileName = decodeURIComponent((match?.[1] || match?.[2] || fallbackName).trim());
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.URL.revokeObjectURL(url);
+}
+
+async function exportSelectedResultsAsHtml() {
+    const selectedTests = getSelectedTestIdentifiers();
+    if (!selectedTests.length) {
+        showWarning('Select one or more test results to export as HTML.');
+        return;
+    }
+
+    const button = document.getElementById('export-html-btn');
+    const originalText = button?.innerHTML;
+    try {
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+        }
+
+        const response = await fetch(`${API_BASE_URL}/history/export-html`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tests: selectedTests })
+        });
+
+        if (!response.ok) {
+            let errorText = 'Failed to export HTML report.';
+            try {
+                const err = await response.json();
+                errorText = err.error || errorText;
+            } catch { }
+            throw new Error(errorText);
+        }
+
+        await downloadFromResponse(response, `test-results-${new Date().toISOString().slice(0, 10)}.html`);
+        showSuccess(`HTML report exported for ${selectedTests.length} selected result${selectedTests.length > 1 ? 's' : ''}.`);
+    } catch (error) {
+        showError(error.message || 'Failed to export HTML report.');
+    } finally {
+        if (button) {
+            button.innerHTML = originalText || '<i class="fas fa-file-code"></i> Export as HTML';
+        }
+        handleCheckboxChange();
+    }
+}
+
+async function exportSelectedResultsAsExtent() {
+    const selectedTests = getSelectedTestIdentifiers();
+    if (!selectedTests.length) {
+        showWarning('Select one or more test results to export as Extent Report.');
+        return;
+    }
+
+    const button = document.getElementById('export-extent-btn');
+    const originalText = button?.innerHTML;
+    try {
+        if (button) {
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+        }
+
+        const response = await fetch(`${API_BASE_URL}/history/export-extent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tests: selectedTests })
+        });
+
+        if (!response.ok) {
+            let errorText = 'Failed to export Extent report.';
+            try {
+                const err = await response.json();
+                errorText = err.error || errorText;
+            } catch { }
+            throw new Error(errorText);
+        }
+
+        await downloadFromResponse(response, `extent-report-${new Date().toISOString().slice(0, 10)}.html`);
+        showSuccess(`Extent report exported for ${selectedTests.length} selected result${selectedTests.length > 1 ? 's' : ''}.`);
+    } catch (error) {
+        showError(error.message || 'Failed to export Extent report.');
+    } finally {
+        if (button) {
+            button.innerHTML = originalText || '<i class="fas fa-chart-bar"></i> Extent Report';
+        }
+        handleCheckboxChange();
+    }
 }
 
 async function deleteSelectedTests() {
@@ -2666,7 +3415,7 @@ async function deleteSelectedTests() {
     const indices = Array.from(checkboxes).map(cb => parseInt(cb.value));
     const testNames = indices.map(index => {
         const test = window.testResultsHistory[index];
-        return test.scenarioName;
+        return getProfessionalResultName(test.scenarioName);
     });
 
     // Create display text for test names
@@ -2762,7 +3511,7 @@ async function confirmDelete() {
         // Get test names for success message
         const testNames = indices.map(index => {
             const test = window.testResultsHistory[index];
-            return test.scenarioName;
+            return getProfessionalResultName(test.scenarioName);
         });
 
         // Call API to delete tests
@@ -2836,7 +3585,7 @@ function viewEvidence(index) {
             <div style="position: sticky; top: 0; background: white; border-bottom: 2px solid #e5e7eb; padding: 20px; z-index: 1; border-radius: 12px 12px 0 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2 style="margin: 0; color: #1f2937;">
-                        <i class="fas fa-images"></i> Evidence - ${escapeHtml(item.scenarioName)}
+                        <i class="fas fa-images"></i> Evidence - ${escapeHtml(getProfessionalResultName(item.scenarioName))}
                     </h2>
                     <button onclick="closeDynamicModal('evidence-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                         <i class="fas fa-times"></i> Close
@@ -2915,7 +3664,7 @@ function viewLogs(index) {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <h2 style="margin: 0; color: #1f2937;">
-                            <i class="fas fa-file-alt"></i> Execution Logs - ${escapeHtml(item.scenarioName)}
+                            <i class="fas fa-file-alt"></i> Execution Logs - ${escapeHtml(getProfessionalResultName(item.scenarioName))}
                         </h2>
                         <p style="margin: 8px 0 0 0; color: #6b7280;">
                             Module: <strong>${escapeHtml(item.module)}</strong> | 
@@ -3370,196 +4119,3 @@ function hideLoading() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// DATA-DRIVEN EXECUTION — JavaScript Functions
-// ═══════════════════════════════════════════════════════════
-
-/** Populate dd-scenario dropdown when module changes */
-async function loadDDScenarios() {
-    const module = document.getElementById('dd-module')?.value;
-    if (!module) return;
-    try {
-        const r = await fetch(`${API_BASE_URL}/scenarios/module/${module}`);
-        const d = await r.json();
-        if (d.success) {
-            document.getElementById('dd-scenario').innerHTML =
-                '<option value="">Select Scenario</option>' +
-                d.scenarios.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-        }
-    } catch (e) { console.error('loadDDScenarios:', e); }
-}
-
-/** Handle file upload for data-driven test */
-function handleDDFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        document.getElementById('dd-data').value = e.target.result;
-        // Auto-select format based on extension
-        const fmtSelect = document.getElementById('dd-format');
-        if (file.name.toLowerCase().endsWith('.json')) {
-            fmtSelect.value = 'JSON';
-        } else if (file.name.toLowerCase().endsWith('.csv')) {
-            fmtSelect.value = 'CSV';
-        }
-        showSuccess(`Loaded file: ${file.name}`);
-    };
-    reader.onerror = function () {
-        showError('Error reading file');
-    };
-    reader.readAsText(file);
-
-    // Reset file input so same file can be selected again
-    event.target.value = '';
-}
-
-/** Load sample CSV into the textarea */
-function loadSampleData() {
-    const fmt = document.getElementById('dd-format')?.value;
-    if (fmt === 'JSON') {
-        document.getElementById('dd-data').value =
-            JSON.stringify([
-                { username: 'user1', password: 'pass1', expectedResult: 'success' },
-                { username: 'user2', password: 'pass2', expectedResult: 'failure' }
-            ], null, 2);
-    } else {
-        document.getElementById('dd-data').value =
-            'username,password,expectedResult\nuser1,pass1,success\nuser2,pass2,failure';
-    }
-}
-
-/** Preview the data set columns + row count */
-async function previewDataSet() {
-    const dataContent = document.getElementById('dd-data')?.value?.trim();
-    const dataFormat = document.getElementById('dd-format')?.value || 'CSV';
-
-    if (!dataContent) { showError('Please enter some data first.'); return; }
-
-    try {
-        const r = await fetch(`${API_BASE_URL}/datadriven/preview`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dataFormat, dataContent })
-        });
-        const d = await r.json();
-
-        const area = document.getElementById('dd-preview-area');
-        const content = document.getElementById('dd-preview-content');
-
-        if (d.success) {
-            area.classList.remove('hidden');
-            content.innerHTML = `
-                <div style="margin-bottom:10px;">
-                    <strong style="color:#0369a1;">${d.rowCount} row(s)</strong> &nbsp;|&nbsp;
-                    Columns: ${d.columns.map(c => `<code style="background:#dbeafe;padding:2px 6px;border-radius:4px;margin:0 2px;">${escapeHtml(c)}</code>`).join(' ')}
-                </div>
-                <div style="overflow-x:auto;">
-                    <table style="font-size:0.85em;border-collapse:collapse;width:100%;">
-                        <thead style="background:#bfdbfe;">
-                            <tr>${d.columns.map(c => `<th style="padding:6px 10px;text-align:left;border:1px solid #93c5fd;">${escapeHtml(c)}</th>`).join('')}</tr>
-                        </thead>
-                        <tbody>
-                            ${(d.preview || []).map(row => `
-                                <tr style="background:#fff;">
-                                    ${d.columns.map(c => `<td style="padding:6px 10px;border:1px solid #e2e8f0;">${escapeHtml(row[c] || '')}</td>`).join('')}
-                                </tr>`).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
-        } else {
-            showError('Preview failed: ' + d.error);
-        }
-    } catch (e) {
-        showError('Preview error: ' + e.message);
-    }
-}
-
-/** Execute data-driven test and display per-row results */
-async function executeDataDriven() {
-    const module = document.getElementById('dd-module')?.value;
-    const scenario = document.getElementById('dd-scenario')?.value;
-    const dataContent = document.getElementById('dd-data')?.value?.trim();
-    const dataFormat = document.getElementById('dd-format')?.value || 'CSV';
-
-    if (!module || !scenario) { showError('Please select a module and scenario.'); return; }
-    if (!dataContent) { showError('Please enter test data.'); return; }
-
-    const btn = document.getElementById('dd-execute-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
-
-    try {
-        addConsoleLog(`[Data-Driven] Starting "${scenario}" with ${dataFormat} data...`, 'info');
-
-        const r = await fetch(`${API_BASE_URL}/datadriven/execute`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ scenarioName: scenario, module, dataFormat, dataContent })
-        });
-        const d = await r.json();
-
-        if (d.success) {
-            addConsoleLog(`[Data-Driven] Completed. Passed: ${d.passed}, Failed: ${d.failed}`, d.failed > 0 ? 'warning' : 'success');
-            renderDataDrivenResults(d);
-        } else {
-            addConsoleLog('[Data-Driven] Execution failed: ' + d.error, 'error');
-            showError('Data-driven execution failed: ' + d.error);
-        }
-    } catch (e) {
-        addConsoleLog('[Data-Driven] Error: ' + e.message, 'error');
-        showError('Error: ' + e.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-play"></i> Execute Data-Driven Test';
-    }
-}
-
-/** Render per-row results table */
-function renderDataDrivenResults(data) {
-    const area = document.getElementById('dd-results-area');
-    const summary = document.getElementById('dd-summary-bar');
-    const table = document.getElementById('dd-results-table');
-
-    area.classList.remove('hidden');
-
-    const allPassed = data.failed === 0;
-    summary.style.background = allPassed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)';
-    summary.style.borderLeft = `4px solid ${allPassed ? 'var(--success-color)' : 'var(--danger-color)'}`;
-    summary.style.borderRadius = '8px';
-    summary.innerHTML = `
-        <strong style="font-size:1.05em;">${allPassed ? '✅' : '⚠️'} Data-Driven Results: ${data.scenarioName}</strong>
-        &nbsp;&nbsp;
-        <span class="badge badge-success">✅ ${data.passed} Passed</span>
-        <span class="badge badge-danger" style="margin-left:6px;">❌ ${data.failed} Failed</span>
-        <span class="badge badge-info" style="margin-left:6px;">Total: ${data.totalRows} rows</span>`;
-
-    const cols = data.results.length > 0 ? Object.keys(data.results[0].dataRow) : [];
-    table.innerHTML = `
-        <table style="width:100%;border-collapse:collapse;font-size:0.88em;">
-            <thead style="background:#f9fafb;">
-                <tr>
-                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Row #</th>
-                    ${cols.map(c => `<th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">${escapeHtml(c)}</th>`).join('')}
-                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Status</th>
-                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Duration</th>
-                    <th style="padding:10px;border-bottom:2px solid var(--border);text-align:left;">Error</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.results.map(r => {
-        const passed = r.status === 'Passed';
-        const rowBg = passed ? '' : 'background:rgba(239,68,68,0.04);';
-        return `<tr style="${rowBg}">
-                        <td style="padding:10px;border-bottom:1px solid var(--border);">${r.rowNumber}</td>
-                        ${cols.map(c => `<td style="padding:10px;border-bottom:1px solid var(--border);">${escapeHtml(r.dataRow[c] || '')}</td>`).join('')}
-                        <td style="padding:10px;border-bottom:1px solid var(--border);">
-                            <span class="badge badge-${passed ? 'success' : 'danger'}">${passed ? '✅ Passed' : '❌ Failed'}</span>
-                        </td>
-                        <td style="padding:10px;border-bottom:1px solid var(--border);">${escapeHtml(r.duration)}</td>
-                        <td style="padding:10px;border-bottom:1px solid var(--border);color:var(--danger-color);font-size:0.85em;">${escapeHtml(r.errorMessage || '')}</td>
-                    </tr>`;
-    }).join('')}
-            </tbody>
-        </table>`;
-}

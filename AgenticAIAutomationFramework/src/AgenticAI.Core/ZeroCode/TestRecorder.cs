@@ -33,6 +33,12 @@ namespace AgenticAI.Core.ZeroCode
         /// Event fired when a new action is captured
         /// </summary>
         public event Action<RecordedAction>? OnActionCaptured;
+        
+        /// <summary>
+        /// Event fired when recorder needs a placeholder name for a typed value
+        /// Arguments: (fieldName, actualValue) => placeholderName
+        /// </summary>
+        public event Func<string, string, Task<string>>? OnPlaceholderNeeded;
 
         public TestRecorder(string scenarioName, string module = "Default")
         {
@@ -211,6 +217,19 @@ namespace AgenticAI.Core.ZeroCode
                         Value = value,
                         Timestamp = _recordedActions.Count
                     };
+                    
+                    // ALWAYS infer parameter names for Type and Input actions (smart recording)
+                    // This enables both direct execution AND data-driven testing automatically
+                    if ((actionType.ToLower() == "type" || actionType.ToLower() == "input") && !string.IsNullOrWhiteSpace(value))
+                    {
+                        string parameterName = GeneratePlaceholderName(selector, value);
+                        
+                        // Store BOTH the actual value (for direct execution) AND parameter name (for data-driven)
+                        action.Value = value; // Keep actual value for non-data-driven execution
+                        action.Metadata["ParameterName"] = parameterName; // Store parameter name for data-driven execution
+                        
+                        Logger.Info($"📝 Captured {actionType}: {value} (Parameter: {parameterName})");
+                    }
 
                     // Handle iframe context
                     if (inIFrame && !string.IsNullOrEmpty(iframeSelector))
@@ -666,14 +685,15 @@ namespace AgenticAI.Core.ZeroCode
         /// <summary>
         /// Add an assertion to the scenario
         /// </summary>
-        public void AddAssertion(string type, string locator, string? expectedValue = null, string? description = null)
+        public void AddAssertion(string type, string locator, string? expectedValue = null, string? description = null, int? executeAfterActionIndex = null)
         {
             var assertion = new Assertion
             {
                 Type = type,
                 Locator = locator,
                 ExpectedValue = expectedValue,
-                Description = description ?? $"Verify {type}"
+                Description = description ?? $"Verify {type}",
+                ExecuteAfterActionIndex = executeAfterActionIndex
             };
             
             _scenario.Assertions.Add(assertion);
@@ -750,6 +770,121 @@ namespace AgenticAI.Core.ZeroCode
                 Logger.Warning($"IFrame detection failed: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Generate a meaningful placeholder name for a field based on its selector
+        /// Auto-generates from selector attributes
+        /// </summary>
+        private string GeneratePlaceholderName(string selector, string actualValue)
+        {
+            // Try to extract meaningful name from selector
+            string parameterName = ExtractFieldNameFromSelector(selector);
+            
+            return parameterName;
+        }
+        
+        /// <summary>
+        /// Extract a meaningful field name from a CSS selector
+        /// Examples: input[name="email"] → email, #userEmail → email, #userName → username
+        /// </summary>
+        private string ExtractFieldNameFromSelector(string selector)
+        {
+            // Try to extract from name attribute
+            var nameMatch = System.Text.RegularExpressions.Regex.Match(selector, @"name[*=]?[""']([^""']+)[""']", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (nameMatch.Success)
+            {
+                return SanitizePlaceholderName(nameMatch.Groups[1].Value);
+            }
+            
+            // Try to extract from id
+            var idMatch = System.Text.RegularExpressions.Regex.Match(selector, @"#([a-zA-Z][\w-]*)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (idMatch.Success)
+            {
+                string idValue = idMatch.Groups[1].Value;
+                return SanitizePlaceholderName(idValue);
+            }
+            
+            // Try to extract from placeholder attribute
+            var placeholderMatch = System.Text.RegularExpressions.Regex.Match(selector, @"placeholder[*=]?[""']([^""']+)[""']", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (placeholderMatch.Success)
+            {
+                return SanitizePlaceholderName(placeholderMatch.Groups[1].Value);
+            }
+            
+            // Try to detect from input type or common patterns
+            if (selector.Contains("email", StringComparison.OrdinalIgnoreCase))
+                return "email";
+            if (selector.Contains("password", StringComparison.OrdinalIgnoreCase))
+                return "password";
+            if (selector.Contains("username", StringComparison.OrdinalIgnoreCase))
+                return "username";
+            if (selector.Contains("phone", StringComparison.OrdinalIgnoreCase) || selector.Contains("mobile", StringComparison.OrdinalIgnoreCase))
+                return "phone";
+            if (selector.Contains("first", StringComparison.OrdinalIgnoreCase) && selector.Contains("name", StringComparison.OrdinalIgnoreCase))
+                return "firstName";
+            if (selector.Contains("last", StringComparison.OrdinalIgnoreCase) && selector.Contains("name", StringComparison.OrdinalIgnoreCase))
+                return "lastName";
+            if (selector.Contains("address", StringComparison.OrdinalIgnoreCase))
+                return "address";
+            
+            // Default fallback
+            return "value";
+        }
+        
+        /// <summary>
+        /// Remove special characters and ensure valid placeholder name
+        /// Converts to camelCase and removes common prefixes
+        /// Examples: userEmail → email, txtPassword → password, inputUserName → username
+        /// </summary>
+        private string SanitizePlaceholderName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "value";
+            
+            // Remove common prefixes that don't add meaning
+            var prefixesToRemove = new[] { "user", "input", "txt", "field", "box", "ctl", "ctrl" };
+            string lowerName = name.ToLower();
+            
+            foreach (var prefix in prefixesToRemove)
+            {
+                // Check if name starts with prefix followed by uppercase letter or underscore/dash
+                if (lowerName.StartsWith(prefix))
+                {
+                    // Extract the part after the prefix
+                    string remaining = name.Substring(prefix.Length);
+                    
+                    // If remaining starts with uppercase, underscore, or dash, use it
+                    if (remaining.Length > 0 && (char.IsUpper(remaining[0]) || remaining[0] == '_' || remaining[0] == '-'))
+                    {
+                        name = remaining.TrimStart('_', '-');
+                        break;
+                    }
+                }
+            }
+                
+            // Remove special characters and spaces
+            name = System.Text.RegularExpressions.Regex.Replace(name, @"[^\w\s-]", "");
+            
+            // Convert to camelCase
+            var parts = name.Split(new[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+                return "value";
+                
+            var result = parts[0].ToLower();
+            for (int i = 1; i < parts.Length; i++)
+            {
+                if (parts[i].Length > 0)
+                {
+                    result += char.ToUpper(parts[i][0]) + parts[i].Substring(1).ToLower();
+                }
+            }
+            
+            // Ensure it starts with a letter
+            if (!char.IsLetter(result[0]))
+                result = "field" + char.ToUpper(result[0]) + result.Substring(1);
+                
+            return result;
         }
 
         /// <summary>
