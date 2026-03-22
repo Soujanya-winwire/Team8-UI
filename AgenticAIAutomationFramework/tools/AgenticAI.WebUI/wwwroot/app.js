@@ -179,7 +179,7 @@ async function initializeSignalR() {
 }
 
 // View Management
-function showView(viewName) {
+window.showView = function(viewName) {
     // Hide all views
     document.querySelectorAll('.view-content').forEach(view => {
         view.classList.add('hidden');
@@ -267,7 +267,7 @@ function showView(viewName) {
         console.error(`Failed to load view '${viewName}':`, error);
         showError(`Failed to load ${viewName} view: ${error.message}`);
     }
-}
+};  // End of window.showView
 
 // Dashboard Functions
 async function loadDashboard() {
@@ -1157,7 +1157,9 @@ async function loadRecordView() {
                     <div class="form-group" style="margin-bottom: 10px;">
                         <label>Scenario Name *</label>
                         <input type="text" class="form-control" id="record-name" 
-                               placeholder="e.g., Login_Test" required>
+                               placeholder="e.g., Login_Test" required
+                               oninput="window.validateScenarioNameRealtime()">
+                        <div id="scenario-name-validation" style="display: none; color: #dc3545; font-size: 0.875rem; margin-top: 6px; line-height: 1.4;"></div>
                     </div>
                     <div class="form-group" style="margin-bottom: 10px;">
                         <label>Module *</label>
@@ -1335,8 +1337,8 @@ function updateRecordingTable(action) {
     if (!window.liveAutoAssertions) window.liveAutoAssertions = [];
 
     const rowIndex = window.recordedActions.length - 1;
-    const autoAssertion = inferAutoAssertionFromAction(action, rowIndex);
-    window.liveAutoAssertions[rowIndex] = autoAssertion;
+    const autoAssertions = inferAutoAssertionsFromAction(action, rowIndex);
+    window.liveAutoAssertions[rowIndex] = autoAssertions;
 
     const container = document.getElementById('recording-live-actions');
     if (container) container.classList.remove('hidden');
@@ -1387,7 +1389,8 @@ function getRecordedActionField(action, fieldName) {
     return action[camel] ?? action[pascal] ?? '';
 }
 
-function inferAutoAssertionFromAction(action, actionIndex) {
+function inferAutoAssertionsFromAction(action, actionIndex) {
+    const assertions = [];
     const actionTypeRaw = (getRecordedActionField(action, 'actionType') || '').trim();
     const actionType = actionTypeRaw.toLowerCase();
     const locator = getRecordedActionField(action, 'locator') || '';
@@ -1395,56 +1398,115 @@ function inferAutoAssertionFromAction(action, actionIndex) {
     const metadata = action?.metadata || action?.Metadata || {};
     const parameterName = metadata.ParameterName || metadata.parameterName || '';
 
-    if (actionType === 'navigate') {
-        if (!value) return null;
-        return {
-            type: 'UrlContains',
-            locator: '',
-            expectedValue: getStableUrlToken(value),
-            description: 'Auto-verify navigation completed',
-            executeAfterActionIndex: actionIndex,
-            enabled: true
-        };
+    // Skip parametrization steps - they shouldn't have auto-assertions
+    // Any action with ParameterName metadata is a data-driven parameterization step
+    if (parameterName) {
+        // This is a parametrization value step, skip assertion
+        return assertions;
     }
 
-    if (['type', 'input', 'fill', 'select'].includes(actionType)) {
-        if (!locator) return null;
+    if (actionType === 'navigate') {
+        if (value) {
+            assertions.push({
+                type: 'UrlContains',
+                locator: '',
+                expectedValue: getStableUrlToken(value),
+                description: 'Auto-verify navigation completed',
+                executeAfterActionIndex: actionIndex,
+                enabled: true
+            });
+        }
+        return assertions;
+    }
+
+    if (['type', 'input', 'fill'].includes(actionType)) {
+        if (!locator) return assertions;
         const expectedValue = parameterName ? `{{${parameterName}}}` : value;
 
         if (!expectedValue) {
-            return {
+            assertions.push({
                 type: 'ElementVisible',
                 locator,
                 expectedValue: '',
                 description: `Auto-verify ${actionTypeRaw || 'input'} target is visible`,
                 executeAfterActionIndex: actionIndex,
                 enabled: true
-            };
+            });
+        } else {
+            assertions.push({
+                type: 'ValueEquals',
+                locator,
+                expectedValue,
+                description: `Auto-verify value entered for ${actionTypeRaw || 'input'}`,
+                executeAfterActionIndex: actionIndex,
+                enabled: true
+            });
         }
+        return assertions;
+    }
 
-        return {
-            type: 'ValueEquals',
-            locator,
-            expectedValue,
-            description: `Auto-verify value entered for ${actionTypeRaw || 'input'}`,
-            executeAfterActionIndex: actionIndex,
-            enabled: true
-        };
+    if (actionType === 'select') {
+        if (locator) {
+            assertions.push({
+                type: 'ElementVisible',
+                locator,
+                expectedValue: '',
+                description: 'Auto-verify dropdown is visible after selection',
+                executeAfterActionIndex: actionIndex,
+                enabled: true
+            });
+        }
+        return assertions;
+    }
+
+    if (actionType === 'click') {
+        // For click actions, verify element EXISTS before clicking
+        // Use ElementExists instead of ElementVisible because click will auto-scroll to element
+        if (locator) {
+            assertions.push({
+                type: 'ElementExists',
+                locator,
+                expectedValue: '',
+                description: 'Auto-verify element exists before click',
+                executeBeforeActionIndex: actionIndex,
+                enabled: true
+            });
+        }
+        return assertions;
+    }
+
+    if (actionType === 'submit') {
+        // For submit actions: verify element EXISTS before submitting
+        // Use ElementExists instead of ElementVisible because submit will auto-scroll to element
+        if (locator) {
+            assertions.push({
+                type: 'ElementExists',
+                locator,
+                expectedValue: '',
+                description: 'Auto-verify element exists before submit',
+                executeBeforeActionIndex: actionIndex,
+                enabled: true
+            });
+        }
+        return assertions;
     }
 
     if (['wait', 'waitforelement', 'switchtoframe', 'switchtodefaultcontent'].includes(actionType)) {
-        return null;
+        return assertions;
     }
 
-    if (!locator) return null;
-    return {
-        type: 'ElementExists',
-        locator,
-        expectedValue: '',
-        description: `Auto-verify target exists after ${actionTypeRaw || 'action'}`,
-        executeAfterActionIndex: actionIndex,
-        enabled: true
-    };
+    if (locator) {
+        assertions.push({
+            type: 'ElementExists',
+            locator,
+            expectedValue: '',
+            description: `Auto-verify target exists after ${actionTypeRaw || 'action'}`,
+            executeAfterActionIndex: actionIndex,
+            enabled: true
+        });
+    }
+    
+    return assertions;
 }
 
 function getStableUrlToken(url) {
@@ -1531,8 +1593,80 @@ async function syncLiveAutoAssertionsToRecorder() {
     }
 }
 
+// Real-time validation for scenario name uniqueness
+let validateScenarioTimeout;
+let isDuplicateScenarioName = false;
+
+window.validateScenarioNameRealtime = async function() {
+    clearTimeout(validateScenarioTimeout);
+    
+    const nameInput = document.getElementById('record-name');
+    const validationMsg = document.getElementById('scenario-name-validation');
+    const startBtn = document.getElementById('start-recording-btn');
+    const scenarioName = nameInput.value.trim();
+    
+    if (!scenarioName) {
+        validationMsg.style.display = 'none';
+        nameInput.style.borderColor = '';
+        isDuplicateScenarioName = false;
+        if (startBtn && !isRecording) {
+            startBtn.disabled = false;
+        }
+        return;
+    }
+    
+    // Debounce validation by 300ms (reduced for faster feedback)
+    validateScenarioTimeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/scenarios`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.scenarios && Array.isArray(data.scenarios)) {
+                    const duplicateScenario = data.scenarios.find(s => {
+                        const name = s.Name || s.name;
+                        return name && name.toLowerCase() === scenarioName.toLowerCase();
+                    });
+                    
+                    if (duplicateScenario) {
+                        const moduleName = duplicateScenario.Module || duplicateScenario.module || 'Unknown';
+                        validationMsg.textContent = `Scenario name "${scenarioName}" already exists in module "${moduleName}". Please use a different name.`;
+                        validationMsg.style.display = 'block';
+                        nameInput.style.borderColor = '#dc3545';
+                        isDuplicateScenarioName = true;
+                        if (startBtn) {
+                            startBtn.disabled = true;
+                            startBtn.title = 'Cannot start recording - duplicate scenario name detected';
+                        }
+                    } else {
+                        console.log('No duplicate found - name is unique');
+                        validationMsg.style.display = 'none';
+                        nameInput.style.borderColor = '';
+                        isDuplicateScenarioName = false;
+                        if (startBtn && !isRecording) {
+                            startBtn.disabled = false;
+                            startBtn.title = '';
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('Validation failed (backend will validate)');
+            isDuplicateScenarioName = false;
+            if (startBtn && !isRecording) {
+                startBtn.disabled = false;
+            }
+        }
+    }, 300);
+};  // End of window.validateScenarioNameRealtime
+
 async function startAssistedRecording(event) {
     event.preventDefault();
+
+    // Check for duplicate scenario name flag
+    if (isDuplicateScenarioName) {
+        showError('Cannot start recording - a scenario with this name already exists. Please choose a different name.');
+        return;
+    }
 
     const request = {
         scenarioName: document.getElementById('record-name').value,
@@ -1543,6 +1677,28 @@ async function startAssistedRecording(event) {
     };
 
     try {
+        // Validate: Check if scenario with same name already exists across ALL modules (global uniqueness)
+        try {
+            const checkResponse = await fetch(`${API_BASE_URL}/scenarios`);
+            if (checkResponse.ok) {
+                const checkData = await checkResponse.json();
+                if (checkData.success && checkData.scenarios && Array.isArray(checkData.scenarios)) {
+                    const duplicateScenario = checkData.scenarios.find(s => 
+                        s.Name && s.Name.toLowerCase() === request.scenarioName.toLowerCase()
+                    );
+                    
+                    if (duplicateScenario) {
+                        showError(`Scenario name "${request.scenarioName}" already exists in module "${duplicateScenario.Module}". Please use a different name.`);
+                        console.warn('Duplicate scenario detected:', request.scenarioName, 'in module:', duplicateScenario.Module);
+                        return;
+                    }
+                }
+            }
+        } catch (validationError) {
+            // Log validation check error but continue (backend will also validate)
+            console.warn('Frontend validation check failed:', validationError.message);
+        }
+
         // Show loading state
         const startBtn = document.getElementById('start-recording-btn');
         const originalText = startBtn.innerHTML;
@@ -2235,22 +2391,22 @@ async function executeScenario(module, name) {
                 updateExecutionStatus(statusType, testPassed ? 'Execution completed successfully' : 'Test execution completed with failures');
             }
             if (typeof addConsoleLog === 'function') {
-                addConsoleLog(`? Test completed: ${data.result.status}`, statusMessage);
+                addConsoleLog(`✓ Test completed: ${data.result.status}`, statusMessage);
                 displayTestResult(data.result);
             }
 
             // Show appropriate notification based on actual test result
             if (testPassed) {
-                showSuccess(`? Test passed: ${data.result.status}`);
+                showSuccess(`✓ Test passed: ${data.result.status}`);
             } else {
-                showError(`? Test failed: ${data.result.status}${data.result.errorMessage ? ' - ' + data.result.errorMessage : ''}`);
+                showError(`✗ Test failed: ${data.result.status}${data.result.errorMessage ? ' - ' + data.result.errorMessage : ''}`);
             }
         } else {
             if (typeof updateExecutionStatus === 'function') {
                 updateExecutionStatus('failed', 'Execution failed');
             }
             if (typeof addConsoleLog === 'function') {
-                addConsoleLog(`? Test failed: ${data.error}`, 'error');
+                addConsoleLog(`✗ Test failed: ${data.error}`, 'error');
             }
             showError(`Test execution failed: ${data.error}`);
         }

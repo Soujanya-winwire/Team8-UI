@@ -174,14 +174,14 @@ async function loadCIPipelines() {
 function getCIStatusIcon(status) {
     const statusLower = (status || '').toLowerCase();
     const icons = {
-        'success': '?',
-        'failure': '?',
-        'cancelled': '?',
-        'in_progress': '?',
-        'queued': '?',
-        'completed': '?'
+        'success': '✓',
+        'failure': '✗',
+        'cancelled': '⊘',
+        'in_progress': '⟳',
+        'queued': '⏱',
+        'completed': '✓'
     };
-    return icons[statusLower] || '?';
+    return icons[statusLower] || '●';
 }
 
 function getCIStatusClass(status) {
@@ -213,7 +213,7 @@ function getCITimeAgo(dateString) {
 }
 
 async function triggerPipeline() {
-    if (!confirm('?? Are you sure you want to trigger a new build?\n\nThis will start a new CI/CD pipeline run.')) return;
+    if (!confirm('⚠️ Are you sure you want to trigger a new build?\n\nThis will start a new CI/CD pipeline run.')) return;
 
     try {
         showLoading('Triggering pipeline...');
@@ -231,14 +231,14 @@ async function triggerPipeline() {
         hideLoading();
 
         if (data.success) {
-            showSuccess('? Pipeline triggered successfully! Refreshing in 3 seconds...');
+            showSuccess('✓ Pipeline triggered successfully! Refreshing in 3 seconds...');
             setTimeout(() => loadCIPipelines(), 3000);
         } else {
             showWarning(data.message || 'Failed to trigger pipeline. Check your GitHub token configuration.');
         }
     } catch (error) {
         hideLoading();
-        showError('? Error triggering pipeline: ' + error.message);
+        showError('✗ Error triggering pipeline: ' + error.message);
     }
 }
 

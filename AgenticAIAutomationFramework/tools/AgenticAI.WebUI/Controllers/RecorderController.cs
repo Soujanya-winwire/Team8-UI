@@ -38,6 +38,21 @@ namespace AgenticAI.WebUI.Controllers
                     });
                 }
 
+                // Validate: Check if scenario with same name already exists across ALL modules (global uniqueness)
+                var scenarioManager = new ScenarioManager();
+                var allScenarios = scenarioManager.LoadAllScenarios();
+                var duplicateScenario = allScenarios.FirstOrDefault(s => 
+                    s.Name != null && s.Name.Equals(request.ScenarioName, StringComparison.OrdinalIgnoreCase));
+
+                if (duplicateScenario != null)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        error = $"Scenario name '{request.ScenarioName}' already exists in module '{duplicateScenario.Module}'. Please use a different name."
+                    });
+                }
+
                 _activeRecorder = new TestRecorder(request.ScenarioName, request.Module);
                 _activeRecorder.SetScenarioDescription(request.Description);
 
@@ -443,28 +458,39 @@ namespace AgenticAI.WebUI.Controllers
             for (int actionIndex = 0; actionIndex < scenario.Actions.Count; actionIndex++)
             {
                 var action = scenario.Actions[actionIndex];
-                var generated = BuildAutoAssertion(action, actionIndex);
-                if (generated == null)
+                var generatedList = BuildAutoAssertions(action, actionIndex);
+                
+                foreach (var generated in generatedList)
                 {
-                    continue;
-                }
+                    var key = GetAssertionDedupKey(generated);
+                    if (existingKeys.Contains(key))
+                    {
+                        continue;
+                    }
 
-                var key = GetAssertionDedupKey(generated);
-                if (existingKeys.Contains(key))
-                {
-                    continue;
+                    scenario.Assertions.Add(generated);
+                    existingKeys.Add(key);
+                    addedCount++;
                 }
-
-                scenario.Assertions.Add(generated);
-                existingKeys.Add(key);
-                addedCount++;
             }
 
             return addedCount;
         }
 
-        private static Assertion? BuildAutoAssertion(RecordedAction action, int actionIndex)
+        private static List<Assertion> BuildAutoAssertions(RecordedAction action, int actionIndex)
         {
+            var assertions = new List<Assertion>();
+            
+            // Skip parametrization steps - they shouldn't have auto-assertions
+            // Any action with ParameterName metadata is a data-driven parameterization step
+            if (action.Metadata != null && 
+                action.Metadata.TryGetValue("ParameterName", out var parameterName) &&
+                !string.IsNullOrWhiteSpace(parameterName))
+            {
+                // This is a parametrization value step, skip assertion
+                return assertions;
+            }
+
             var actionType = (action.ActionType ?? string.Empty).Trim().ToLowerInvariant();
             var locator = action.Locator ?? string.Empty;
             var value = action.Value;
@@ -472,69 +498,120 @@ namespace AgenticAI.WebUI.Controllers
             switch (actionType)
             {
                 case "navigate":
+                    // Postcondition: Verify navigation completed successfully
                     if (string.IsNullOrWhiteSpace(value))
                     {
-                        return null;
+                        break;
                     }
 
-                    return new Assertion
+                    assertions.Add(new Assertion
                     {
                         Type = "UrlContains",
                         ExpectedValue = GetStableUrlToken(value),
-                        Description = "Auto-verify navigation completed",
+                        Description = "Verify navigation completed",
                         ExecuteAfterActionIndex = actionIndex
-                    };
+                    });
+                    break;
 
                 case "type":
                 case "input":
                 case "fill":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify element is visible before typing
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementVisible",
+                        Locator = locator,
+                        Description = "Verify element is visible before input",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+
+                    // Postcondition: Verify value was entered correctly
+                    var expectedValue = BuildExpectedValueForValueAssertion(action, value);
+                    if (!string.IsNullOrWhiteSpace(expectedValue))
+                    {
+                        assertions.Add(new Assertion
+                        {
+                            Type = "ValueEquals",
+                            Locator = locator,
+                            ExpectedValue = expectedValue,
+                            Description = "Verify value entered correctly",
+                            ExecuteAfterActionIndex = actionIndex
+                        });
+                    }
+                    break;
+
                 case "select":
                     if (string.IsNullOrWhiteSpace(locator))
                     {
-                        return null;
+                        break;
                     }
 
-                    var expectedValue = BuildExpectedValueForValueAssertion(action, value);
-                    if (string.IsNullOrWhiteSpace(expectedValue))
+                    // Precondition: Verify dropdown is visible before selection
+                    assertions.Add(new Assertion
                     {
-                        return new Assertion
-                        {
-                            Type = "ElementVisible",
-                            Locator = locator,
-                            Description = $"Auto-verify {action.ActionType} target is visible",
-                            ExecuteAfterActionIndex = actionIndex
-                        };
-                    }
-
-                    return new Assertion
-                    {
-                        Type = "ValueEquals",
+                        Type = "ElementVisible",
                         Locator = locator,
-                        ExpectedValue = expectedValue,
-                        Description = $"Auto-verify value entered for {action.ActionType}",
-                        ExecuteAfterActionIndex = actionIndex
-                    };
+                        Description = "Verify dropdown is visible before selection",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+                    break;
+
+                case "click":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify element exists before clicking
+                    // Use ElementExists instead of ElementVisible because click action
+                    // will automatically scroll to element, so it doesn't need to be visible yet
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementExists",
+                        Locator = locator,
+                        Description = "Verify element exists before click",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+                    break;
+
+                case "submit":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify element exists before submitting
+                    // Use ElementExists instead of ElementVisible because submit action
+                    // will automatically scroll to element, so it doesn't need to be visible yet
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementExists",
+                        Locator = locator,
+                        Description = "Verify element exists before submit",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+                    break;
 
                 case "wait":
                 case "waitforelement":
                 case "switchtoframe":
                 case "switchtodefaultcontent":
-                    return null;
+                case "screenshot":
+                case "hover":
+                    // No assertions for non-interactive or utility actions
+                    break;
 
                 default:
-                    if (string.IsNullOrWhiteSpace(locator))
-                    {
-                        return null;
-                    }
-
-                    return new Assertion
-                    {
-                        Type = "ElementExists",
-                        Locator = locator,
-                        Description = $"Auto-verify target exists after {action.ActionType}",
-                        ExecuteAfterActionIndex = actionIndex
-                    };
+                    // Avoid trivial assertions for unknown action types
+                    break;
             }
+            
+            return assertions;
         }
 
         private static string BuildExpectedValueForValueAssertion(RecordedAction action, string? fallbackValue)

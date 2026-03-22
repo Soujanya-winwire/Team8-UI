@@ -104,17 +104,17 @@
             const testIdSelector = this.getTestIdSelector(element);
             if (testIdSelector) return testIdSelector;
 
-            // Priority 2: aria-label (ACCESSIBILITY - Semantic and stable)
+            // Priority 2: ID selector (STABLE - When present, usually unique and semantic like #submit)
+            const idSelector = this.getIdSelector(element);
+            if (idSelector) return idSelector;
+
+            // Priority 3: aria-label (ACCESSIBILITY - Semantic and stable)
             const ariaSelector = this.getAriaLabelSelector(element);
             if (ariaSelector) return ariaSelector;
 
-            // Priority 3: role + accessible name (ACCESSIBILITY - Semantic HTML)
+            // Priority 4: role + accessible name (ACCESSIBILITY - Semantic HTML)
             const roleSelector = this.getRoleSelector(element);
             if (roleSelector) return roleSelector;
-
-            // Priority 4: text content (HIGHLY STABLE - Visible to users)
-            const textSelector = this.getTextSelector(element);
-            if (textSelector) return textSelector;
 
             // Priority 5: name attribute (FORM ELEMENTS - Semantic for forms)
             const nameSelector = this.getNameSelector(element);
@@ -124,15 +124,19 @@
             const placeholderSelector = this.getPlaceholderSelector(element);
             if (placeholderSelector) return placeholderSelector;
 
-            // Priority 7: CSS selector with stable classes (Avoid IDs entirely)
+            // Priority 7: CSS selector with stable classes
             const cssSelector = this.getCssSelector(element);
             if (cssSelector) return cssSelector;
 
-            // Priority 8: Composite selector (tag + attributes)
+            // Priority 8: text content for buttons/links (last resort before composite)
+            const textSelector = this.getTextSelector(element);
+            if (textSelector) return textSelector;
+
+            // Priority 9: Composite selector (tag + attributes)
             const compositeSelector = this.getCompositeSelector(element);
             if (compositeSelector) return compositeSelector;
 
-            // Priority 9: XPath (last resort)
+            // Priority 10: XPath (last resort)
             return this.getXPathSelector(element);
         }
 
@@ -148,6 +152,52 @@
                     return `[${attr}="${this.escapeSelector(value)}"]`;
                 }
             }
+            return null;
+        }
+
+        /**
+         * Get ID selector (only if ID looks stable and semantic)
+         * CRITICAL: Prioritize ID for buttons, especially for common patterns like #submit, #login, etc.
+         */
+        static getIdSelector(element) {
+            const id = element.id;
+            if (!id || !id.trim()) return null;
+
+            // Filter out dynamic-looking IDs (with timestamps, random strings, etc.)
+            // But ALWAYS allow semantic button IDs like "submit", "login", "logout", etc.
+            const tag = element.tagName.toLowerCase();
+            
+            // For buttons, always use ID if it's semantic (common submit/action button IDs)
+            if (tag === 'button' || tag === 'input' || tag === 'a') {
+                // Common semantic IDs for buttons
+                const semanticIds = /^(submit|login|logout|signin|signup|register|search|cancel|ok|save|delete|edit|add|remove|close|next|prev|back|continue|finish|send|apply|reset)$/i;
+                if (semanticIds.test(id)) {
+                    return `#${id}`;
+                }
+            }
+
+            // For all elements: reject clearly dynamic IDs
+            const dynamicPatterns = [
+                /\d{8,}/,          // Long numbers (timestamps)
+                /_\d{6,}/,         // Underscore + 6+ digits
+                /^(ember|react|ng|vue|x)_/i, // Framework prefixes
+                /[a-f0-9]{20,}/i,  // Long hex strings (GUIDs)
+                /-\d+-\d+/         // Pattern like component-123-456
+            ];
+
+            for (const pattern of dynamicPatterns) {
+                if (pattern.test(id)) {
+                    return null; // Skip dynamic ID
+                }
+            }
+
+            // Check if ID is unique (essential for ID selectors)
+            const idSelector = `#${id}`;
+            const matches = document.querySelectorAll(idSelector);
+            if (matches.length === 1 && matches[0] === element) {
+                return idSelector;
+            }
+
             return null;
         }
 
@@ -195,22 +245,13 @@
         }
 
         /**
-         * Get text-based selector (for buttons, links)
+         * Get text-based selector (for buttons, links) - FALLBACK ONLY
+         * Note: Removed :has-text() Playwright syntax since it's not standard CSS
+         * This is now a fallback - ID and other selectors are prioritized
          */
         static getTextSelector(element) {
-            const tag = element.tagName.toLowerCase();
-            if (!['button', 'a', 'span'].includes(tag)) return null;
-
-            let text = element.textContent || '';
-            text = text.trim();
-
-            // Only use text if it's meaningful and not too long
-            if (text && text.length > 0 && text.length < 50 && !text.includes('\n')) {
-                // Escape quotes and special characters
-                const escapedText = text.replace(/"/g, '\\"');
-                return `${tag}:has-text("${escapedText}")`;
-            }
-
+            // Text selector is now a low priority fallback
+            // Removed to prevent non-standard selector generation
             return null;
         }
 
@@ -253,23 +294,75 @@
         }
 
         /**
-         * Get stable CSS selector (avoid nth-child, dynamic classes)
+         * Get stable CSS selector with uniqueness validation (ENHANCED)
+         * Note: ID checking removed since getIdSelector handles it at higher priority
          */
         static getCssSelector(element) {
             const tag = element.tagName.toLowerCase();
-            const classes = this.getStableClasses(element);
-
-            if (classes.length > 0) {
-                return `${tag}.${classes.join('.')}`;
+            
+            // For inputs/textareas/selects, try name attribute first
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+                const name = element.getAttribute('name');
+                if (name) {
+                    const nameSelector = `${tag}[name="${name}"]`;
+                    const nameMatches = document.querySelectorAll(nameSelector);
+                    if (nameMatches.length === 1 && nameMatches[0] === element) {
+                        return nameSelector;
+                    }
+                }
             }
-
-            // If no stable classes, use tag + attribute combination
+            
+            // Try tag + classes
+            const classes = this.getStableClasses(element);
+            let selector = tag;
+            
+            if (classes.length > 0) {
+                selector = `${tag}.${classes.join('.')}`;
+                const classMatches = document.querySelectorAll(selector);
+                
+                // CRITICAL: If classes match multiple elements, use position-based immediately
+                if (classMatches.length === 1 && classMatches[0] === element) {
+                    return selector;
+                } else if (classMatches.length > 1) {
+                    // Not unique! Use nth-of-type
+                    const parent = element.parentElement;
+                    if (parent) {
+                        const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
+                        const index = siblings.indexOf(element);
+                        if (index >= 0 && siblings.length > 1) {
+                            return `${tag}:nth-of-type(${index + 1})`;
+                        }
+                    }
+                }
+            }
+            
+            // Try tag + type attribute for inputs
             const type = element.getAttribute('type');
             if (type) {
-                return `${tag}[type="${type}"]`;
+                selector = `${tag}[type="${type}"]`;
+                const typeMatches = document.querySelectorAll(selector);
+                if (typeMatches.length === 1 && typeMatches[0] === element) {
+                    return selector;
+                }
             }
-
-            return tag;
+            
+            // Check if plain tag selector is unique (rare)
+            const tagMatches = document.querySelectorAll(tag);
+            if (tagMatches.length === 1 && tagMatches[0] === element) {
+                return tag;
+            }
+            
+            // Last resort: use nth-of-type for uniqueness
+            const parent = element.parentElement;
+            if (parent) {
+                const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
+                const index = siblings.indexOf(element);
+                if (index >= 0) {
+                    return `${tag}:nth-of-type(${index + 1})`;
+                }
+            }
+            
+            return selector || tag;
         }
 
         /**
@@ -676,6 +769,10 @@
             
             // Form submission
             document.addEventListener('submit', this.handleSubmit.bind(this), RECORDER_CONFIG.captureMode);
+
+            // Scroll events (debounced to avoid capturing micro-scrolls)
+            document.addEventListener('scroll', this.handleScroll.bind(this), true);
+            window.addEventListener('scroll', this.handleScroll.bind(this), true);
 
             // BROWSER NAVIGATION ACTIONS
             this.setupBrowserNavigationTracking();
@@ -1187,6 +1284,59 @@
             });
 
             NavigationTracker.updateLastActionTime();
+        }
+
+        static handleScroll(event) {
+            if (!this.isRecording) return;
+
+            // Debounce scroll events (only record meaningful scrolls, not micro-adjustments)
+            const scrollDebounceKey = 'scroll_debounce';
+            
+            if (this.pendingInputActions[scrollDebounceKey]) {
+                clearTimeout(this.pendingInputActions[scrollDebounceKey]);
+            }
+
+            this.pendingInputActions[scrollDebounceKey] = setTimeout(() => {
+                // Determine scroll position
+                const scrollX = window.scrollX || window.pageXOffset;
+                const scrollY = window.scrollY || window.pageYOffset;
+
+                // Get scroll target (window or specific element)
+                const target = event.target;
+                let selector = 'window';
+                let scrollElement = null;
+
+                if (target && target !== document && target !== window && target.nodeType === 1) {
+                    // Scrolled element is a specific DOM element
+                    scrollElement = target;
+                    selector = SmartLocatorGenerator.generateSelector(scrollElement);
+                }
+
+                // Only record if scroll is significant (more than 50px)
+                const scrollDistance = Math.abs(scrollY) + Math.abs(scrollX);
+                if (scrollDistance < 50) {
+                    return;
+                }
+
+                this.sendAction({
+                    eventType: 'scroll',
+                    actionType: 'scroll',
+                    selector: selector,
+                    value: JSON.stringify({ x: Math.round(scrollX), y: Math.round(scrollY) }),
+                    element: scrollElement ? {
+                        tag: scrollElement.tagName.toLowerCase(),
+                        id: scrollElement.id,
+                        classes: Array.from(scrollElement.classList || [])
+                    } : { tag: 'window' },
+                    iframe: {
+                        inIFrame: IFrameHandler.isInIFrame(),
+                        iframeSelector: IFrameHandler.getIFrameSelector()
+                    },
+                    timestamp: Date.now()
+                });
+
+                delete this.pendingInputActions[scrollDebounceKey];
+            }, 800); // Wait 800ms after scroll stops to record
         }
 
         static sendAction(actionData) {

@@ -55,6 +55,11 @@ namespace AgenticAI.Core.ZeroCode
 
             try
             {
+                // CRITICAL FIX: Ensure Steps array is properly built before execution
+                // This handles cases where the scenario is loaded directly from JSON
+                // and the Steps array is outdated or doesn't include new assertions
+                EnsureStepsArrayIsValid(scenario);
+                
                 // Check if scenario uses new unified Steps model
                 if (scenario.Steps != null && scenario.Steps.Count > 0)
                 {
@@ -113,10 +118,11 @@ namespace AgenticAI.Core.ZeroCode
                     
                     // Calculate total steps for last step detection
                     var totalActions = scenario.Actions.Count;
-                    var assertionsForActions = scenario.Assertions.Where(a => a.ExecuteAfterActionIndex.HasValue).ToList();
-                    var remainingAssertions = scenario.Assertions.Where(a => !a.ExecuteAfterActionIndex.HasValue).ToList();
+                    var beforeAssertions = scenario.Assertions.Where(a => a.ExecuteBeforeActionIndex.HasValue).ToList();
+                    var afterAssertions = scenario.Assertions.Where(a => a.ExecuteAfterActionIndex.HasValue).ToList();
+                    var remainingAssertions = scenario.Assertions.Where(a => !a.ExecuteAfterActionIndex.HasValue && !a.ExecuteBeforeActionIndex.HasValue).ToList();
                     var hasNavigation = !string.IsNullOrEmpty(scenario.StartUrl) || !string.IsNullOrEmpty(_config.BaseUrl);
-                    var totalSteps = (hasNavigation ? 1 : 0) + totalActions + remainingAssertions.Count;
+                    var totalSteps = (hasNavigation ? 1 : 0) + totalActions + beforeAssertions.Count + afterAssertions.Count + remainingAssertions.Count;
                     var currentStepIndex = 0;
                     
                     // Navigate to start URL - use Base URL from config if StartUrl is empty
@@ -146,21 +152,32 @@ namespace AgenticAI.Core.ZeroCode
                     // Execute actions with their assertions interleaved
                     for (int i = 0; i < scenario.Actions.Count; i++)
                     {
-                        var isLastStep = (currentStepIndex == totalSteps - 1);
+                        // Execute precondition assertions (BEFORE action)
+                        var beforeList = scenario.Assertions
+                            .Where(a => a.ExecuteBeforeActionIndex == i)
+                            .ToList();
+                        
+                        foreach (var assertion in beforeList)
+                        {
+                            var isLastStep = (currentStepIndex == totalSteps - 1);
+                            await ExecuteAssertionAsync(assertion, testResult, isLastStep);
+                            currentStepIndex++;
+                        }
                         
                         // Execute the action
-                        await ExecuteActionAsync(scenario.Actions[i], testResult, isLastStep);
+                        var isLastActionStep = (currentStepIndex == totalSteps - 1);
+                        await ExecuteActionAsync(scenario.Actions[i], testResult, isLastActionStep);
                         currentStepIndex++;
                         
-                        // Execute assertions that should run after this action
-                        var assertionsForThisAction = scenario.Assertions
+                        // Execute postcondition assertions (AFTER action)
+                        var afterList = scenario.Assertions
                             .Where(a => a.ExecuteAfterActionIndex == i)
                             .ToList();
                         
-                        foreach (var assertion in assertionsForThisAction)
+                        foreach (var assertion in afterList)
                         {
-                            isLastStep = (currentStepIndex == totalSteps - 1);
-                            await ExecuteAssertionAsync(assertion, testResult, isLastStep);
+                            var isLastAssertion = (currentStepIndex == totalSteps - 1);
+                            await ExecuteAssertionAsync(assertion, testResult, isLastAssertion);
                             currentStepIndex++;
                         }
                     }
@@ -272,10 +289,12 @@ namespace AgenticAI.Core.ZeroCode
 
                 // Smart wait - only wait if element is not immediately available
                 // This prevents unnecessary delays while ensuring element is ready
+                // IMPORTANT: Skip for scroll actions with "window" locator (page scroll)
                 if (!string.IsNullOrEmpty(action.Locator) && 
                     actionType != "navigate" && 
                     actionType != "wait" && 
-                    actionType != "waitforelement")
+                    actionType != "waitforelement" &&
+                    !(actionType == "scroll" && action.Locator == "window"))  // Don't wait for "window" element
                 {
                     try
                     {
@@ -314,7 +333,7 @@ namespace AgenticAI.Core.ZeroCode
                         if (!string.IsNullOrEmpty(action.Value))
                         {
                             var resolvedValue = ResolveActionValueFromDataset(action);
-                                step.Description = $"Type \"{resolvedValue}\" into {action.Locator}";
+                            step.Description = $"Type \"{resolvedValue}\" into {action.Locator}";
                             
                             // ENHANCED: Scroll to input field before typing to ensure visibility
                             try
@@ -328,8 +347,32 @@ namespace AgenticAI.Core.ZeroCode
                                 // Don't fail on scroll, proceed with typing anyway
                             }
                             
-                            await _driver.TypeAsync(action.Locator, resolvedValue!);
-                            Logger.Info($"Successfully typed into: {action.Locator}");
+                            // CRITICAL FIX: Check if element is a radio button or checkbox
+                            // These elements should be clicked, not filled
+                            try
+                            {
+                                var elementType = await _driver.GetAttributeAsync(action.Locator, "type");
+                                
+                                if (elementType != null && (elementType.ToLower() == "radio" || elementType.ToLower() == "checkbox"))
+                                {
+                                    // For radio buttons and checkboxes, use click instead of type
+                                    await _driver.ClickAsync(action.Locator);
+                                    Logger.Info($"Successfully clicked {elementType} input: {action.Locator}");
+                                }
+                                else
+                                {
+                                    // Normal text inputs - use type
+                                    await _driver.TypeAsync(action.Locator, resolvedValue!);
+                                    Logger.Info($"Successfully typed into: {action.Locator}");
+                                }
+                            }
+                            catch (Exception typeCheckEx)
+                            {
+                                Logger.Debug($"Could not determine input type: {typeCheckEx.Message}. Attempting to type...");
+                                // If we can't determine type, try typing anyway
+                                await _driver.TypeAsync(action.Locator, resolvedValue!);
+                                Logger.Info($"Successfully typed into: {action.Locator}");
+                            }
                         }
                         break;
 
@@ -394,7 +437,38 @@ namespace AgenticAI.Core.ZeroCode
 
                     case "scroll":
                         // GLOBAL FIX: Enhanced scroll with special value support
-                        if (string.IsNullOrEmpty(action.Locator) && !string.IsNullOrEmpty(action.Value))
+                        // Handle window/page scrolling (captured during recording)
+                        if (action.Locator == "window" && !string.IsNullOrEmpty(action.Value))
+                        {
+                            try
+                            {
+                                // Parse JSON coordinates: {"x":0,"y":183}
+                                var scrollData = System.Text.Json.JsonDocument.Parse(action.Value);
+                                var x = scrollData.RootElement.GetProperty("x").GetInt32();
+                                var y = scrollData.RootElement.GetProperty("y").GetInt32();
+                                
+                                await _driver.ExecuteScriptAsync($"window.scrollTo({{ left: {x}, top: {y}, behavior: 'smooth' }})");
+                                await Task.Delay(500); // Wait for scroll animation
+                                Logger.Info($"Scrolled page to position: x={x}, y={y}");
+                            }
+                            catch (Exception jsonEx)
+                            {
+                                Logger.Warning($"Failed to parse scroll JSON, trying legacy format: {jsonEx.Message}");
+                                
+                                // Fallback: try comma-separated format
+                                if (action.Value.Contains(","))
+                                {
+                                    var coords = action.Value.Split(',');
+                                    if (coords.Length == 2 && int.TryParse(coords[0].Trim(), out var x) && int.TryParse(coords[1].Trim(), out var y))
+                                    {
+                                        await _driver.ExecuteScriptAsync($"window.scrollTo({{ left: {x}, top: {y}, behavior: 'smooth' }})");
+                                        await Task.Delay(500);
+                                        Logger.Info($"Scrolled page to coordinates: ({x}, {y})");
+                                    }
+                                }
+                            }
+                        }
+                        else if (string.IsNullOrEmpty(action.Locator) && !string.IsNullOrEmpty(action.Value))
                         {
                             // Handle special scroll values: "top", "bottom", or pixel coordinates
                             var scrollValue = action.Value.ToLower().Trim();
@@ -440,7 +514,7 @@ namespace AgenticAI.Core.ZeroCode
                                 Logger.Warning($"Unknown scroll value: {action.Value}");
                             }
                         }
-                        else if (!string.IsNullOrEmpty(action.Locator))
+                        else if (!string.IsNullOrEmpty(action.Locator) && action.Locator != "window")
                         {
                             // Scroll to specific element using locator
                             try
@@ -961,6 +1035,94 @@ namespace AgenticAI.Core.ZeroCode
                 
                 testResult.Steps.Add(step);
             }
+        }
+
+        /// <summary>
+        /// Ensures the Steps array is properly built from Actions and Assertions arrays
+        /// This is critical for proper execution order of preconditions and postconditions
+        /// </summary>
+        private void EnsureStepsArrayIsValid(TestScenario scenario)
+        {
+            if (scenario.Actions == null || scenario.Actions.Count == 0)
+            {
+                return;
+            }
+
+            scenario.Assertions ??= new List<Assertion>();
+            
+            // Always rebuild the Steps array to ensure assertions are in correct order
+            // This handles cases where:
+            // 1. Steps array is null or empty
+            // 2. Steps array is outdated (doesn't include newly generated assertions)
+            // 3. Assertions have been added but Steps wasn't updated
+            var unifiedSteps = new List<TestStep>();
+            int orderIndex = 0;
+
+            for (int actionIndex = 0; actionIndex < scenario.Actions.Count; actionIndex++)
+            {
+                var action = scenario.Actions[actionIndex];
+
+                // Add BEFORE assertions (preconditions) first
+                var beforeAssertions = scenario.Assertions
+                    .Where(a => a.ExecuteBeforeActionIndex == actionIndex)
+                    .ToList();
+
+                foreach (var assertion in beforeAssertions)
+                {
+                    unifiedSteps.Add(new TestStep
+                    {
+                        Order = orderIndex++,
+                        StepType = "Assertion",
+                        Action = null,
+                        Assertion = assertion
+                    });
+                }
+
+                // Add the action
+                unifiedSteps.Add(new TestStep
+                {
+                    Order = orderIndex++,
+                    StepType = "Action",
+                    Action = action,
+                    Assertion = null
+                });
+
+                // Add AFTER assertions (postconditions) last
+                var afterAssertions = scenario.Assertions
+                    .Where(a => a.ExecuteAfterActionIndex == actionIndex)
+                    .ToList();
+
+                foreach (var assertion in afterAssertions)
+                {
+                    unifiedSteps.Add(new TestStep
+                    {
+                        Order = orderIndex++,
+                        StepType = "Assertion",
+                        Action = null,
+                        Assertion = assertion
+                    });
+                }
+            }
+
+            // Add unassigned assertions at the end
+            var unassignedAssertions = scenario.Assertions
+                .Where(a => !a.ExecuteBeforeActionIndex.HasValue && !a.ExecuteAfterActionIndex.HasValue)
+                .ToList();
+
+            foreach (var assertion in unassignedAssertions)
+            {
+                unifiedSteps.Add(new TestStep
+                {
+                    Order = orderIndex++,
+                    StepType = "Assertion",
+                    Action = null,
+                    Assertion = assertion
+                });
+            }
+
+            scenario.Steps = unifiedSteps;
+            
+            Logger.Debug($"Rebuilt Steps array: {unifiedSteps.Count} total steps from {scenario.Actions.Count} actions and {scenario.Assertions.Count} assertions");
         }
     }
 }
