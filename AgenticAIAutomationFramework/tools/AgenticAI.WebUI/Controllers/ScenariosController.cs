@@ -2,6 +2,7 @@ using AgenticAI.Core.Interfaces;
 using AgenticAI.Core.ZeroCode;
 using AgenticAI.Core.ZeroCode.Models;
 using AgenticAI.Core.Configuration;
+using AgenticAI.Core.DataDriven;
 using AgenticAI.UIAutomation.Drivers;
 using AgenticAI.WebUI.Hubs;
 using Microsoft.AspNetCore.Mvc;
@@ -124,12 +125,441 @@ namespace AgenticAI.WebUI.Controllers
                     return NotFound(new { success = false, error = "Scenario not found" });
                 }
                 
+                // GLOBAL FIX: Clean up legacy issues in old scenarios
+                CleanupLegacyScenarioIssues(scenario);
+                
+                // Auto-generate assertions if missing or incomplete
+                // This ensures that old scenarios and new scenarios both have proper assertions
+                EnsureScenarioHasAssertions(scenario);
+                
                 return Ok(new { success = true, scenario });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { success = false, error = ex.Message });
             }
+        }
+
+        /// <summary>
+        /// GLOBAL FIX: Automatically clean up legacy issues in old scenarios
+        /// Fixes incorrect locators, removes duplicates, normalizes data
+        /// </summary>
+        private void CleanupLegacyScenarioIssues(TestScenario scenario)
+        {
+            if (scenario == null) return;
+
+            // Fix 1: Replace incorrect locators in Actions
+            if (scenario.Actions != null)
+            {
+                foreach (var action in scenario.Actions)
+                {
+                    // Fix: button:has-text("Submit") → #submit (or other semantic IDs)
+                    if (!string.IsNullOrEmpty(action.Locator) && action.Locator.Contains("button:has-text"))
+                    {
+                        // Extract button text
+                        var match = System.Text.RegularExpressions.Regex.Match(action.Locator, @"button:has-text\([""']?(\w+)[""']?\)");
+                        if (match.Success)
+                        {
+                            var buttonText = match.Groups[1].Value.ToLower();
+                            
+                            // Map common button texts to their semantic IDs
+                            var buttonIdMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                            {
+                                { "submit", "#submit" },
+                                { "login", "#login" },
+                                { "signin", "#signin" },
+                                { "signup", "#signup" },
+                                { "register", "#register" },
+                                { "search", "#search" },
+                                { "cancel", "#cancel" },
+                                { "save", "#save" },
+                                { "delete", "#delete" },
+                                { "ok", "#ok" }
+                            };
+
+                            if (buttonIdMap.TryGetValue(buttonText, out var semanticId))
+                            {
+                                action.Locator = semanticId;
+                                action.Description = action.Description?.Replace($"button:has-text(\"{buttonText}\")", semanticId)
+                                                   ?? $"Click on {semanticId}";
+                                Log.Debug($"Fixed action locator: button:has-text(\"{buttonText}\") → {semanticId}");
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Fix 2: Remove duplicate and fix incorrect locators in Assertions
+            if (scenario.Assertions != null && scenario.Assertions.Count > 0)
+            {
+                var cleanedAssertions = new List<Assertion>();
+                var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var assertion in scenario.Assertions)
+                {
+                    // Fix incorrect locators in assertions
+                    if (!string.IsNullOrEmpty(assertion.Locator) && assertion.Locator.Contains("button:has-text"))
+                    {
+                        var match = System.Text.RegularExpressions.Regex.Match(assertion.Locator, @"button:has-text\([""']?(\w+)[""']?\)");
+                        if (match.Success)
+                        {
+                            var buttonText = match.Groups[1].Value.ToLower();
+                            var buttonIdMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                            {
+                                { "submit", "#submit" },
+                                { "login", "#login" },
+                                { "signin", "#signin" },
+                                { "signup", "#signup" }
+                            };
+
+                            if (buttonIdMap.TryGetValue(buttonText, out var semanticId))
+                            {
+                                assertion.Locator = semanticId;
+                                Log.Debug($"Fixed assertion locator: button:has-text(\"{buttonText}\") → {semanticId}");
+                            }
+                        }
+                    }
+
+                    // Deduplicate using proper key
+                    var key = GetAssertionDedupKey(assertion);
+                    if (!seenKeys.Contains(key))
+                    {
+                        cleanedAssertions.Add(assertion);
+                        seenKeys.Add(key);
+                    }
+                    else
+                    {
+                        Log.Debug($"Removed duplicate assertion: {assertion.Type} on {assertion.Locator}");
+                    }
+                }
+
+                scenario.Assertions = cleanedAssertions;
+            }
+
+            // Fix 3: Clear outdated Steps array (will be rebuilt)
+            scenario.Steps = new List<TestStep>();
+        }
+
+        /// <summary>
+        /// Ensures a scenario has auto-generated assertions for its actions
+        /// CRITICAL FIX: Respects user edits - only auto-generates if NO assertions exist for an action
+        /// </summary>
+        private void EnsureScenarioHasAssertions(TestScenario scenario)
+        {
+            if (scenario.Actions == null || scenario.Actions.Count == 0)
+            {
+                return;
+            }
+
+            scenario.Assertions ??= new List<Assertion>();
+
+            // CRITICAL FIX: Track which actions already have assertions (by action index, not locator)
+            // This prevents auto-generation from overwriting user edits
+            var actionsWithBeforeAssertions = new HashSet<int>(
+                scenario.Assertions
+                    .Where(a => a.ExecuteBeforeActionIndex.HasValue)
+                    .Select(a => a.ExecuteBeforeActionIndex.Value)
+            );
+
+            var actionsWithAfterAssertions = new HashSet<int>(
+                scenario.Assertions
+                    .Where(a => a.ExecuteAfterActionIndex.HasValue)
+                    .Select(a => a.ExecuteAfterActionIndex.Value)
+            );
+
+            bool addedNewAssertions = false;
+
+            for (int actionIndex = 0; actionIndex < scenario.Actions.Count; actionIndex++)
+            {
+                var action = scenario.Actions[actionIndex];
+                var generatedList = BuildAutoAssertions(action, actionIndex);
+                
+                foreach (var generated in generatedList)
+                {
+                    // Check if an assertion already exists for this action (before or after)
+                    bool alreadyExists = false;
+                    
+                    if (generated.ExecuteBeforeActionIndex.HasValue)
+                    {
+                        alreadyExists = actionsWithBeforeAssertions.Contains(generated.ExecuteBeforeActionIndex.Value);
+                    }
+                    else if (generated.ExecuteAfterActionIndex.HasValue)
+                    {
+                        alreadyExists = actionsWithAfterAssertions.Contains(generated.ExecuteAfterActionIndex.Value);
+                    }
+
+                    // Skip if user already defined an assertion for this action (respects user edits)
+                    if (alreadyExists)
+                    {
+                        continue;
+                    }
+
+                    // Add the auto-generated assertion
+                    scenario.Assertions.Add(generated);
+                    
+                    // Track that this action now has an assertion
+                    if (generated.ExecuteBeforeActionIndex.HasValue)
+                    {
+                        actionsWithBeforeAssertions.Add(generated.ExecuteBeforeActionIndex.Value);
+                    }
+                    else if (generated.ExecuteAfterActionIndex.HasValue)
+                    {
+                        actionsWithAfterAssertions.Add(generated.ExecuteAfterActionIndex.Value);
+                    }
+                    
+                    addedNewAssertions = true;
+                }
+            }
+
+            // CRITICAL FIX: If we added new assertions, rebuild the Steps array
+            // to ensure they're executed in the correct order
+            if (addedNewAssertions || scenario.Steps == null || scenario.Steps.Count == 0)
+            {
+                RebuildStepsArray(scenario);
+            }
+        }
+
+        /// <summary>
+        /// Rebuilds the Steps array from Actions and Assertions arrays
+        /// This ensures assertions execute in the correct order (before/after actions)
+        /// </summary>
+        private void RebuildStepsArray(TestScenario scenario)
+        {
+            var unifiedSteps = new List<TestStep>();
+            int orderIndex = 0;
+
+            for (int actionIndex = 0; actionIndex < scenario.Actions.Count; actionIndex++)
+            {
+                var action = scenario.Actions[actionIndex];
+
+                // Add BEFORE assertions (preconditions) first
+                var beforeAssertions = scenario.Assertions
+                    .Where(a => a.ExecuteBeforeActionIndex == actionIndex)
+                    .ToList();
+
+                foreach (var assertion in beforeAssertions)
+                {
+                    unifiedSteps.Add(new TestStep
+                    {
+                        Order = orderIndex++,
+                        StepType = "Assertion",
+                        Action = null,
+                        Assertion = assertion
+                    });
+                }
+
+                // Add the action
+                unifiedSteps.Add(new TestStep
+                {
+                    Order = orderIndex++,
+                    StepType = "Action",
+                    Action = action,
+                    Assertion = null
+                });
+
+                // Add AFTER assertions (postconditions) last
+                var afterAssertions = scenario.Assertions
+                    .Where(a => a.ExecuteAfterActionIndex == actionIndex)
+                    .ToList();
+
+                foreach (var assertion in afterAssertions)
+                {
+                    unifiedSteps.Add(new TestStep
+                    {
+                        Order = orderIndex++,
+                        StepType = "Assertion",
+                        Action = null,
+                        Assertion = assertion
+                    });
+                }
+            }
+
+            // Add unassigned assertions at the end
+            var unassignedAssertions = scenario.Assertions
+                .Where(a => !a.ExecuteBeforeActionIndex.HasValue && !a.ExecuteAfterActionIndex.HasValue)
+                .ToList();
+
+            foreach (var assertion in unassignedAssertions)
+            {
+                unifiedSteps.Add(new TestStep
+                {
+                    Order = orderIndex++,
+                    StepType = "Assertion",
+                    Action = null,
+                    Assertion = assertion
+                });
+            }
+
+            scenario.Steps = unifiedSteps;
+        }
+
+        private static List<Assertion> BuildAutoAssertions(RecordedAction action, int actionIndex)
+        {
+            var assertions = new List<Assertion>();
+            
+            // Skip parametrization steps - they shouldn't have auto-assertions
+            // Any action with ParameterName metadata is a data-driven parameterization step
+            if (action.Metadata != null &&
+                action.Metadata.TryGetValue("ParameterName", out var parameterName) &&
+                !string.IsNullOrWhiteSpace(parameterName))
+            {
+                // This is a parametrization value step, skip assertion
+                return assertions;
+            }
+
+            var actionType = (action.ActionType ?? string.Empty).Trim().ToLowerInvariant();
+            var locator = action.Locator ?? string.Empty;
+            var value = action.Value;
+
+            switch (actionType)
+            {
+                case "navigate":
+                    // Postcondition: Verify navigation completed successfully
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        break;
+                    }
+
+                    assertions.Add(new Assertion
+                    {
+                        Type = "UrlContains",
+                        ExpectedValue = GetStableUrlToken(value),
+                        Description = "Verify navigation completed",
+                        ExecuteAfterActionIndex = actionIndex
+                    });
+                    break;
+
+                case "type":
+                case "input":
+                case "fill":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify element is visible before typing
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementVisible",
+                        Locator = locator,
+                        Description = "Verify element is visible before input",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+
+                    // Postcondition: Verify value was entered correctly
+                    var expectedValue = BuildExpectedValueForValueAssertion(action, value);
+                    if (!string.IsNullOrWhiteSpace(expectedValue))
+                    {
+                        assertions.Add(new Assertion
+                        {
+                            Type = "ValueEquals",
+                            Locator = locator,
+                            ExpectedValue = expectedValue,
+                            Description = "Verify value entered correctly",
+                            ExecuteAfterActionIndex = actionIndex
+                        });
+                    }
+                    break;
+
+                case "select":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify dropdown is visible before selection
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementVisible",
+                        Locator = locator,
+                        Description = "Verify dropdown is visible before selection",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+                    break;
+
+                case "click":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify element exists before clicking
+                    // Use ElementExists instead of ElementVisible because click action
+                    // will automatically scroll to element, so it doesn't need to be visible yet
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementExists",
+                        Locator = locator,
+                        Description = "Verify element exists before click",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+                    break;
+
+                case "submit":
+                    if (string.IsNullOrWhiteSpace(locator))
+                    {
+                        break;
+                    }
+
+                    // Precondition: Verify element exists before submitting
+                    // Use ElementExists instead of ElementVisible because submit action
+                    // will automatically scroll to element, so it doesn't need to be visible yet
+                    assertions.Add(new Assertion
+                    {
+                        Type = "ElementExists",
+                        Locator = locator,
+                        Description = "Verify element exists before submit",
+                        ExecuteBeforeActionIndex = actionIndex
+                    });
+                    break;
+
+                case "wait":
+                case "waitforelement":
+                case "switchtoframe":
+                case "switchtodefaultcontent":
+                case "screenshot":
+                case "hover":
+                    // No assertions for non-interactive or utility actions
+                    break;
+
+                default:
+                    // Avoid trivial assertions for unknown action types
+                    break;
+            }
+            
+            return assertions;
+        }
+
+        private static string BuildExpectedValueForValueAssertion(RecordedAction action, string? fallbackValue)
+        {
+            if (action.Metadata != null &&
+                action.Metadata.TryGetValue("ParameterName", out var parameterName) &&
+                !string.IsNullOrWhiteSpace(parameterName))
+            {
+                return ParameterResolver.WrapAsPlaceholder(parameterName);
+            }
+
+            return fallbackValue ?? string.Empty;
+        }
+
+        private static string GetStableUrlToken(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var parsed))
+            {
+                var path = parsed.AbsolutePath?.TrimEnd('/') ?? string.Empty;
+                return string.IsNullOrWhiteSpace(path) || path == "/"
+                    ? parsed.Host
+                    : $"{parsed.Host}{path}";
+            }
+
+            return url;
+        }
+
+        private static string GetAssertionDedupKey(Assertion assertion)
+        {
+            // CRITICAL FIX: Include BOTH ExecuteBeforeActionIndex AND ExecuteAfterActionIndex
+            // to properly deduplicate precondition and postcondition assertions
+            return $"{assertion.Type}|{assertion.Locator}|{assertion.ExpectedValue}|{assertion.ExecuteBeforeActionIndex}|{assertion.ExecuteAfterActionIndex}";
         }
 
         /// <summary>
@@ -266,6 +696,10 @@ namespace AgenticAI.WebUI.Controllers
                 scenario.Module = module;
                 scenario.Name = name;
                 scenario.ModifiedAt = DateTime.Now;
+                
+                // GLOBAL FIX: Clean up before saving
+                CleanupLegacyScenarioIssues(scenario);
+                
                 manager.SaveScenario(scenario);
                 
                 return Ok(new

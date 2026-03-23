@@ -17,17 +17,26 @@ async function viewScenario(module, name) {
         if (data.success) {
             const scenario = data.scenario;
 
-            // CRITICAL FIX: Convert backend executeAfterActionIndex to frontend afterActionIndex
+            // Convert backend ExecuteBeforeActionIndex/ExecuteAfterActionIndex to frontend properties
+            // Support both PascalCase (C#) and camelCase (JSON) property names
             const assertions = (scenario.assertions || []).map(a => {
                 const assertionWithIndex = {
-                    type: a.type,
-                    locator: a.locator,
-                    expectedValue: a.expectedValue,
-                    description: a.description
+                    type: a.type || a.Type,
+                    locator: a.locator || a.Locator,
+                    expectedValue: a.expectedValue || a.ExpectedValue,
+                    description: a.description || a.Description
                 };
 
-                if (a.executeAfterActionIndex !== undefined && a.executeAfterActionIndex !== null) {
-                    assertionWithIndex.afterActionIndex = a.executeAfterActionIndex;
+                // Check for ExecuteBeforeActionIndex (preconditions)
+                const beforeIndex = a.executeBeforeActionIndex ?? a.ExecuteBeforeActionIndex;
+                if (beforeIndex !== undefined && beforeIndex !== null) {
+                    assertionWithIndex.beforeActionIndex = beforeIndex;
+                }
+
+                // Check for ExecuteAfterActionIndex (postconditions)
+                const afterIndex = a.executeAfterActionIndex ?? a.ExecuteAfterActionIndex;
+                if (afterIndex !== undefined && afterIndex !== null) {
+                    assertionWithIndex.afterActionIndex = afterIndex;
                 }
 
                 return assertionWithIndex;
@@ -42,6 +51,11 @@ async function viewScenario(module, name) {
                 actions: JSON.parse(JSON.stringify(scenario.actions || [])),
                 assertions: assertions
             };
+
+            console.log('[Scenario Editor] Loaded scenario:', name);
+            console.log('[Scenario Editor] Actions:', currentEditingScenario.actions.length);
+            console.log('[Scenario Editor] Assertions:', currentEditingScenario.assertions.length);
+            console.log('[Scenario Editor] Assertions with afterActionIndex:', assertions.filter(a => a.afterActionIndex !== undefined && a.afterActionIndex !== null).length);
 
             renderScenarioModal();
         }
@@ -139,11 +153,14 @@ function renderCompactStepsList() {
     
     // Actions Table
     if (actions.length > 0) {
+        // Count total steps (actions + assertions)
+        const totalSteps = actions.length + assertions.length;
+        
         html += `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h4 style="margin: 0; color: #1f2937; font-size: 14px; display: flex; align-items: center; gap: 6px;">
                     <i class="fas fa-list-ol" style="color: var(--primary-color); font-size: 13px;"></i>
-                    Scenario Flow (${actions.length} steps)
+                    Scenario Flow (${totalSteps} steps: ${actions.length} actions, ${assertions.length} assertions)
                 </h4>
                 <button class="btn btn-primary btn-sm" onclick="addNewStep(${actions.length}, 'action')" title="Add Step at End" style="font-size: 11px; padding: 5px 10px;">
                     <i class="fas fa-plus"></i> Add Step
@@ -166,6 +183,41 @@ function renderCompactStepsList() {
             const canMoveUp = idx > 0;
             const canMoveDown = idx < actions.length - 1;
             
+            // Render BEFORE assertions (preconditions) - FIRST
+            const beforeAssertions = assertions.filter(a => a.beforeActionIndex === idx);
+            beforeAssertions.forEach(assertion => {
+                const globalAssertionIndex = assertions.indexOf(assertion);
+                html += `
+                    <tr style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                        <td style="padding: 6px 10px; color: #d97706; font-weight: 600; font-size: 11px; padding-left: 20px;">
+                            <i class="fas fa-shield-alt" style="font-size: 10px;"></i>
+                        </td>
+                        <td style="padding: 6px 10px;">
+                            <span class="badge" style="background: #f59e0b; color: white; font-size: 10px; padding: 3px 8px;">${escapeHtml(assertion.type)}</span>
+                        </td>
+                        <td style="padding: 6px 10px; color: #d97706; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                            ${escapeHtml(assertion.locator || '-')}
+                        </td>
+                        <td style="padding: 6px 10px; color: #b45309; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                            <span style="font-style: italic; color: #92400e;">BEFORE: ${assertion.description || assertion.expectedValue || '-'}</span>
+                        </td>
+                        <td style="padding: 6px 10px; text-align: center;">
+                            <div style="display: flex; gap: 3px; justify-content: center; align-items: center;">
+                                <button class="btn btn-sm" style="padding: 3px 6px; background: transparent; color: var(--primary-color); border: none; cursor: pointer; font-size: 12px;" 
+                                        onclick="editStep(${globalAssertionIndex}, 'assertion')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm" style="padding: 3px 6px; background: transparent; color: var(--danger-color); border: none; cursor: pointer; font-size: 12px;" 
+                                        onclick="deleteAssertion(${globalAssertionIndex})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Render the ACTION row - SECOND
             html += `
                 <tr style="border-bottom: 1px solid #f3f4f6;">
                     <td style="padding: 6px 10px; color: #3b82f6; font-weight: 600; font-size: 11px;">${idx + 1}</td>
@@ -214,6 +266,41 @@ function renderCompactStepsList() {
                     </td>
                 </tr>
             `;
+            
+
+            // Render AFTER assertions (postconditions)
+            const afterAssertions = assertions.filter(a => a.afterActionIndex === idx);
+            afterAssertions.forEach(assertion => {
+                const globalAssertionIndex = assertions.indexOf(assertion);
+                html += `
+                    <tr style="background: #f0fdf4; border-left: 4px solid #10b981;">
+                        <td style="padding: 6px 10px; color: #059669; font-weight: 600; font-size: 11px; padding-left: 20px;">
+                            <i class="fas fa-check-circle" style="font-size: 10px;"></i>
+                        </td>
+                        <td style="padding: 6px 10px;">
+                            <span class="badge badge-success" style="font-size: 10px; padding: 3px 8px;">${escapeHtml(assertion.type)}</span>
+                        </td>
+                        <td style="padding: 6px 10px; color: #059669; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                            ${escapeHtml(assertion.locator || '-')}
+                        </td>
+                        <td style="padding: 6px 10px; color: #047857; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                            <span style="font-style: italic; color: #065f46;">AFTER: ${assertion.description || assertion.expectedValue || '-'}</span>
+                        </td>
+                        <td style="padding: 6px 10px; text-align: center;">
+                            <div style="display: flex; gap: 3px; justify-content: center; align-items: center;">
+                                <button class="btn btn-sm" style="padding: 3px 6px; background: transparent; color: var(--primary-color); border: none; cursor: pointer; font-size: 12px;" 
+                                        onclick="editStep(${globalAssertionIndex}, 'assertion')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm" style="padding: 3px 6px; background: transparent; color: var(--danger-color); border: none; cursor: pointer; font-size: 12px;" 
+                                        onclick="deleteAssertion(${globalAssertionIndex})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
         });
         
         html += `
@@ -222,10 +309,12 @@ function renderCompactStepsList() {
         `;
     }
     
-    // Assertions Table
-    const unassignedAssertions = assertions.filter(a => 
-        a.afterActionIndex === undefined || a.afterActionIndex === null || a.afterActionIndex < 0
-    );
+    // Assertions Table (only show unassigned assertions)
+    const unassignedAssertions = assertions.filter(a => {
+        const hasBeforeIndex = a.beforeActionIndex !== undefined && a.beforeActionIndex !== null && a.beforeActionIndex >= 0;
+        const hasAfterIndex = a.afterActionIndex !== undefined && a.afterActionIndex !== null && a.afterActionIndex >= 0;
+        return !hasBeforeIndex && !hasAfterIndex;
+    });
     
     if (unassignedAssertions.length > 0) {
         html += `
@@ -916,6 +1005,30 @@ async function saveScenarioChanges() {
         let orderIndex = 0;
 
         currentEditingScenario.actions.forEach((action, actionIndex) => {
+            // Add BEFORE assertions (preconditions) first
+            const beforeAssertions = currentEditingScenario.assertions.filter(
+                a => a.beforeActionIndex === actionIndex
+            );
+
+            beforeAssertions.forEach(assertion => {
+                const savedAssertion = {
+                    Type: assertion.type,
+                    Locator: assertion.locator,
+                    ExpectedValue: assertion.expectedValue,
+                    Description: assertion.description,
+                    ExecuteBeforeActionIndex: actionIndex
+                };
+                orderedAssertions.push(savedAssertion);
+                unifiedSteps.push({
+                    order: orderIndex++,
+                    stepName: 'Assertion_' + savedAssertion.Type,
+                    stepType: 'Assertion',
+                    action: null,
+                    assertion: savedAssertion
+                });
+            });
+
+            // Add the action
             orderedActions.push(action);
             unifiedSteps.push({
                 order: orderIndex++,
@@ -925,21 +1038,23 @@ async function saveScenarioChanges() {
                 assertion: null
             });
 
-            const assertionsForThisStep = currentEditingScenario.assertions.filter(
+            // Add AFTER assertions (postconditions) last
+            const afterAssertions = currentEditingScenario.assertions.filter(
                 a => a.afterActionIndex === actionIndex
             );
 
-            assertionsForThisStep.forEach(assertion => {
+            afterAssertions.forEach(assertion => {
                 const savedAssertion = {
-                    type: assertion.type,
-                    locator: assertion.locator,
-                    expectedValue: assertion.expectedValue,
-                    executeAfterActionIndex: actionIndex
+                    Type: assertion.type,
+                    Locator: assertion.locator,
+                    ExpectedValue: assertion.expectedValue,
+                    Description: assertion.description,
+                    ExecuteAfterActionIndex: actionIndex
                 };
                 orderedAssertions.push(savedAssertion);
                 unifiedSteps.push({
                     order: orderIndex++,
-                    stepName: 'Assertion_' + savedAssertion.type,
+                    stepName: 'Assertion_' + savedAssertion.Type,
                     stepType: 'Assertion',
                     action: null,
                     assertion: savedAssertion
@@ -947,20 +1062,24 @@ async function saveScenarioChanges() {
             });
         });
 
-        const unmatchedAssertions = currentEditingScenario.assertions.filter(
-            a => a.afterActionIndex === undefined || a.afterActionIndex === null || a.afterActionIndex < 0
-        );
+        // Add unassigned assertions (no before/after index)
+        const unmatchedAssertions = currentEditingScenario.assertions.filter(a => {
+            const hasBeforeIndex = a.beforeActionIndex !== undefined && a.beforeActionIndex !== null && a.beforeActionIndex >= 0;
+            const hasAfterIndex = a.afterActionIndex !== undefined && a.afterActionIndex !== null && a.afterActionIndex >= 0;
+            return !hasBeforeIndex && !hasAfterIndex;
+        });
 
         unmatchedAssertions.forEach(assertion => {
             const savedAssertion = {
-                type: assertion.type,
-                locator: assertion.locator,
-                expectedValue: assertion.expectedValue
+                Type: assertion.type,
+                Locator: assertion.locator,
+                ExpectedValue: assertion.expectedValue,
+                Description: assertion.description
             };
             orderedAssertions.push(savedAssertion);
             unifiedSteps.push({
                 order: orderIndex++,
-                stepName: 'Assertion_' + savedAssertion.type,
+                stepName: 'Assertion_' + savedAssertion.Type,
                 stepType: 'Assertion',
                 action: null,
                 assertion: savedAssertion

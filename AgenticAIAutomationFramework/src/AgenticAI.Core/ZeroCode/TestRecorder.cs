@@ -300,6 +300,16 @@ namespace AgenticAI.Core.ZeroCode
                         case "submit":
                             action.Description = $"Submit form {selector}";
                             break;
+                        case "scroll":
+                            if (selector == "window")
+                            {
+                                action.Description = $"Scroll page to position {value}";
+                            }
+                            else
+                            {
+                                action.Description = $"Scroll {selector} to position {value}";
+                            }
+                            break;
                         case "upload":
                             action.Description = $"Upload file to {selector}";
                             break;

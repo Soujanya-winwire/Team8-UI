@@ -82,9 +82,15 @@ namespace AgenticAI.Core.ZeroCode.Models
         public string? Description { get; set; }
         
         /// <summary>
-        /// Legacy: Index of the action after which this assertion should be executed.
-        /// Kept for backward compatibility.
-        /// New scenarios should use the Steps collection instead.
+        /// Index of the action before which this assertion should be executed (precondition).
+        /// Use this for validating element state before performing an action.
+        /// </summary>
+        public int? ExecuteBeforeActionIndex { get; set; }
+        
+        /// <summary>
+        /// Index of the action after which this assertion should be executed (postcondition).
+        /// Use this for validating results after an action completes.
+        /// Kept for backward compatibility with legacy scenarios.
         /// </summary>
         public int? ExecuteAfterActionIndex { get; set; }
     }

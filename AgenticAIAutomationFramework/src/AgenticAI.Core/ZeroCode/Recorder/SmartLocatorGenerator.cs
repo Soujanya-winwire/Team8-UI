@@ -70,19 +70,23 @@ namespace AgenticAI.Core.ZeroCode.Recorder
             const nameLocator = this.getNameLocator(element);
             if (nameLocator) return nameLocator;
             
-            // Priority 4: aria-label
+            // Priority 4: Placeholder (for inputs/textareas)
+            const placeholderLocator = this.getPlaceholderLocator(element);
+            if (placeholderLocator) return placeholderLocator;
+            
+            // Priority 5: aria-label
             const ariaLabelLocator = this.getAriaLabelLocator(element);
             if (ariaLabelLocator) return ariaLabelLocator;
             
-            // Priority 5: Role + accessible name
+            // Priority 6: Role + accessible name
             const roleLocator = this.getRoleLocator(element);
             if (roleLocator) return roleLocator;
             
-            // Priority 6: Text content (for buttons, links)
+            // Priority 7: Text content (for buttons, links)
             const textLocator = this.getTextLocator(element);
             if (textLocator) return textLocator;
             
-            // Priority 7: Stable CSS selector
+            // Priority 8: Stable CSS selector
             const cssLocator = this.getCssLocator(element);
             if (cssLocator) return cssLocator;
             
@@ -166,7 +170,38 @@ namespace AgenticAI.Core.ZeroCode.Recorder
         },
         
         /**
-         * Priority 4: aria-label
+         * Priority 4: Placeholder attribute (for inputs and textareas)
+         */
+        getPlaceholderLocator: function(element) {
+            const tagName = element.tagName.toLowerCase();
+            const placeholder = element.getAttribute('placeholder');
+            
+            if (placeholder && placeholder.trim() && (tagName === 'input' || tagName === 'textarea')) {
+                // Create selector with placeholder
+                let selector = tagName + '[placeholder=""' + placeholder + '""]';
+                
+                // Add type for additional specificity on inputs
+                if (tagName === 'input' && element.type) {
+                    selector = tagName + '[type=""' + element.type + '""][placeholder=""' + placeholder + '""]';
+                }
+                
+                // Validate uniqueness
+                const matches = document.querySelectorAll(selector);
+                if (matches.length === 1 && matches[0] === element) {
+                    return {
+                        locator: selector,
+                        strategy: 'placeholder',
+                        confidence: 85,
+                        value: placeholder
+                    };
+                }
+            }
+            
+            return null;
+        },
+        
+        /**
+         * Priority 5: aria-label
          */
         getAriaLabelLocator: function(element) {
             const ariaLabel = element.getAttribute('aria-label');
@@ -185,7 +220,7 @@ namespace AgenticAI.Core.ZeroCode.Recorder
         },
         
         /**
-         * Priority 5: Role + accessible name
+         * Priority 6: Role + accessible name
          */
         getRoleLocator: function(element) {
             const role = element.getAttribute('role') || this.getImplicitRole(element);
@@ -241,30 +276,114 @@ namespace AgenticAI.Core.ZeroCode.Recorder
         },
         
         /**
-         * Priority 7: Stable CSS selector
+         * Priority 8: Stable CSS selector with enhanced uniqueness validation
          */
         getCssLocator: function(element) {
             const tagName = element.tagName.toLowerCase();
             let selector = tagName;
+            let baseSelector = tagName;
             
-            // Add stable classes (ignore dynamic/utility classes)
-            const stableClasses = this.getStableClasses(element);
-            if (stableClasses.length > 0) {
-                selector += '.' + stableClasses.join('.');
+            // For inputs/textareas, try ID first if stable
+            const id = element.id;
+            if (id && !this.isDynamicId(id) && (tagName === 'input' || tagName === 'textarea' || tagName === 'select')) {
+                const idSelector = '#' + id;
+                const idMatches = document.querySelectorAll(idSelector);
+                if (idMatches.length === 1 && idMatches[0] === element) {
+                    return {
+                        locator: idSelector,
+                        strategy: 'css',
+                        confidence: 90
+                    };
+                }
+            }
+            
+            // For inputs/textareas without placeholder, try ID even if dynamic as last resort before nth
+            if (tagName === 'input' || tagName === 'textarea') {
+                // Check if we have any distinguishing attributes
+                const name = element.getAttribute('name');
+                if (name && name.trim()) {
+                    const nameSelector = tagName + '[name=""' + name + '""]';
+                    const nameMatches = document.querySelectorAll(nameSelector);
+                    if (nameMatches.length === 1 && nameMatches[0] === element) {
+                        return {
+                            locator: nameSelector,
+                            strategy: 'css',
+                            confidence: 85
+                        };
+                    }
+                }
+            }
+            
+            // For inputs/textareas, prioritize placeholder for uniqueness
+            const placeholder = element.getAttribute('placeholder');
+            if (placeholder && placeholder.trim() && (tagName === 'input' || tagName === 'textarea')) {
+                const placeholderSelector = tagName + '[placeholder=""' + placeholder + '""]';
+                const placeholderMatches = document.querySelectorAll(placeholderSelector);
+                if (placeholderMatches.length === 1 && placeholderMatches[0] === element) {
+                    return {
+                        locator: placeholderSelector,
+                        strategy: 'css',
+                        confidence: 85
+                    };
+                }
+                // Use placeholder in combined selector for uniqueness
+                selector += '[placeholder=""' + placeholder + '""]';
+                baseSelector = selector;
             }
             
             // Add type attribute for inputs
             if (element.type && tagName === 'input') {
                 selector += '[type=""' + element.type + '""]';
+                
+                // Check if type + placeholder is unique
+                const typeMatches = document.querySelectorAll(selector);
+                if (typeMatches.length === 1 && typeMatches[0] === element) {
+                    return {
+                        locator: selector,
+                        strategy: 'css',
+                        confidence: 80
+                    };
+                }
             }
             
-            // Add placeholder as additional specificity
-            const placeholder = element.getAttribute('placeholder');
-            if (placeholder && placeholder.trim()) {
-                selector += '[placeholder=""' + placeholder + '""]';
+            // Add stable classes only if needed for uniqueness
+            const stableClasses = this.getStableClasses(element);
+            if (stableClasses.length > 0) {
+                const withClasses = selector + '.' + stableClasses.join('.');
+                const classMatches = document.querySelectorAll(withClasses);
+                
+                // CRITICAL: If class selector is not unique, skip it and go directly to position-based
+                if (classMatches.length === 1 && classMatches[0] === element) {
+                    return {
+                        locator: withClasses,
+                        strategy: 'css',
+                        confidence: 70
+                    };
+                } else if (classMatches.length > 1) {
+                    // Classes not unique, use position-based selector immediately
+                    const parent = element.parentElement;
+                    if (parent) {
+                        const siblings = Array.from(parent.children).filter(e => {
+                            const siblingTag = e.tagName.toLowerCase();
+                            return siblingTag === tagName;
+                        });
+                        const index = siblings.indexOf(element);
+                        
+                        if (index >= 0 && siblings.length > 1) {
+                            // Use nth-of-type for position
+                            const nthSelector = tagName + ':nth-of-type(' + (index + 1) + ')';
+                            return {
+                                locator: nthSelector,
+                                strategy: 'css',
+                                confidence: 60
+                            };
+                        }
+                    }
+                }
+                selector = withClasses;
             }
             
-            // Check uniqueness
+            // Check current selector uniqueness
             const matches = document.querySelectorAll(selector);
             if (matches.length === 1 && matches[0] === element) {
                 return {
@@ -274,7 +393,39 @@ namespace AgenticAI.Core.ZeroCode.Recorder
                 };
             }
             
-            // Add nth-child if not unique
+            // If selector matches multiple elements, use position-based
+            if (matches.length > 1) {
+                const parent = element.parentElement;
+                if (parent) {
+                    const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
+                    const index = siblings.indexOf(element);
+                    
+                    if (index >= 0) {
+                        // Return nth-of-type to ensure uniqueness
+                        const nthSelector = tagName + ':nth-of-type(' + (index + 1) + ')';
+                        return {
+                            locator: nthSelector,
+                            strategy: 'css',
+                            confidence: 55
+                        };
+                    }
+                }
+            }
+            
+            // If still not unique, try adding ID even if it might be dynamic
+            if (id && !selector.includes('#')) {
+                const withId = '#' + id;
+                const idMatches = document.querySelectorAll(withId);
+                if (idMatches.length === 1 && idMatches[0] === element) {
+                    return {
+                        locator: withId,
+                        strategy: 'css',
+                        confidence: 60
+                    };
+                }
+            }
+            
+            // Last resort: Add nth-of-type for positional uniqueness
             const parent = element.parentElement;
             if (parent) {
                 const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
@@ -298,7 +449,7 @@ namespace AgenticAI.Core.ZeroCode.Recorder
         },
         
         /**
-         * Priority 8: XPath fallback
+         * Priority 9: XPath fallback
          */
         getXPathLocator: function(element) {
             const xpath = this.generateXPath(element);
