@@ -36,6 +36,9 @@ namespace AgenticAI.Core.Configuration
         public int ParallelWorkers { get; set; } = 4;
         public bool EnableSelfHealing { get; set; } = true;
         
+        // Test Recorder Settings
+        public int RecorderWaitTimeMs { get; set; } = 1000; // Default 1 second wait after each recorded action
+        
         // Cross-browser parallel execution
         public bool CrossBrowserParallelExecution { get; set; } = false;
         

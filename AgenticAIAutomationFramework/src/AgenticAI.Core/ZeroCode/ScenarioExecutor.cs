@@ -957,7 +957,25 @@ namespace AgenticAI.Core.ZeroCode
                         break;
 
                     case "elementexists":
-                        var elements = await _driver.FindElementsAsync(assertion.Locator);
+                        // Wait for element with retry logic (better for DDT and dynamic content)
+                        var maxRetries = 30; // 30 retries = ~15 seconds total (increased for slow-loading React sites)
+                        var retryDelay = 500; // 500ms between retries
+                        IList<Core.Interfaces.IWebElement>? elements = null;
+                        
+                        for (int i = 0; i <= maxRetries; i++)
+                        {
+                            elements = await _driver.FindElementsAsync(assertion.Locator);
+                            if (elements != null && elements.Count > 0)
+                            {
+                                break; // Element found!
+                            }
+                            
+                            if (i < maxRetries)
+                            {
+                                await Task.Delay(retryDelay);
+                            }
+                        }
+                        
                         if (elements == null || elements.Count == 0)
                         {
                             throw new Exception($"Element does not exist in the DOM: {assertion.Locator}");

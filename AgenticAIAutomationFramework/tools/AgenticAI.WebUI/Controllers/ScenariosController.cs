@@ -629,7 +629,11 @@ namespace AgenticAI.WebUI.Controllers
                     }
                     else
                     {
-                        columnName = ExtractFieldNameFromLocator(action.Locator, columns.Count + 1);
+                        // If no ParameterName in metadata, try to infer from locator using ParameterResolver
+                        var inferredName = AgenticAI.Core.DataDriven.ParameterResolver.InferParameterName(action.Locator ?? string.Empty, action.ActionType ?? "Type");
+                        columnName = !string.IsNullOrWhiteSpace(inferredName) 
+                            ? inferredName 
+                            : ExtractFieldNameFromLocator(action.Locator ?? string.Empty, columns.Count + 1);
                     }
                     
                     if (!columns.Contains(columnName, StringComparer.OrdinalIgnoreCase))
@@ -638,9 +642,7 @@ namespace AgenticAI.WebUI.Controllers
                     }
                 }
 
-                // Add standard columns if not already present
-                if (!columns.Contains("tag", StringComparer.OrdinalIgnoreCase))
-                    columns.Add("tag");
+                // DON'T automatically add "tag" column - only use actual test parameters
 
                 return Ok(new
                 {
