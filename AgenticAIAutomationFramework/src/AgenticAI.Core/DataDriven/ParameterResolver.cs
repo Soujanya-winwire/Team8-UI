@@ -168,8 +168,8 @@ namespace AgenticAI.Core.DataDriven
                 return string.Empty;
 
             // Remove common prefixes/suffixes
-            rawName = Regex.Replace(rawName, @"^(input-?|field-?|txt-?|user-?)", "", RegexOptions.IgnoreCase);
-            rawName = Regex.Replace(rawName, @"(-?input|-?field|-?txt)$", "", RegexOptions.IgnoreCase);
+            rawName = Regex.Replace(rawName, @"^(input-?|field-?|txt-?|user-?|textarea-?|select-?|button-?|btn-?)", "", RegexOptions.IgnoreCase);
+            rawName = Regex.Replace(rawName, @"(-?input|-?field|-?txt|-?textarea|-?select|-?button|-?btn)$", "", RegexOptions.IgnoreCase);
 
             // Trim any remaining leading/trailing delimiters
             rawName = rawName.Trim('-', '_', ' ');
@@ -209,6 +209,10 @@ namespace AgenticAI.Core.DataDriven
                 return "address";
             if (result == "zipcode" || result == "postalcode")
                 return "zip";
+            if (result == "dob" || result == "dateofbirth" || result == "birthdate")
+                return "dateOfBirth";
+            if (result == "date" || result == "datevalue")
+                return "date";
 
             return result;
         }

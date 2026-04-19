@@ -77,7 +77,30 @@ namespace AgenticAI.UIAutomation.Drivers
             {
                 await InitializeAsync();
             }
-            await _page!.GotoAsync(url);
+            
+            // Navigate with NetworkIdle first
+            await _page!.GotoAsync(url, new PageGotoOptions 
+            { 
+                WaitUntil = WaitUntilState.NetworkIdle,
+                Timeout = _config.TimeoutInSeconds * 1000
+            });
+            
+            // Additional wait for React/dynamic content to render
+            // Wait for body to be fully loaded as a baseline
+            try
+            {
+                await _page.WaitForLoadStateAsync(LoadState.DOMContentLoaded, new PageWaitForLoadStateOptions
+                {
+                    Timeout = 5000
+                });
+                
+                // Give React apps a moment to initialize after DOM is ready
+                await Task.Delay(1000);
+            }
+            catch
+            {
+                // If additional wait fails, continue - NetworkIdle should be sufficient for most cases
+            }
         }
 
         /// <summary>
@@ -165,19 +188,105 @@ namespace AgenticAI.UIAutomation.Drivers
         {
             var selector = GetSelector(locator, "auto");
             
-            // Highlight element before clicking
-            await HighlightElementAsync(selector);
-            
-            // If we're in a frame, click within frame context
+            // Wait for element to be present and visible with retry logic
+            ILocator locatorEl;
             if (_currentFrame != null)
             {
-                Logger.Debug($"Clicking in frame context: {selector}");
-                await _currentFrame.ClickAsync(selector, new FrameClickOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+                locatorEl = _currentFrame.Locator(selector);
             }
             else
             {
-                await _page!.ClickAsync(selector, new PageClickOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+                locatorEl = _page!.Locator(selector);
             }
+
+            // Retry for up to 15 seconds (30 * 500ms)
+            bool elementFound = false;
+            for (int i = 0; i <= 30; i++)
+            {
+                try
+                {
+                    var count = await locatorEl.CountAsync();
+                    if (count > 0)
+                    {
+                        elementFound = true;
+                        break;
+                    }
+                }
+                catch { }
+                
+                if (i < 30) // Don't wait after last attempt
+                {
+                    await Task.Delay(500);
+                }
+            }
+
+            if (!elementFound)
+            {
+                Logger.Error($"Element not found after 15 seconds: {selector}");
+                throw new TimeoutException($"Element not found: {selector}");
+            }
+
+            // Wait for element to be visible and enabled
+            try
+            {
+                await locatorEl.First.WaitForAsync(new LocatorWaitForOptions 
+                { 
+                    State = WaitForSelectorState.Visible,
+                    Timeout = 5000 
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug($"Element not visible after wait: {selector}. Error: {ex.Message}");
+            }
+
+            // Scroll element into view
+            try
+            {
+                await locatorEl.First.ScrollIntoViewIfNeededAsync();
+            }
+            catch { }
+            
+            // Highlight element before clicking
+            await HighlightElementAsync(selector);
+            
+            // Click with retry
+            int maxClickRetries = 3;
+            Exception? lastException = null;
+            
+            for (int retry = 0; retry < maxClickRetries; retry++)
+            {
+                try
+                {
+                    // If we're in a frame, click within frame context
+                    if (_currentFrame != null)
+                    {
+                        Logger.Debug($"Clicking in frame context: {selector}");
+                        await _currentFrame.ClickAsync(selector, new FrameClickOptions { Timeout = 10000 });
+                    }
+                    else
+                    {
+                        await _page!.ClickAsync(selector, new PageClickOptions { Timeout = 10000 });
+                    }
+                    
+                    // Success - exit retry loop
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    Logger.Debug($"Click attempt {retry + 1}/{maxClickRetries} failed for {selector}: {ex.Message}");
+                    
+                    if (retry < maxClickRetries - 1)
+                    {
+                        await Task.Delay(1000); // Wait before retry
+                    }
+                }
+            }
+            
+            // All retries failed
+            Logger.Error($"All click attempts failed for {selector}");
+            throw lastException ?? new Exception($"Failed to click element: {selector}");
         }
 
         public async Task CheckAsync(string locator)
@@ -290,7 +399,12 @@ namespace AgenticAI.UIAutomation.Drivers
                 locatorEl = _page!.Locator(selector);
             }
             
-            await locatorEl.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
+            // ENHANCED: Longer timeout for React/dynamic components (5 seconds instead of default 30s timeout)
+            // This is especially important for datepickers and dropdowns that render dynamically
+            await locatorEl.WaitForAsync(new LocatorWaitForOptions { 
+                State = WaitForSelectorState.Visible,
+                Timeout = 5000 // 5 seconds for select to become visible
+            });
 
             try
             {
@@ -416,18 +530,92 @@ namespace AgenticAI.UIAutomation.Drivers
         {
             var selector = GetSelector(locator, "auto");
             
+            // Get the input type before typing
+            ILocator locatorEl;
+            if (_currentFrame != null)
+            {
+                locatorEl = _currentFrame.Locator(selector);
+            }
+            else
+            {
+                locatorEl = _page!.Locator(selector);
+            }
+
+            string inputType = "";
+            try
+            {
+                inputType = await locatorEl.First.GetAttributeAsync("type") ?? "";
+                inputType = inputType.ToLower();
+            }
+            catch { }
+
+            // Validate and transform data based on input type
+            string valueToType = text;
+            if (!string.IsNullOrEmpty(inputType))
+            {
+                switch (inputType)
+                {
+                    case "date":
+                        // Check if the value is already in YYYY-MM-DD format
+                        if (!System.Text.RegularExpressions.Regex.IsMatch(text, @"^\d{4}-\d{2}-\d{2}$"))
+                        {
+                            // Try to parse as date and convert
+                            if (DateTime.TryParse(text, out DateTime parsedDate))
+                            {
+                                valueToType = parsedDate.ToString("yyyy-MM-DD");
+                                Logger.Debug($"Converted date '{text}' to '{valueToType}' for date input");
+                            }
+                            else
+                            {
+                                var errorMsg = $"Invalid date value '{text}' for date field {selector}. Expected format: YYYY-MM-DD (e.g., 2000-01-15)";
+                                Logger.Error(errorMsg);
+                                throw new ArgumentException(errorMsg);
+                            }
+                        }
+                        break;
+
+                    case "number":
+                        // Validate it's a number
+                        if (!double.TryParse(text, out _))
+                        {
+                            var errorMsg = $"Invalid number value '{text}' for number field {selector}. Expected numeric value (e.g., 123 or 45.67)";
+                            Logger.Error(errorMsg);
+                            throw new ArgumentException(errorMsg);
+                        }
+                        break;
+
+                    case "email":
+                        // Basic email validation
+                        if (!text.Contains("@") || !text.Contains("."))
+                        {
+                            Logger.Debug($"Warning: '{text}' may not be a valid email for field {selector}");
+                        }
+                        break;
+
+                    case "tel":
+                    case "phone":
+                        // Remove non-numeric characters if present
+                        var numericOnly = System.Text.RegularExpressions.Regex.Replace(text, @"[^\d]", "");
+                        if (string.IsNullOrEmpty(numericOnly))
+                        {
+                            Logger.Debug($"Warning: '{text}' contains no numeric digits for phone field {selector}");
+                        }
+                        break;
+                }
+            }
+            
             // Highlight element before typing
             await HighlightElementAsync(selector);
             
             // Use frame context if available
             if (_currentFrame != null)
             {
-                Logger.Debug($"Typing in frame context: {selector}");
-                await _currentFrame.FillAsync(selector, text, new FrameFillOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+                Logger.Debug($"Typing in frame context: {selector} (type: {inputType}, value: {valueToType})");
+                await _currentFrame.FillAsync(selector, valueToType, new FrameFillOptions { Timeout = _config.TimeoutInSeconds * 1000 });
             }
             else
             {
-                await _page!.FillAsync(selector, text, new PageFillOptions { Timeout = _config.TimeoutInSeconds * 1000 });
+                await _page!.FillAsync(selector, valueToType, new PageFillOptions { Timeout = _config.TimeoutInSeconds * 1000 });
             }
         }
 

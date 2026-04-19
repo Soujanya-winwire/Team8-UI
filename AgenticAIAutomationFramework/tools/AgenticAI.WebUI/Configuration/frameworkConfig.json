@@ -13,6 +13,7 @@
   "TimeoutInSeconds": 30,
   "ParallelWorkers": 4,
   "EnableSelfHealing": true,
+  "RecorderWaitTimeMs": 1000,
   "CrossBrowserParallelExecution": false,
   "ParallelBrowsers": [
     "Chrome",

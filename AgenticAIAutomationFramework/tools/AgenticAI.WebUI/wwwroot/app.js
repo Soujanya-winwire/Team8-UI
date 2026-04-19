@@ -1352,6 +1352,9 @@ function updateRecordingTable(action) {
         const actionType = getRecordedActionField(action, 'actionType');
         const locator = getRecordedActionField(action, 'locator') || '-';
         const value = getRecordedActionField(action, 'value') || '-';
+        
+        // Get the first auto-assertion if any exist
+        const autoAssertion = autoAssertions && autoAssertions.length > 0 ? autoAssertions[0] : null;
 
         const stepCell = autoAssertion
             ? `<div style="display:flex; flex-direction:column; gap:4px;">
@@ -1769,7 +1772,8 @@ async function stopRecording() {
 
         await syncLiveAutoAssertionsToRecorder();
 
-        const response = await fetch(`${API_BASE_URL}/recorder/stop`, {
+        // Step 1: Stop recording WITHOUT saving (preview mode)
+        const response = await fetch(`${API_BASE_URL}/recorder/stop-preview`, {
             method: 'POST'
         });
 
@@ -1779,44 +1783,86 @@ async function stopRecording() {
         stopBtn.innerHTML = originalText;
 
         if (data.success) {
-            isRecording = false;
-            window.liveAutoAssertions = [];
-            document.getElementById('start-recording-btn').disabled = false;
-            document.getElementById('stop-recording-btn').disabled = true;
-            document.getElementById('recording-status').classList.add('hidden');
+            const actionCount = data.scenario?.actionCount || data.scenario?.actions?.length || 0;
+            const scenarioName = data.scenario?.name || 'Test Scenario';
+            const scenarioModule = data.scenario?.module || document.getElementById('record-module')?.value || 'Default';
 
-            // Handle different response formats
-            const actionCount = data.scenario?.actionCount ||
-                data.scenario?.actions?.length ||
-                data.actionCount ||
-                0;
-            const scenarioName = data.scenario?.name ||
-                data.scenarioName ||
-                'Test Scenario';
-            const scenarioModule = data.scenario?.module ||
-                document.getElementById('record-module')?.value ||
-                'Default';
+            // Step 2: Ask user if they want to SAVE the recording
+            if (confirm(`Recording captured ${actionCount} action(s).\n\nDo you want to save this recording?`)) {
+                // User confirmed - save the scenario
+                stopBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                stopBtn.disabled = true;
 
-            setRecordedScenarioForGeneration(scenarioName, scenarioModule);
+                try {
+                    const saveResponse = await fetch(`${API_BASE_URL}/recorder/save`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data.scenario)
+                    });
 
-            showSuccess(`Recording saved! ${actionCount} action(s) captured.`);
+                    const saveData = await saveResponse.json();
 
-            // Try to add console log if console exists
-            try {
-                addConsoleLog(`Recording completed: ${scenarioName}`, 'success');
-            } catch (e) {
-                console.log('Console log not available:', e);
-            }
+                    if (saveData.success) {
+                        isRecording = false;
+                        window.liveAutoAssertions = [];
+                        document.getElementById('start-recording-btn').disabled = false;
+                        document.getElementById('stop-recording-btn').disabled = true;
+                        document.getElementById('recording-status').classList.add('hidden');
 
-            // Clear form
-            const form = document.getElementById('assisted-record-form');
-            if (form) {
-                form.reset();
-            }
+                        setRecordedScenarioForGeneration(scenarioName, scenarioModule);
 
-            // Ask if user wants to view the scenario
-            if (confirm('Recording saved! Would you like to view the scenario?')) {
-                showView('scenarios');
+                        showSuccess(`Recording saved! ${actionCount} action(s) captured.`);
+
+                        // Try to add console log if console exists
+                        try {
+                            addConsoleLog(`Recording completed: ${scenarioName}`, 'success');
+                        } catch (e) {
+                            console.log('Console log not available:', e);
+                        }
+
+                        // Clear form
+                        const form = document.getElementById('assisted-record-form');
+                        if (form) {
+                            form.reset();
+                        }
+
+                        // Ask if user wants to view the scenario
+                        if (confirm('Would you like to view the saved scenario?')) {
+                            showView('scenarios');
+                        }
+                    } else {
+                        showError(saveData.error || 'Failed to save recording');
+                        stopBtn.disabled = false;
+                    }
+                } catch (saveError) {
+                    console.error('Save recording error:', saveError);
+                    showError('Failed to save recording. Please try again.');
+                    stopBtn.disabled = false;
+                }
+            } else {
+                // User cancelled - discard the recording
+                try {
+                    // Call backend to ensure session is fully cleared
+                    await fetch(`${API_BASE_URL}/recorder/discard`, {
+                        method: 'POST'
+                    });
+                } catch (discardError) {
+                    console.error('Error discarding recording:', discardError);
+                }
+
+                isRecording = false;
+                window.liveAutoAssertions = [];
+                document.getElementById('start-recording-btn').disabled = false;
+                document.getElementById('stop-recording-btn').disabled = true;
+                document.getElementById('recording-status').classList.add('hidden');
+
+                showInfo('Recording discarded (not saved)');
+
+                // Clear form
+                const form = document.getElementById('assisted-record-form');
+                if (form) {
+                    form.reset();
+                }
             }
         } else {
             stopBtn.disabled = false;
@@ -2639,6 +2685,14 @@ async function loadConfigurationView() {
                                 <input type="number" class="form-control" id="config-retry" 
                                        value="${configuration.maxRetryCount}" min="0" max="5">
                             </div>
+                            <div class="form-group">
+                                <label>Recorder Wait (milliseconds)</label>
+                                <input type="number" class="form-control" id="config-recorder-wait" 
+                                       value="${configuration.recorderWaitTimeMs || 1000}" min="0" max="5000" step="100">
+                                <small style="color: #6b7280; display: block; margin-top: 5px;">
+                                    Wait time applied after each recorded action (0 = no wait, recommended: 500-2000ms)
+                                </small>
+                            </div>
                         </div>
 
                         <!-- Cross-Browser Parallel Execution Options -->
@@ -2762,6 +2816,7 @@ async function saveConfiguration() {
         baseUrl: document.getElementById('config-base-url').value,
         timeoutInSeconds: parseInt(document.getElementById('config-timeout').value),
         maxRetryCount: parseInt(document.getElementById('config-retry').value),
+        recorderWaitTimeMs: parseInt(document.getElementById('config-recorder-wait').value),
         headless: document.getElementById('config-headless').checked,
         enableVideo: document.getElementById('config-video').checked,
         enableScreenshots: document.getElementById('config-screenshots').checked,
@@ -2926,6 +2981,14 @@ async function loadResultsView() {
             <div style="padding: 0 10px 10px 10px;">
                 <div class="grid-4" style="gap: 10px;">
                     <div class="form-group" style="margin: 0;">
+                        <label>Execution Type</label>
+                        <select class="form-control" id="filter-execution-type" onchange="applyTestFilters()">
+                            <option value="">All</option>
+                            <option value="normal" selected>Normal Only</option>
+                            <option value="ddt">DDT Only</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
                         <label>Status</label>
                         <select class="form-control" id="filter-status" onchange="applyTestFilters()">
                             <option value="">All</option>
@@ -3060,6 +3123,7 @@ function populateTestFilterDropdowns() {
 
 // Apply filters to test results
 function applyTestFilters() {
+    const executionTypeFilter = document.getElementById('filter-execution-type').value;
     const statusFilter = document.getElementById('filter-status').value;
     const browserFilter = document.getElementById('filter-browser').value;
     const envFilter = document.getElementById('filter-environment').value;
@@ -3067,6 +3131,25 @@ function applyTestFilters() {
 
     // Start with all history
     let filtered = [...allTestHistory];
+
+    // Apply execution type filter
+    if (executionTypeFilter === 'normal') {
+        // Only show tests WITHOUT DDT markers (rowIndex, iteration, etc.)
+        filtered = filtered.filter(h => {
+            const name = h.testCaseName || '';
+            const hasRowIndex = h.rowIndex !== undefined && h.rowIndex !== null;
+            const hasDDTMarker = /\[\s*DDT|\[\s*Iteration|\[\s*Row\s+\d+/i.test(name);
+            return !hasRowIndex && !hasDDTMarker;
+        });
+    } else if (executionTypeFilter === 'ddt') {
+        // Only show tests WITH DDT markers
+        filtered = filtered.filter(h => {
+            const name = h.testCaseName || '';
+            const hasRowIndex = h.rowIndex !== undefined && h.rowIndex !== null;
+            const hasDDTMarker = /\[\s*DDT|\[\s*Iteration|\[\s*Row\s+\d+/i.test(name);
+            return hasRowIndex || hasDDTMarker;
+        });
+    }
 
     // Apply status filter
     if (statusFilter) {
@@ -3156,6 +3239,7 @@ function displayFilteredTestResults(history) {
 
 // Clear all filters
 function clearAllTestFilters() {
+    document.getElementById('filter-execution-type').value = 'normal';
     document.getElementById('filter-status').selectedIndex = 0;
     document.getElementById('filter-browser').selectedIndex = 0;
     document.getElementById('filter-environment').selectedIndex = 0;
@@ -3170,7 +3254,7 @@ async function refreshTestResults() {
     showSuccess('Test results refreshed');
 }
 
-function getProfessionalResultName(rawName) {
+function getProfessionalResultName(rawName, rowIndex) {
     const name = (rawName || '').trim();
     if (!name) return 'Unknown';
 
@@ -3189,8 +3273,13 @@ function getProfessionalResultName(rawName) {
         return `${scenarioName} [DDT • Iteration ${iteration}]`;
     }
 
-    // If no explicit row marker, keep original name and append DDT tag for clarity
-    return `${name} [DDT]`;
+    // Only add [DDT] tag if rowIndex is explicitly set (indicating DDT run)
+    if (rowIndex !== undefined && rowIndex !== null) {
+        return `${name} [DDT • Iteration ${rowIndex + 1}]`;
+    }
+
+    // For normal tests, return name as-is without [DDT] tag
+    return name;
 }
 
 // Show empty state
@@ -3307,7 +3396,7 @@ function displayResultsHistory(historyList) {
                                            onchange="handleCheckboxChange()">
                                 </td>
                                 <td>
-                                    <div style="font-weight:600;color:#111827;line-height:1.35;">${escapeHtml(getProfessionalResultName(item.scenarioName))}</div>
+                                    <div style="font-weight:600;color:#111827;line-height:1.35;">${escapeHtml(getProfessionalResultName(item.scenarioName, item.rowIndex))}</div>
                                 </td>
                                 <td>
                                     <span class="badge" style="background-color: ${statusBadgeColor}; color: white; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 600;">
@@ -3571,7 +3660,7 @@ async function deleteSelectedTests() {
     const indices = Array.from(checkboxes).map(cb => parseInt(cb.value));
     const testNames = indices.map(index => {
         const test = window.testResultsHistory[index];
-        return getProfessionalResultName(test.scenarioName);
+        return getProfessionalResultName(test.scenarioName, test.rowIndex);
     });
 
     // Create display text for test names
@@ -3667,7 +3756,7 @@ async function confirmDelete() {
         // Get test names for success message
         const testNames = indices.map(index => {
             const test = window.testResultsHistory[index];
-            return getProfessionalResultName(test.scenarioName);
+            return getProfessionalResultName(test.scenarioName, test.rowIndex);
         });
 
         // Call API to delete tests
@@ -3741,7 +3830,7 @@ function viewEvidence(index) {
             <div style="position: sticky; top: 0; background: white; border-bottom: 2px solid #e5e7eb; padding: 20px; z-index: 1; border-radius: 12px 12px 0 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2 style="margin: 0; color: #1f2937;">
-                        <i class="fas fa-images"></i> Evidence - ${escapeHtml(getProfessionalResultName(item.scenarioName))}
+                        <i class="fas fa-images"></i> Evidence - ${escapeHtml(getProfessionalResultName(item.scenarioName, item.rowIndex))}
                     </h2>
                     <button onclick="closeDynamicModal('evidence-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                         <i class="fas fa-times"></i> Close
@@ -3820,7 +3909,7 @@ function viewLogs(index) {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <h2 style="margin: 0; color: #1f2937;">
-                            <i class="fas fa-file-alt"></i> Execution Logs - ${escapeHtml(getProfessionalResultName(item.scenarioName))}
+                            <i class="fas fa-file-alt"></i> Execution Logs - ${escapeHtml(getProfessionalResultName(item.scenarioName, item.rowIndex))}
                         </h2>
                         <p style="margin: 8px 0 0 0; color: #6b7280;">
                             Module: <strong>${escapeHtml(item.module)}</strong> | 
@@ -4067,6 +4156,17 @@ async function viewScenario(module, name) {
         if (data.success) {
             const scenario = data.scenario;
 
+            // Filter out auto-generated Wait actions from display
+            const visibleActions = scenario.actions.filter(action => {
+                if (action.actionType === 'Wait' || action.ActionType === 'Wait') {
+                    const meta = action.metadata || action.Metadata;
+                    if (meta && (meta.AutoGenerated === 'true' || meta.AutoGenerated === true)) {
+                        return false; // Hide auto-generated waits
+                    }
+                }
+                return true;
+            });
+
             showModal('Scenario Details', `
                 <div>
                     <div style="margin-bottom: 20px;">
@@ -4077,9 +4177,9 @@ async function viewScenario(module, name) {
                         <strong>Tags:</strong> ${scenario.tags.map(t => `<span class="badge badge-info">${t}</span>`).join(' ')}
                     </div>
 
-                    <h4>Actions (${scenario.actions.length}):</h4>
+                    <h4>Actions (${visibleActions.length}):</h4>
                     <div style="max-height: 300px; overflow-y: auto;">
-                        ${scenario.actions.map(action => `
+                        ${visibleActions.map(action => `
                             <div class="action-item" style="margin-bottom: 10px;">
                                 <div>
                                     <div class="action-type">${action.actionType}</div>

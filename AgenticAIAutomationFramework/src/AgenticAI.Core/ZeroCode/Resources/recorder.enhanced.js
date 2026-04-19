@@ -95,7 +95,7 @@
     class SmartLocatorGenerator {
         /**
          * Generate the best selector for an element following priority rules
-         * PERMANENT SOLUTION: Prioritize semantic selectors, avoid ALL IDs by default
+         * COMPREHENSIVE: Tries multiple strategies before falling back to nth-of-type
          */
         static generateSelector(element) {
             if (!element || !element.tagName) return null;
@@ -104,7 +104,11 @@
             const testIdSelector = this.getTestIdSelector(element);
             if (testIdSelector) return testIdSelector;
 
-            // Priority 2: ID selector (STABLE - When present, usually unique and semantic like #submit)
+            // Priority 2: React Select container (SPECIAL CASE - Needs specific handling)
+            const reactSelectSelector = this.getReactSelectContainerSelector(element);
+            if (reactSelectSelector) return reactSelectSelector;
+
+            // Priority 3: ID selector (STABLE - When present, usually unique and semantic like #submit)
             const idSelector = this.getIdSelector(element);
             if (idSelector) return idSelector;
 
@@ -120,24 +124,32 @@
             const nameSelector = this.getNameSelector(element);
             if (nameSelector) return nameSelector;
 
-            // Priority 6: placeholder (INPUT FIELDS - Visible to users)
+            // Priority 6: Label-based selector for form elements
+            const labelSelector = this.getLabelSelector(element);
+            if (labelSelector) return labelSelector;
+
+            // Priority 7: placeholder (INPUT FIELDS - Visible to users)
             const placeholderSelector = this.getPlaceholderSelector(element);
             if (placeholderSelector) return placeholderSelector;
 
-            // Priority 7: CSS selector with stable classes
-            const cssSelector = this.getCssSelector(element);
-            if (cssSelector) return cssSelector;
-
-            // Priority 8: text content for buttons/links (last resort before composite)
+            // Priority 8: Text content for buttons/links/labels (SEMANTIC - More stable than nth-of-type)
             const textSelector = this.getTextSelector(element);
             if (textSelector) return textSelector;
 
-            // Priority 9: Composite selector (tag + attributes)
+            // Priority 9: Composite selector (tag + multiple attributes - ROBUST!)
             const compositeSelector = this.getCompositeSelector(element);
             if (compositeSelector) return compositeSelector;
 
-            // Priority 10: XPath (last resort)
-            return this.getXPathSelector(element);
+            // Priority 10: CSS selector with stable classes and parent context
+            const cssSelector = this.getCssSelector(element);
+            if (cssSelector) return cssSelector;
+
+            // Priority 11: XPath with attributes (better than plain nth-of-type)
+            const xpathSelector = this.getXPathSelector(element);
+            if (xpathSelector) return xpathSelector;
+
+            // Priority 12: Last resort - nth-of-type with parent context
+            return this.getFallbackSelector(element);
         }
 
         /**
@@ -153,6 +165,91 @@
                 }
             }
             return null;
+        }
+
+        /**
+         * Get React Select container selector - SPECIAL HANDLING for React Select components
+         * React Select often has nested divs that change structure. We need to find the stable container.
+         */
+        static getReactSelectContainerSelector(element) {
+            // Check if this element is part of a React Select component
+            let current = element;
+            let reactSelectControl = null;
+            let depth = 0;
+            const maxDepth = 8; // Search up to 8 levels
+
+            while (current && depth < maxDepth) {
+                const classes = current.className || '';
+                
+                // Check if this is the react-select control container
+                if (classes.includes('react-select__control') || 
+                    classes.includes('css-') && classes.includes('-control')) {
+                    reactSelectControl = current;
+                    break;
+                }
+                
+                current = current.parentElement;
+                depth++;
+            }
+
+            if (!reactSelectControl) return null;
+
+            // BEST: Try to find the hidden input element with an ID (most stable)
+            const hiddenInput = reactSelectControl.querySelector('input[id^="react-select-"]');
+            if (hiddenInput && hiddenInput.id) {
+                // Use the input ID for most stable selector
+                return `#${hiddenInput.id}`;
+            }
+
+            // SECOND BEST: Look for wrapper div with data attributes or meaningful ID
+            current = reactSelectControl.parentElement;
+            depth = 0;
+
+            while (current && depth < 6) {
+                // Check for data attributes (more stable than IDs sometimes)
+                const dataTest = current.getAttribute('data-test') || 
+                                current.getAttribute('data-testid') ||
+                                current.getAttribute('data-qa');
+                if (dataTest) {
+                    return `[data-test="${dataTest}"] .react-select__control`;
+                }
+
+                // Check for meaningful parent ID that exists as an HTML element
+                // Be careful: verify the ID is on an actual element, not text content
+                if (current.id && current.id.trim() && current.getAttribute('id')) {
+                    const parentId = current.id;
+                    // Check if this selector actually works
+                    const testSelector = `#${parentId} .react-select__control`;
+                    try {
+                        const matches = document.querySelectorAll(testSelector);
+                        if (matches.length > 0 && Array.from(matches).includes(reactSelectControl)) {
+                            return testSelector;
+                        }
+                    } catch (e) {
+                        // Invalid selector, continue searching
+                    }
+                }
+
+                current = current.parentElement;
+                depth++;
+            }
+
+            // FALLBACK: If we have a unique class on the React Select itself, use it
+            const controlClasses = reactSelectControl.className.split(' ')
+                .filter(cls => cls && !cls.startsWith('css-') && cls !== 'react-select__control');
+            
+            if (controlClasses.length > 0) {
+                const uniqueClass = controlClasses[0];
+                const selector = `.${uniqueClass}`;
+                const matches = document.querySelectorAll(selector);
+                if (matches.length === 1) {
+                    return selector;
+                }
+            }
+
+            // LAST RESORT: Use a very specific multi-class selector
+            // This at least is more specific than a deep XPath
+            return null; // Return null to try other selector methods
         }
 
         /**
@@ -203,14 +300,70 @@
 
 
         /**
-         * Get name attribute selector
+         * Get name attribute selector - ENHANCED for uniqueness
          */
         static getNameSelector(element) {
             const name = element.getAttribute('name');
             if (!name || !name.trim()) return null;
 
             const tag = element.tagName.toLowerCase();
-            return `${tag}[name="${this.escapeSelector(name)}"]`;
+            const nameSelector = `${tag}[name="${this.escapeSelector(name)}"]`;
+            
+            // Verify it's unique
+            const matches = document.querySelectorAll(nameSelector);
+            if (matches.length === 1 && matches[0] === element) {
+                return nameSelector;
+            }
+            
+            // If not unique, try adding type or other attributes
+            const type = element.getAttribute('type');
+            if (type) {
+                const withType = `${tag}[name="${this.escapeSelector(name)}"][type="${type}"]`;
+                const typeMatches = document.querySelectorAll(withType);
+                if (typeMatches.length === 1 && typeMatches[0] === element) {
+                    return withType;
+                }
+            }
+            
+            return null; // Not unique enough
+        }
+
+        /**
+         * Get label-based selector for form elements
+         * Finds associated <label> and uses its text
+         */
+        static getLabelSelector(element) {
+            const tag = element.tagName.toLowerCase();
+            
+            // Only for form elements
+            if (!['input', 'select', 'textarea'].includes(tag)) return null;
+            
+            let labelText = null;
+            
+            // Try to find label by 'for' attribute
+            const id = element.getAttribute('id');
+            if (id) {
+                const label = document.querySelector(`label[for="${id}"]`);
+                if (label && label.textContent) {
+                    labelText = label.textContent.trim().replace(/\s+/g, ' ');
+                }
+            }
+            
+            // Try to find parent label
+            if (!labelText) {
+                const parentLabel = element.closest('label');
+                if (parentLabel && parentLabel.textContent) {
+                    labelText = parentLabel.textContent.trim().replace(/\s+/g, ' ');
+                }
+            }
+            
+            if (labelText && labelText.length > 0 && labelText.length < 50) {
+                // Use XPath to find input by label text
+                const escapedText = labelText.replace(/'/g, "\\'");
+                return `//label[normalize-space(.)='${escapedText}']//${tag} | //${tag}[@id=//label[normalize-space(.)='${escapedText}']/@for]`;
+            }
+            
+            return null;
         }
 
         /**
@@ -230,6 +383,22 @@
             const role = element.getAttribute('role');
             if (!role) return null;
 
+            // SPECIAL HANDLING for 'option' role - capture the specific option text
+            if (role === 'option') {
+                const optionText = element.textContent?.trim();
+                if (optionText) {
+                    // Use XPath to find the specific option by text
+                    // Note: escapeXPathString already returns a properly quoted string
+                    return `//*[@role="option"][contains(normalize-space(.), ${this.escapeXPathString(optionText)})]`;
+                }
+                
+                // If no text, try value attribute
+                const value = element.getAttribute('value') || element.getAttribute('data-value');
+                if (value) {
+                    return `[role="option"][value="${this.escapeSelector(value)}"]`;
+                }
+            }
+
             // Try to add accessible name for uniqueness
             const ariaLabel = element.getAttribute('aria-label');
             if (ariaLabel) {
@@ -245,14 +414,47 @@
         }
 
         /**
-         * Get text-based selector (for buttons, links) - FALLBACK ONLY
-         * Note: Removed :has-text() Playwright syntax since it's not standard CSS
-         * This is now a fallback - ID and other selectors are prioritized
+         * Get text-based selector (for buttons, links) - IMPROVED
+         * Uses XPath for robust text matching on buttons and links
+         * This provides better reliability than nth-of-type positional selectors
          */
         static getTextSelector(element) {
-            // Text selector is now a low priority fallback
-            // Removed to prevent non-standard selector generation
-            return null;
+            const tag = element.tagName.toLowerCase();
+            
+            // Only use text selectors for buttons and links where text is meaningful
+            if (tag !== 'button' && tag !== 'a' && element.getAttribute('role') !== 'button') {
+                return null;
+            }
+
+            // Get visible text content - handle nested elements properly
+            let text = '';
+            
+            // Try innerText first (visible text only)
+            if (element.innerText) {
+                text = element.innerText.trim();
+            } 
+            // Fallback to textContent
+            else if (element.textContent) {
+                text = element.textContent.trim();
+            }
+            
+            // Skip if no text or text is too long
+            if (!text || text.length === 0 || text.length > 50) {
+                return null;
+            }
+
+            // Remove extra whitespace and newlines
+            text = text.replace(/\s+/g, ' ').trim();
+            
+            // Skip if still empty after cleanup
+            if (!text) return null;
+
+            // Escape single quotes for XPath
+            const escapedText = text.replace(/'/g, "\\'");
+            
+            // Use XPath for text matching - more reliable than CSS
+            // Using contains() for partial match to handle nested elements
+            return `//${tag}[contains(normalize-space(.), '${escapedText}')]`;
         }
 
         /**
@@ -269,32 +471,108 @@
         }
 
         /**
-         * Get composite selector (tag + multiple attributes for uniqueness)
+         * Get composite selector (tag + multiple attributes for uniqueness) - ENHANCED
+         * Tries to combine multiple attributes to create unique selectors
          */
         static getCompositeSelector(element) {
             const tag = element.tagName.toLowerCase();
             const attributes = [];
 
-            // Collect stable attributes
+            // Collect stable attributes in priority order
             const type = element.getAttribute('type');
             if (type) attributes.push(`[type="${type}"]`);
 
             const title = element.getAttribute('title');
-            if (title) attributes.push(`[title="${this.escapeSelector(title)}"]`);
+            if (title && title.length < 50) {
+                attributes.push(`[title="${this.escapeSelector(title)}"]`);
+            }
 
             const value = element.getAttribute('value');
-            if (value && value.length < 20) attributes.push(`[value="${this.escapeSelector(value)}"]`);
+            if (value && value.length > 0 && value.length < 20) {
+                attributes.push(`[value="${this.escapeSelector(value)}"]`);
+            }
+
+            const alt = element.getAttribute('alt');
+            if (alt) {
+                attributes.push(`[alt="${this.escapeSelector(alt)}"]`);
+            }
+
+            // For links, include href as attribute
+            if (tag === 'a') {
+                const href = element.getAttribute('href');
+                if (href && !href.match(/^(#|javascript:)/)) {
+                    // Try full href first
+                    const fullSelector = `a[href="${this.escapeSelector(href)}"]`;
+                    const fullMatches = document.querySelectorAll(fullSelector);
+                    if (fullMatches.length === 1 && fullMatches[0] === element) {
+                        return fullSelector;
+                    }
+                }
+                
+                // Check for rel attribute
+                const rel = element.getAttribute('rel');
+                if (rel) attributes.push(`[rel="${rel}"]`);
+                
+                // Check for target attribute
+                const target = element.getAttribute('target');
+                if (target) attributes.push(`[target="${target}"]`);
+            }
+
+            // For select elements - try by position within a specific parent container
+            if (tag === 'select') {
+                const parent = element.parentElement;
+                if (parent) {
+                    // Try parent ID + select
+                    if (parent.id) {
+                        const parentSelector = `#${parent.id} > select`;
+                        const matches = document.querySelectorAll(parentSelector);
+                        if (matches.length === 1 && matches[0] === element) {
+                            return parentSelector;
+                        }
+                    }
+                    
+                    // Try parent class + select
+                    const parentClasses = this.getStableClasses(parent);
+                    if (parentClasses.length > 0) {
+                        const parentTag = parent.tagName.toLowerCase();
+                        const parentSelector = `${parentTag}.${parentClasses[0]} > select`;
+                        const matches = document.querySelectorAll(parentSelector);
+                        if (matches.length === 1 && matches[0] === element) {
+                            return parentSelector;
+                        }
+                    }
+                }
+            }
+
+            // For buttons, check for specific attributes
+            if (tag === 'button' || element.getAttribute('role') === 'button') {
+                const disabled = element.getAttribute('disabled');
+                if (disabled !== null) attributes.push('[disabled]');
+                
+                const tabindex = element.getAttribute('tabindex');
+                if (tabindex) attributes.push(`[tabindex="${tabindex}"]`);
+            }
 
             // Return composite selector if we have at least one attribute
             if (attributes.length > 0) {
-                return tag + attributes.join('');
+                const selector = tag + attributes.join('');
+                
+                // Verify uniqueness
+                const matches = document.querySelectorAll(selector);
+                if (matches.length === 1 && matches[0] === element) {
+                    return selector;
+                }
+                
+                // Try with parent context
+                const withParent = this.getParentContextSelector(element, selector);
+                if (withParent) return withParent;
             }
 
             return null;
         }
 
         /**
-         * Get stable CSS selector with uniqueness validation (ENHANCED)
+         * Get stable CSS selector with uniqueness validation (ENHANCED with Parent Context)
          * Note: ID checking removed since getIdSelector handles it at higher priority
          */
         static getCssSelector(element) {
@@ -320,19 +598,14 @@
                 selector = `${tag}.${classes.join('.')}`;
                 const classMatches = document.querySelectorAll(selector);
                 
-                // CRITICAL: If classes match multiple elements, use position-based immediately
+                // If unique, use it!
                 if (classMatches.length === 1 && classMatches[0] === element) {
                     return selector;
-                } else if (classMatches.length > 1) {
-                    // Not unique! Use nth-of-type
-                    const parent = element.parentElement;
-                    if (parent) {
-                        const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
-                        const index = siblings.indexOf(element);
-                        if (index >= 0 && siblings.length > 1) {
-                            return `${tag}:nth-of-type(${index + 1})`;
-                        }
-                    }
+                } 
+                // If not unique, try adding parent context before falling back to nth-of-type
+                else if (classMatches.length > 1) {
+                    const parentSelector = this.getParentContextSelector(element, selector);
+                    if (parentSelector) return parentSelector;
                 }
             }
             
@@ -346,23 +619,160 @@
                 }
             }
             
+            // Try adding href for links (partial match for stability)
+            if (tag === 'a') {
+                const href = element.getAttribute('href');
+                if (href && !href.match(/^(#|javascript:)/)) {
+                    // Use full href match first
+                    const fullHrefSelector = `a[href="${this.escapeSelector(href)}"]`;
+                    const fullMatches = document.querySelectorAll(fullHrefSelector);
+                    if (fullMatches.length === 1 && fullMatches[0] === element) {
+                        return fullHrefSelector;
+                    }
+                    
+                    // Try partial href match if full doesn't work
+                    const hrefPart = href.split('?')[0].split('#')[0]; // Remove query params and hash
+                    const lastPart = hrefPart.substring(hrefPart.lastIndexOf('/') + 1);
+                    if (lastPart) {
+                        selector = `a[href*="${this.escapeSelector(lastPart)}"]`;
+                        const hrefMatches = document.querySelectorAll(selector);
+                        if (hrefMatches.length === 1 && hrefMatches[0] === element) {
+                            return selector;
+                        }
+                    }
+                }
+                
+                // Try title attribute for links
+                const title = element.getAttribute('title');
+                if (title && title.trim()) {
+                    selector = `a[title="${this.escapeSelector(title)}"]`;
+                    const titleMatches = document.querySelectorAll(selector);
+                    if (titleMatches.length === 1 && titleMatches[0] === element) {
+                        return selector;
+                    }
+                }
+            }
+            
             // Check if plain tag selector is unique (rare)
             const tagMatches = document.querySelectorAll(tag);
             if (tagMatches.length === 1 && tagMatches[0] === element) {
                 return tag;
             }
             
-            // Last resort: use nth-of-type for uniqueness
-            const parent = element.parentElement;
-            if (parent) {
-                const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
-                const index = siblings.indexOf(element);
-                if (index >= 0) {
-                    return `${tag}:nth-of-type(${index + 1})`;
+            // Try parent context with plain tag
+            const parentContextSelector = this.getParentContextSelector(element, tag);
+            if (parentContextSelector) return parentContextSelector;
+            
+            // For all elements, try ALL available classes (not just stable ones) as last attempt
+            if (element.classList && element.classList.length > 0) {
+                const allClasses = Array.from(element.classList).filter(c => c && c.trim());
+                if (allClasses.length > 0) {
+                    selector = `${tag}.${allClasses.join('.')}`;
+                    const allClassMatches = document.querySelectorAll(selector);
+                    if (allClassMatches.length === 1 && allClassMatches[0] === element) {
+                        return selector;
+                    }
+                    
+                    // Try with parent context
+                    const allClassParentSelector = this.getParentContextSelector(element, selector);
+                    if (allClassParentSelector) return allClassParentSelector;
                 }
             }
             
-            return selector || tag;
+            // NO nth-of-type here - return null so we try other methods first
+            return null;
+        }
+
+        /**
+         * Get fallback selector (ABSOLUTE LAST RESORT)
+         * Uses nth-of-type but with maximum parent context for stability
+         */
+        static getFallbackSelector(element) {
+            const tag = element.tagName.toLowerCase();
+            const parent = element.parentElement;
+            
+            if (!parent) return tag;
+            
+            const siblings = Array.from(parent.children).filter(e => e.tagName === element.tagName);
+            const index = siblings.indexOf(element);
+            
+            if (index < 0) return tag;
+            
+            // Try to add as much parent context as possible
+            // 1. Parent ID (best)
+            if (parent.id) {
+                return `#${parent.id} > ${tag}:nth-of-type(${index + 1})`;
+            }
+            
+            // 2. Parent class (good)
+            const parentClasses = this.getStableClasses(parent);
+            if (parentClasses.length > 0) {
+                const parentTag = parent.tagName.toLowerCase();
+                return `${parentTag}.${parentClasses[0]} > ${tag}:nth-of-type(${index + 1})`;
+            }
+            
+            // 3. Grandparent ID + parent tag (better than nothing)
+            const grandparent = parent.parentElement;
+            if (grandparent && grandparent.id) {
+                const parentTag = parent.tagName.toLowerCase();
+                return `#${grandparent.id} ${parentTag} > ${tag}:nth-of-type(${index + 1})`;
+            }
+            
+            // 4. Plain nth-of-type (worst case)
+            return `${tag}:nth-of-type(${index + 1})`;
+        }
+
+        /**
+         * Get selector with parent context for better specificity
+         * Tries to create unique selector by combining element with parent classes/IDs
+         */
+        static getParentContextSelector(element, elementSelector) {
+            const parent = element.parentElement;
+            if (!parent) return null;
+
+            // Try parent with ID
+            if (parent.id) {
+                const parentSelector = `#${parent.id} > ${elementSelector}`;
+                const matches = document.querySelectorAll(parentSelector);
+                if (matches.length === 1 && matches[0] === element) {
+                    return parentSelector;
+                }
+            }
+
+            // Try parent with stable classes
+            const parentClasses = this.getStableClasses(parent);
+            if (parentClasses.length > 0) {
+                const parentTag = parent.tagName.toLowerCase();
+                const parentSelector = `${parentTag}.${parentClasses[0]} > ${elementSelector}`;
+                const matches = document.querySelectorAll(parentSelector);
+                if (matches.length === 1 && matches[0] === element) {
+                    return parentSelector;
+                }
+            }
+
+            // Try grandparent context (one more level up)
+            const grandparent = parent.parentElement;
+            if (grandparent) {
+                if (grandparent.id) {
+                    const grandparentSelector = `#${grandparent.id} ${elementSelector}`;
+                    const matches = document.querySelectorAll(grandparentSelector);
+                    if (matches.length === 1 && matches[0] === element) {
+                        return grandparentSelector;
+                    }
+                }
+
+                const grandparentClasses = this.getStableClasses(grandparent);
+                if (grandparentClasses.length > 0) {
+                    const grandparentTag = grandparent.tagName.toLowerCase();
+                    const grandparentSelector = `${grandparentTag}.${grandparentClasses[0]} ${elementSelector}`;
+                    const matches = document.querySelectorAll(grandparentSelector);
+                    if (matches.length === 1 && matches[0] === element) {
+                        return grandparentSelector;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /**
@@ -429,6 +839,24 @@
          */
         static escapeSelector(value) {
             return value.replace(/["'\\]/g, '\\$&');
+        }
+
+        /**
+         * Escape special characters in XPath strings
+         */
+        static escapeXPathString(value) {
+            // XPath doesn't have escape sequences, so we use concat if the string contains quotes
+            if (value.includes('"') && value.includes("'")) {
+                // String contains both types of quotes - use concat
+                const parts = value.split('"');
+                return `concat("${parts.join('", \'"\', "')}")`;
+            } else if (value.includes('"')) {
+                // Contains double quotes - wrap in single quotes
+                return `'${value}'`;
+            } else {
+                // Safe to wrap in double quotes
+                return `"${value}"`;
+            }
         }
 
         /**
@@ -990,6 +1418,16 @@
             // Check if should exclude
             if (ElementAnalyzer.shouldExclude(actionableElement)) return;
 
+            // PREVENT DUPLICATE RADIO/CHECKBOX CLICKS: Skip if same element clicked within 500ms
+            const elementKey = SmartLocatorGenerator.generateSelector(actionableElement);
+            const now = Date.now();
+            if (this.lastClickedElement === elementKey && (now - this.lastClickTime) < 500) {
+                console.log('⏭️ Skipping duplicate click on:', elementKey);
+                return; // Prevent duplicate within 500ms
+            }
+            this.lastClickedElement = elementKey;
+            this.lastClickTime = now;
+
             // CRITICAL FIX: Check if this is a navigation link
             const isNavigationLink = actionableElement.tagName.toLowerCase() === 'a' && 
                                      actionableElement.href && 
@@ -1062,6 +1500,76 @@
                 text = actionableElement.textContent.trim().substring(0, 50);
             }
 
+            // SMART DETECTION: Check if this click will cause navigation or dynamic content
+            const tag = actionableElement.tagName.toLowerCase();
+            let hasHref = false;
+            let isExternalNavigation = false;
+            let willNavigate = false;
+            let isDropdown = false;
+            let isModal = false;
+            
+            if (tag === 'a') {
+                const href = actionableElement.getAttribute('href');
+                hasHref = !!href;
+                
+                // Check if href will navigate (not anchor link or javascript:)
+                if (href) {
+                    isExternalNavigation = !href.startsWith('#') && 
+                                         !href.startsWith('javascript:') &&
+                                         !href.startsWith('mailto:') &&
+                                         !href.startsWith('tel:') &&
+                                         href.trim() !== '';
+                    
+                    // Check if it navigates to a different page (not just hash change)
+                    if (isExternalNavigation) {
+                        // Check if target is _blank (opens new tab - no wait needed)
+                        const target = actionableElement.getAttribute('target');
+                        willNavigate = target !== '_blank';
+                    }
+                }
+            }
+            // Detect select/dropdown elements
+            else if (tag === 'select') {
+                isDropdown = true;
+            }
+            //Detect divs/buttons that act as dropdowns
+            else if (tag === 'div' || tag === 'button' || tag === 'input') {
+                const classes = actionableElement.className || '';
+                const role = actionableElement.getAttribute('role');
+                const ariaHaspopup = actionableElement.getAttribute('aria-haspopup');
+                const ariaExpanded = actionableElement.getAttribute('aria-expanded');
+                
+                // Check if this is a React Select component
+                const isReactSelect = classes.includes('react-select') ||
+                                    classes.includes('__control') ||
+                                    classes.includes('__value-container') ||
+                                    classes.includes('__input-container') ||
+                                    actionableElement.closest('.react-select__control') ||
+                                    actionableElement.closest('[class*="select__control"]');
+                
+                isDropdown = isReactSelect ||
+                           classes.toLowerCase().includes('dropdown') ||
+                           classes.toLowerCase().includes('select') ||
+                           classes.toLowerCase().includes('combobox') ||
+                           role === 'combobox' ||
+                           role === 'listbox' ||
+                           ariaHaspopup === 'true' ||
+                           ariaHaspopup === 'listbox' ||
+                           ariaHaspopup === 'menu' ||
+                           ariaExpanded === 'false'; // Can be expanded
+                
+                isModal = classes.toLowerCase().includes('modal') ||
+                         classes.toLowerCase().includes('dialog') ||
+                         role === 'dialog';
+            }
+            // Also detect buttons with onclick that might navigate or load content
+            else if (tag === 'button') {
+                const onclick = actionableElement.getAttribute('onclick');
+                if (onclick && (onclick.includes('location') || onclick.includes('navigate') || onclick.includes('href'))) {
+                    willNavigate = true;
+                }
+            }
+
             // Send action to recorder
             this.sendAction({
                 eventType: 'click',
@@ -1069,11 +1577,19 @@
                 selector: selector,
                 fallbackSelectors: fallbackSelectors,
                 element: {
-                    tag: actionableElement.tagName.toLowerCase(),
+                    tag: tag,
                     text: text,
                     type: actionableElement.getAttribute('type'),
                     id: actionableElement.id,
-                    classes: Array.from(actionableElement.classList || [])
+                    classes: Array.from(actionableElement.classList || []),
+                    hasHref: hasHref,
+                    isExternalNavigation: isExternalNavigation,
+                    willNavigate: willNavigate,
+                    isDropdown: isDropdown,
+                    isModal: isModal,
+                    role: actionableElement.getAttribute('role'),
+                    ariaHaspopup: actionableElement.getAttribute('aria-haspopup'),
+                    ariaExpanded: actionableElement.getAttribute('aria-expanded')
                 },
                 shadow: shadowInfo,
                 iframe: {
@@ -1157,9 +1673,12 @@
 
             const element = event.target;
             const tag = element.tagName.toLowerCase();
+            const type = element.getAttribute('type');
 
-            // Only handle input/textarea
+            // Only handle input/textarea, but EXCLUDE checkboxes and radio buttons
+            // Checkboxes/radios are handled by handleClick as check/uncheck events
             if (tag !== 'input' && tag !== 'textarea') return;
+            if (type === 'checkbox' || type === 'radio') return;
 
             if (ElementAnalyzer.shouldExclude(element)) return;
 

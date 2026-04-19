@@ -52,6 +52,7 @@ namespace AgenticAI.WebUI.Controllers
                     c.EnableTracing = config.EnableTracing;
                     c.MaxRetryCount = config.MaxRetryCount;
                     c.TimeoutInSeconds = config.TimeoutInSeconds;
+                    c.RecorderWaitTimeMs = config.RecorderWaitTimeMs;
                     c.ParallelWorkers = config.ParallelWorkers;
                     c.EnableSelfHealing = config.EnableSelfHealing;
                     c.EnableAccessibilityTesting = config.EnableAccessibilityTesting;

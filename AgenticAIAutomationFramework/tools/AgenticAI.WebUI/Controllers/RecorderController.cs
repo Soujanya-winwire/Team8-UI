@@ -98,7 +98,168 @@ namespace AgenticAI.WebUI.Controllers
         }
 
         /// <summary>
-        /// Stop recording and save the scenario
+        /// Stop recording WITHOUT saving - returns scenario data for user confirmation
+        /// </summary>
+        [HttpPost("stop-preview")]
+        public async Task<IActionResult> StopRecordingPreview()
+        {
+            try
+            {
+                if (_activeRecorder == null)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        error = "No active recording session found."
+                    });
+                }
+
+                var scenario = await _activeRecorder.StopRecordingAsync();
+
+                // Ensure scenario has required properties
+                if (scenario == null)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        error = "Failed to retrieve scenario from recorder."
+                    });
+                }
+
+                // Initialize collections if null
+                if (scenario.Actions == null)
+                {
+                    scenario.Actions = new List<RecordedAction>();
+                }
+
+                if (scenario.Assertions == null)
+                {
+                    scenario.Assertions = new List<Assertion>();
+                }
+
+                if (scenario.Tags == null)
+                {
+                    scenario.Tags = new List<string>();
+                }
+
+                // Set timestamps
+                scenario.CreatedAt = DateTime.Now;
+                scenario.ModifiedAt = null;
+
+                // Auto-generate safe assertions from recorded actions
+                var autoAssertionCount = AppendAutoAssertionsFromActions(scenario);
+                if (autoAssertionCount > 0)
+                {
+                    Logger.Info($"Auto-generated {autoAssertionCount} assertion(s) for recorded actions in scenario '{scenario.Name}'");
+                }
+
+                // IMPORTANT: Clear the active recorder to allow new recordings
+                // The scenario data is returned to the client, but the session is closed
+                _activeRecorder = null;
+                Logger.Info("Recording session closed. Ready for new recording.");
+
+                // Return scenario WITHOUT saving - user must confirm
+                return Ok(new
+                {
+                    success = true,
+                    message = "Recording stopped. Please confirm to save.",
+                    scenario = new
+                    {
+                        scenario.Name,
+                        scenario.Module,
+                        scenario.Description,
+                        scenario.StartUrl,
+                        scenario.Tags,
+                        scenario.Actions,
+                        scenario.Assertions,
+                        ActionCount = scenario.Actions.Count,
+                        AssertionCount = scenario.Assertions.Count,
+                        scenario.CreatedAt,
+                        scenario.ModifiedAt
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error stopping recording preview: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    error = $"Failed to stop recording: {ex.Message}"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Save a previously recorded scenario (after user confirmation)
+        /// </summary>
+        [HttpPost("save")]
+        public IActionResult SaveRecordedScenario([FromBody] TestScenario scenario)
+        {
+            try
+            {
+                if (scenario == null)
+                {
+                    return BadRequest(new { success = false, error = "Scenario data is required" });
+                }
+
+                var manager = new ScenarioManager();
+                manager.SaveScenario(scenario);
+
+                Logger.Info($"Scenario '{scenario.Name}' saved successfully");
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Scenario saved successfully",
+                    scenarioName = scenario.Name,
+                    moduleName = scenario.Module,
+                    actionCount = scenario.Actions?.Count ?? 0
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to save scenario: {ex.Message}");
+                return BadRequest(new
+                {
+                    success = false,
+                    error = $"Failed to save scenario: {ex.Message}"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Discard a recording session (when user cancels)
+        /// </summary>
+        [HttpPost("discard")]
+        public IActionResult DiscardRecording()
+        {
+            try
+            {
+                // Clear any lingering recording session
+                _activeRecorder = null;
+                
+                Logger.Info("Recording session discarded by user");
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Recording session discarded"
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error discarding recording: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    error = $"Failed to discard recording: {ex.Message}"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Stop recording and save the scenario (legacy endpoint - kept for compatibility)
         /// </summary>
         [HttpPost("stop")]
         public async Task<IActionResult> StopRecording()
@@ -498,6 +659,8 @@ namespace AgenticAI.WebUI.Controllers
             switch (actionType)
             {
                 case "navigate":
+                    // AUTO-ASSERTION GENERATION DISABLED
+                    /*
                     // Postcondition: Verify navigation completed successfully
                     if (string.IsNullOrWhiteSpace(value))
                     {
@@ -511,11 +674,14 @@ namespace AgenticAI.WebUI.Controllers
                         Description = "Verify navigation completed",
                         ExecuteAfterActionIndex = actionIndex
                     });
+                    */
                     break;
 
                 case "type":
                 case "input":
                 case "fill":
+                    // AUTO-ASSERTION GENERATION DISABLED
+                    /*
                     if (string.IsNullOrWhiteSpace(locator))
                     {
                         break;
@@ -543,9 +709,12 @@ namespace AgenticAI.WebUI.Controllers
                             ExecuteAfterActionIndex = actionIndex
                         });
                     }
+                    */
                     break;
 
                 case "select":
+                    // AUTO-ASSERTION GENERATION DISABLED
+                    /*
                     if (string.IsNullOrWhiteSpace(locator))
                     {
                         break;
@@ -559,6 +728,7 @@ namespace AgenticAI.WebUI.Controllers
                         Description = "Verify dropdown is visible before selection",
                         ExecuteBeforeActionIndex = actionIndex
                     });
+                    */
                     break;
 
                 case "click":
@@ -567,19 +737,35 @@ namespace AgenticAI.WebUI.Controllers
                         break;
                     }
 
-                    // Precondition: Verify element exists before clicking
-                    // Use ElementExists instead of ElementVisible because click action
-                    // will automatically scroll to element, so it doesn't need to be visible yet
-                    assertions.Add(new Assertion
+                    // SKIP assertion for dropdown options - they don't exist until dropdown is opened
+                    // Check if this is clicking a dropdown option (role="option")
+                    bool isDropdownOption = locator.Contains("[role=\"option\"]") || 
+                                          locator.Contains("[@role=\"option\"]") ||
+                                          locator.Contains("[role='option']") ||
+                                          locator.Contains("[@role='option']");
+                    
+                    // AUTO-ASSERTION GENERATION DISABLED
+                    // Uncomment below to re-enable automatic ElementExists assertions before Click actions
+                    /*
+                    if (!isDropdownOption)
                     {
-                        Type = "ElementExists",
-                        Locator = locator,
-                        Description = "Verify element exists before click",
-                        ExecuteBeforeActionIndex = actionIndex
-                    });
+                        // Precondition: Verify element exists before clicking
+                        // Use ElementExists instead of ElementVisible because click action
+                        // will automatically scroll to element, so it doesn't need to be visible yet
+                        assertions.Add(new Assertion
+                        {
+                            Type = "ElementExists",
+                            Locator = locator,
+                            Description = "Verify element exists before click",
+                            ExecuteBeforeActionIndex = actionIndex
+                        });
+                    }
+                    */
                     break;
 
                 case "submit":
+                    // AUTO-ASSERTION GENERATION DISABLED
+                    /*
                     if (string.IsNullOrWhiteSpace(locator))
                     {
                         break;
@@ -595,6 +781,7 @@ namespace AgenticAI.WebUI.Controllers
                         Description = "Verify element exists before submit",
                         ExecuteBeforeActionIndex = actionIndex
                     });
+                    */
                     break;
 
                 case "wait":

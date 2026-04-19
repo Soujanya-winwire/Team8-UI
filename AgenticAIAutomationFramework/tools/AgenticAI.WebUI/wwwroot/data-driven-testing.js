@@ -595,7 +595,9 @@ function renderDataTable(data) {
     
     // Add column headers
     columns.forEach(col => {
-        tableHTML += '<th title="' + escapeHtml(col) + '" style="padding:12px 10px;border:1px solid #7dd3fc;text-align:start;color:#0369a1;font-weight:700;font-size:0.9em;white-space:nowrap;">' + escapeHtml(formatColumnHeader(col)) + '</th>';
+        tableHTML += '<th title="' + escapeHtml(col) + '" style="padding:12px 10px;border:1px solid #7dd3fc;text-align:start;color:#0369a1;font-weight:700;font-size:0.9em;white-space:nowrap;">';
+        tableHTML += escapeHtml(formatColumnHeader(col));
+        tableHTML += '</th>';
     });
     
     tableHTML += '<th style="padding:12px 10px;border:1px solid #7dd3fc;text-align:center;color:#0369a1;font-weight:700;font-size:0.9em;inline-size:100px;">Actions</th>';
