@@ -3349,9 +3349,9 @@ async function loadResultsView() {
                     <div class="form-group" style="margin: 0;">
                         <label>Date Range</label>
                         <select class="form-control" id="filter-date-range" onchange="applyTestFilters()">
-                            <option value="all">All Time</option>
+                            <option value="all" selected>All Time</option>
                             <option value="today">Today</option>
-                            <option value="last7days" selected>Last 7 Days</option>
+                            <option value="last7days">Last 7 Days</option>
                             <option value="last30days">Last 30 Days</option>
                         </select>
                     </div>
@@ -3580,7 +3580,7 @@ function clearAllTestFilters() {
     document.getElementById('filter-status').selectedIndex = 0;
     document.getElementById('filter-browser').selectedIndex = 0;
     document.getElementById('filter-environment').selectedIndex = 0;
-    document.getElementById('filter-date-range').value = 'last7days';
+    document.getElementById('filter-date-range').value = 'all';
     applyTestFilters();
 }
 

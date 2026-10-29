@@ -19,17 +19,17 @@
         }
 
         :root {
-            --primary-color: #7c3aed;
-            --secondary-color: #a78bfa;
+            --primary-color: #1e4e8c;
+            --secondary-color: #3b82c4;
             --success-color: #10b981;
             --danger-color: #ef4444;
             --warning-color: #f59e0b;
             --info-color: #3b82f6;
             --dark: #1e293b;
-            --light: #faf5ff;
-            --border: #e9d5ff;
-            --accent-purple: #8b5cf6;
-            --soft-purple: #f3e8ff;
+            --light: #f4f7fb;
+            --border: #dbe3ee;
+            --accent-purple: #2f6fb5;
+            --soft-purple: #e8f0fa;
             --soft-green: #d1fae5;
             --soft-blue: #dbeafe;
             --soft-orange: #fed7aa;
@@ -39,7 +39,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+            background: #eef2f7;
             min-height: 100vh;
         }
 
@@ -65,7 +65,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            border-bottom: 2px solid #e9d5ff;
+            border-bottom: 2px solid #dbe3ee;
         }
 
         .logo-image {
@@ -211,7 +211,7 @@
         }
 
         .stat-icon.primary {
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(30, 78, 140, 0.1);
             color: var(--primary-color);
         }
 
@@ -266,7 +266,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            background: linear-gradient(135deg, #1e4e8c, #3b82c4);
             color: white;
         }
 
@@ -348,8 +348,8 @@
         }
 
         .badge-primary {
-            background: rgba(139, 92, 246, 0.12);
-            color: #7c3aed;
+            background: rgba(30, 78, 140, 0.12);
+            color: #1e4e8c;
         }
 
         .badge-success {
@@ -609,6 +609,13 @@
             margin-bottom: 20px;
         }
 
+        /* Keep icons inside buttons at button size (not the large placeholder icon size) */
+        .empty-state .btn i {
+            font-size: inherit;
+            color: inherit;
+            margin-bottom: 0;
+        }
+
         .empty-state h3 {
             color: var(--dark);
             margin-bottom: 10px;
@@ -620,9 +627,9 @@
 
         /* Enhanced Record Test Section Colors */
         .record-highlight {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            background: linear-gradient(135deg, rgba(30, 78, 140, 0.15), rgba(59, 130, 196, 0.15));
             border: 2px solid var(--primary-color);
-            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 8px 16px rgba(30, 78, 140, 0.2);
         }
 
         .record-highlight h3 {
@@ -1065,7 +1072,7 @@
 
         .step-item-premium:hover .step-content-card {
             border-color: var(--primary-color);
-            box-shadow: 0 12px 20px -5px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 12px 20px -5px rgba(30, 78, 140, 0.15);
             transform: translateY(-3px);
         }
 
@@ -1088,9 +1095,9 @@
         }
 
         .step-type-badge.action {
-            background: rgba(102, 126, 234, 0.12);
+            background: rgba(30, 78, 140, 0.12);
             color: var(--primary-color);
-            border: 1px solid rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(30, 78, 140, 0.2);
         }
 
         .step-type-badge.assertion {
@@ -1139,7 +1146,7 @@
         .premium-input:focus {
             background: white;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 0 0 4px rgba(30, 78, 140, 0.15);
             outline: none;
         }
 
