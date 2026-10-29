@@ -1112,8 +1112,8 @@ function generateScenariosPageButtons(currentPage, totalPages) {
         const isActive = i === currentPage;
         buttons += `
             <button onclick="goToScenariosPage(${i})" 
-                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#3b82f6' : '#d1d5db'}; 
-                           background: ${isActive ? '#3b82f6' : 'white'}; 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#0f766e' : '#d1d5db'}; 
+                           background: ${isActive ? '#0f766e' : 'white'}; 
                            color: ${isActive ? 'white' : '#374151'};
                            border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
                 ${i}
@@ -1485,7 +1485,7 @@ async function loadRecordView() {
                 </div>
             </div>
 
-            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
+            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(15, 118, 110, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
                 Enter scenario details, click Start Recording, perform actions in the opened browser, then click Stop Recording to save your scenario.
             </div>
 
@@ -3034,8 +3034,8 @@ async function loadConfigurationView() {
 
                         <!-- Cross-Browser Parallel Execution Options -->
                         <div id="cross-browser-options" class="${configuration.executionMode === 'Parallel' ? '' : 'hidden'}" style="margin-top: 20px;">
-                            <div class="card" style="border: 2px solid #3b82f6; background: rgba(59, 130, 246, 0.05);">
-                                <div class="card-header" style="background: rgba(59, 130, 246, 0.1);">
+                            <div class="card" style="border: 2px solid #0f766e; background: rgba(15, 118, 110, 0.05);">
+                                <div class="card-header" style="background: rgba(15, 118, 110, 0.1);">
                                     <div class="card-title">
                                         <i class="fas fa-globe"></i> Cross-Browser Parallel Execution
                                     </div>
@@ -3079,7 +3079,7 @@ async function loadConfigurationView() {
                                         </div>
                                     </div>
 
-                                    <div class="alert alert-info" style="margin-top: 20px; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px;">
+                                    <div class="alert alert-info" style="margin-top: 20px; background: rgba(15, 118, 110, 0.1); border-left: 4px solid #0f766e; padding: 15px; border-radius: 6px;">
                                         <strong><i class="fas fa-info-circle"></i> How it works:</strong><br>
                                         Tests will be distributed across selected browsers in round-robin fashion.<br>
                                         <strong>Example:</strong> Test1→Chrome, Test2→Firefox, Test3→Edge, Test4→Chrome...
@@ -3821,8 +3821,8 @@ function generatePageButtons(currentPage, totalPages) {
         const isActive = i === currentPage;
         buttons += `
             <button onclick="goToPage(${i})" 
-                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#3b82f6' : '#d1d5db'}; 
-                           background: ${isActive ? '#3b82f6' : 'white'}; 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#0f766e' : '#d1d5db'}; 
+                           background: ${isActive ? '#0f766e' : 'white'}; 
                            color: ${isActive ? 'white' : '#374151'};
                            border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
                 ${i}
@@ -4179,7 +4179,7 @@ function viewEvidence(index) {
                 ${stepsWithScreenshots.map((step, idx) => `
                     <div style="margin-bottom: 30px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: #f9fafb;">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="background: #3b82f6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                            <div style="background: #0f766e; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
                                 ${idx + 1}
                             </div>
                             <div style="flex: 1;">
@@ -4261,7 +4261,7 @@ function viewLogs(index) {
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px;">
                     <div style="background: #f3f4f6; padding: 12px; border-radius: 6px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">${totalSteps}</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #0f766e;">${totalSteps}</div>
                         <div style="font-size: 13px; color: #6b7280;">Total Steps</div>
                     </div>
                     <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; text-align: center;">
@@ -4299,7 +4299,7 @@ function viewLogs(index) {
 
         return `
                                     <tr style="border-bottom: 1px solid #e5e7eb; background: ${rowBg};">
-                                        <td style="padding: 16px; font-weight: 600; color: #3b82f6;">${idx + 1}</td>
+                                        <td style="padding: 16px; font-weight: 600; color: #0f766e;">${idx + 1}</td>
                                         <td style="padding: 16px;">
                                             <strong style="color: #1f2937;">${escapeHtml(step.stepName)}</strong>
                                         </td>

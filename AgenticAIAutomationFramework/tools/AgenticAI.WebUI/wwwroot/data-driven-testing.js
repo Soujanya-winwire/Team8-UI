@@ -55,8 +55,8 @@ async function initDataDrivenTestingView() {
 
         <!-- EXECUTION TAB -->
         <div id="ddt-execution-tab" class="ddt-tab" style="display:block;">
-            <div class="card" style="border:2px solid var(--info-color);box-shadow:0 6px 16px rgba(59,130,246,0.15);margin-block-start:14px;">
-                <div class="card-header" style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(37,99,235,0.04));">
+            <div class="card" style="border:2px solid var(--info-color);box-shadow:0 6px 16px rgba(15,118,110,0.15);margin-block-start:14px;">
+                <div class="card-header" style="background:linear-gradient(135deg,rgba(15,118,110,0.08),rgba(15,118,110,0.04));">
                     <div class="card-title" style="display:flex;align-items:center;gap:10px;color:var(--info-color);">
                         <i class="fas fa-rocket"></i> Intelligent Test Execution
                     </div>
@@ -589,7 +589,7 @@ function renderDataTable(data) {
     // Build professional table HTML
     let tableHTML = '<div style="overflow-x:auto;border-radius:6px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.08);">';
     tableHTML += '<table style="inline-size:100%;border-collapse:collapse;background:#fff;table-layout:auto;">';
-    tableHTML += '<thead style="background:linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);position:sticky;inset-block-start:0;">';
+    tableHTML += '<thead style="background:linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);position:sticky;inset-block-start:0;">';
     tableHTML += '<tr>';
     tableHTML += '<th style="padding:12px 10px;border:1px solid #7dd3fc;text-align:center;inline-size:50px;color:#0369a1;font-weight:700;font-size:0.9em;">#</th>';
     
@@ -605,7 +605,7 @@ function renderDataTable(data) {
 
     // Add data rows
     data.forEach((row, idx) => {
-        const bgColor = idx % 2 === 0 ? '#fff' : '#f0f9ff';
+        const bgColor = idx % 2 === 0 ? '#fff' : '#f1f8f7';
         const hoverColor = idx % 2 === 0 ? '#f5f5f5' : '#e0f2fe';
         tableHTML += '<tr style="background:' + bgColor + ';transition:background 0.15s;" data-row-idx="' + idx + '" onmouseover="this.style.background=\'' + hoverColor + '\'" onmouseout="this.style.background=\'' + bgColor + '\'">';
         tableHTML += '<td style="padding:10px;border:1px solid #e5e7eb;text-align:center;color:#666;font-size:0.85em;font-weight:600;vertical-align:middle;">' + (idx + 1) + '</td>';
@@ -625,7 +625,7 @@ function renderDataTable(data) {
     tableHTML += '<div style="margin-block-start:16px;display:flex;gap:8px;flex-wrap:wrap;">';
     tableHTML += '<button class="btn btn-sm btn-success" onclick="insertDataRow()" style="padding:10px 14px;font-weight:600;cursor:pointer;">';
     tableHTML += '<i class="fas fa-plus-circle"></i> Insert New Row</button>';
-    tableHTML += '<button class="btn btn-sm" onclick="editTableData()" style="padding:10px 14px;font-weight:600;background:#3b82f6;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
+    tableHTML += '<button class="btn btn-sm" onclick="editTableData()" style="padding:10px 14px;font-weight:600;background:#0f766e;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
     tableHTML += '<i class="fas fa-pencil"></i> Edit Data</button>';
     tableHTML += '<button class="btn btn-sm" onclick="clearTableData()" style="padding:10px 14px;font-weight:600;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
     tableHTML += '<i class="fas fa-trash-alt"></i> Clear All</button>';
@@ -646,8 +646,8 @@ function renderDataTable(data) {
  */
 function buildInsertRowUI(columns) {
     const rowId = 'row-' + Date.now();
-    let formHTML = '<div id="' + rowId + '" style="background:#f0f9ff;border:2px solid #3b82f6;padding:16px;border-radius:8px;margin:16px 0;">';
-    formHTML += '<h4 style="margin:0 0 12px 0;color:#1e40af;">New Row - Insert Details</h4>';
+    let formHTML = '<div id="' + rowId + '" style="background:#f1f8f7;border:2px solid #0f766e;padding:16px;border-radius:8px;margin:16px 0;">';
+    formHTML += '<h4 style="margin:0 0 12px 0;color:#115e59;">New Row - Insert Details</h4>';
     formHTML += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-block-end:12px;">';
     
     columns.forEach((col, idx) => {
@@ -1608,11 +1608,11 @@ async function validateLoadedData() {
                     <span style="color:#059669;">✓ Valid Schema</span>
                 </div>
                 <div style="margin-block-end:10px;color:#666;font-size:0.9em;">
-                    Columns: ${displayColumns.map(c => `<code style="background:#dbeafe;padding:2px 6px;border-radius:4px;margin:0 2px;">${escapeHtml(c)}</code>`).join(' ')}
+                    Columns: ${displayColumns.map(c => `<code style="background:#e0f2f1;padding:2px 6px;border-radius:4px;margin:0 2px;">${escapeHtml(c)}</code>`).join(' ')}
                 </div>
                 <div style="overflow-x:auto;">
                     <table style="font-size:0.85em;border-collapse:collapse;inline-size:100%;">
-                        <thead style="background:#bfdbfe;">
+                        <thead style="background:#b2dfdb;">
                             <tr>${displayColumns.map(c => `<th style="padding:6px 10px;text-align:start;border:1px solid #93c5fd;">${escapeHtml(c)}</th>`).join('')}</tr>
                         </thead>
                         <tbody>
@@ -2218,7 +2218,7 @@ function renderDataDrivenResults(data) {
                     <span class="badge badge-success">✅ ${data.passed || 0} Passed</span>
                     <span class="badge badge-danger" style="margin-inline-start:0;">❌ ${data.failed || 0} Failed</span>
                     <span class="badge badge-info" style="margin-inline-start:0;">📊 ${data.totalRows || 0} Total</span>
-                    <span class="badge" style="background:#e0e7ff;color:#4f46e5;border:none;margin-inline-start:0;">⏱️ ${durationSeconds}s</span>
+                    <span class="badge" style="background:#ccfbf1;color:#0f766e;border:none;margin-inline-start:0;">⏱️ ${durationSeconds}s</span>
                 </div>
             </div>
             <div style="text-align:end;font-size:1.2em;font-weight:600;color:${allPassed ? 'var(--success-color)' : 'var(--danger-color)'};padding:10px 0;">

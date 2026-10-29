@@ -19,19 +19,19 @@
         }
 
         :root {
-            --primary-color: #1e4e8c;
-            --secondary-color: #3b82c4;
+            --primary-color: #0f766e;
+            --secondary-color: #0d9488;
             --success-color: #10b981;
             --danger-color: #ef4444;
             --warning-color: #f59e0b;
-            --info-color: #3b82f6;
+            --info-color: #0e7490;
             --dark: #1e293b;
-            --light: #f4f7fb;
-            --border: #dbe3ee;
-            --accent-purple: #2f6fb5;
-            --soft-purple: #e8f0fa;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --accent-purple: #475569;
+            --soft-purple: #e2e8f0;
             --soft-green: #d1fae5;
-            --soft-blue: #dbeafe;
+            --soft-blue: #e0f2f1;
             --soft-orange: #fed7aa;
             --text-primary: #374151;
             --text-secondary: #6b7280;
@@ -39,7 +39,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #eef2f7;
+            background: #f1f5f9;
             min-height: 100vh;
         }
 
@@ -65,7 +65,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            border-bottom: 2px solid #dbe3ee;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .logo-image {
@@ -113,7 +113,7 @@
         }
 
         .nav-item.active {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: white;
             border-left: 4px solid var(--primary-color);
         }
@@ -211,7 +211,7 @@
         }
 
         .stat-icon.primary {
-            background: rgba(30, 78, 140, 0.1);
+            background: rgba(15, 118, 110, 0.1);
             color: var(--primary-color);
         }
 
@@ -231,8 +231,8 @@
         }
 
         .stat-icon.info {
-            background: rgba(59, 130, 246, 0.12);
-            color: #2563eb;
+            background: rgba(15, 118, 110, 0.12);
+            color: #115e59;
         }
 
         .stat-details h3 {
@@ -266,7 +266,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1e4e8c, #3b82c4);
+            background: #0f766e;
             color: white;
         }
 
@@ -348,8 +348,8 @@
         }
 
         .badge-primary {
-            background: rgba(30, 78, 140, 0.12);
-            color: #1e4e8c;
+            background: rgba(15, 118, 110, 0.12);
+            color: #0f766e;
         }
 
         .badge-success {
@@ -368,8 +368,8 @@
         }
 
         .badge-info {
-            background: rgba(59, 130, 246, 0.12);
-            color: #2563eb;
+            background: rgba(15, 118, 110, 0.12);
+            color: #115e59;
         }
 
         /* Form Elements - COMPACT */
@@ -434,7 +434,7 @@
         }
 
         .execution-status.running {
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(15, 118, 110, 0.1);
             border-left: 4px solid var(--info-color);
         }
 
@@ -459,7 +459,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             transition: width 0.3s;
         }
 
@@ -492,7 +492,7 @@
         }
 
         .console-line.info {
-            color: #60a5fa;
+            color: #2dd4bf;
         }
 
         /* Modal */
@@ -627,9 +627,9 @@
 
         /* Enhanced Record Test Section Colors */
         .record-highlight {
-            background: linear-gradient(135deg, rgba(30, 78, 140, 0.15), rgba(59, 130, 196, 0.15));
+            background: rgba(15, 118, 110, 0.08);
             border: 2px solid var(--primary-color);
-            box-shadow: 0 8px 16px rgba(30, 78, 140, 0.2);
+            box-shadow: 0 8px 16px rgba(15, 118, 110, 0.2);
         }
 
         .record-highlight h3 {
@@ -644,7 +644,7 @@
 
         /* Info Box Styling */
         .info-box {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.08));
+            background: rgba(16, 185, 129, 0.10);
             border-left: 4px solid var(--success-color);
             box-shadow: 0 4px 8px rgba(16, 185, 129, 0.15);
             padding: 20px;
@@ -753,19 +753,19 @@
         }
 
         .toast-success {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: #10b981;
         }
 
         .toast-error {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: #ef4444;
         }
 
         .toast-warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+            background: #f59e0b;
         }
 
         .toast-info {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: #0f766e;
         }
 
         .toast-fade-out {
@@ -1028,7 +1028,7 @@
             top: 10px;
             bottom: 10px;
             width: 2px;
-            background: linear-gradient(to bottom, var(--primary-color) 0%, var(--success-color) 100%);
+            background: var(--primary-color);
             opacity: 0.15;
             border-radius: 2px;
         }
@@ -1072,7 +1072,7 @@
 
         .step-item-premium:hover .step-content-card {
             border-color: var(--primary-color);
-            box-shadow: 0 12px 20px -5px rgba(30, 78, 140, 0.15);
+            box-shadow: 0 12px 20px -5px rgba(15, 118, 110, 0.15);
             transform: translateY(-3px);
         }
 
@@ -1095,9 +1095,9 @@
         }
 
         .step-type-badge.action {
-            background: rgba(30, 78, 140, 0.12);
+            background: rgba(15, 118, 110, 0.12);
             color: var(--primary-color);
-            border: 1px solid rgba(30, 78, 140, 0.2);
+            border: 1px solid rgba(15, 118, 110, 0.2);
         }
 
         .step-type-badge.assertion {
@@ -1146,7 +1146,7 @@
         .premium-input:focus {
             background: white;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(30, 78, 140, 0.15);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.15);
             outline: none;
         }
 
@@ -1170,7 +1170,7 @@
         }
 
         .aitestgen-step.active {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: white;
         }
 
