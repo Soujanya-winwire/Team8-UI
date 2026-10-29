@@ -1,5 +1,7 @@
 import subprocess
 import os
+import re
+import shutil
 import time
 
 # Opt-in features (all off by default, so existing behaviour is unchanged):
@@ -10,11 +12,13 @@ RETRIES = int(os.getenv('AITESTGEN_RETRIES', '0') or 0)
 
 # Ordered (category, keywords) heuristics used to classify a failure.
 FAILURE_CATEGORIES = [
-    ('TIMEOUT', ['timeout', 'timed out']),
+    # Most specific first: Playwright prints "Timeout: Nms" inside assertion and locator
+    # failures too, so TIMEOUT must be the last-resort category.
+    ('ENVIRONMENT', ['browser has been closed', 'executable doesn', 'playwright install', 'enoent', 'cannot find module']),
+    ('NETWORK', ['net::err', 'econnrefused', 'enotfound', 'err_connection', 'ssl_error', 'err_cert']),
+    ('ASSERTION', ['expect(', 'assertionerror']),
     ('LOCATOR', ['strict mode violation', 'waiting for locator', 'locator resolved to', 'element not found', 'no element']),
-    ('ASSERTION', ['expect(', 'expected', 'tobe', 'tohave', 'assertion']),
-    ('NETWORK', ['net::err', 'econnrefused', 'enotfound', 'err_connection', 'ssl']),
-    ('ENVIRONMENT', ['browser has been closed', 'executable doesn', 'playwright install', 'enoent']),
+    ('TIMEOUT', ['timeout', 'timed out']),
 ]
 
 
@@ -27,22 +31,35 @@ def classify_failure(text):
     return 'UNKNOWN'
 
 
+def safe_file_stem(test_id):
+    """Turn a test id (which may contain HTML, URLs or punctuation) into a valid filename stem."""
+    stem = re.sub(r'[^A-Za-z0-9._-]+', '-', str(test_id)).strip('-.')[:80]
+    return stem or 'test'
+
+
 def execute_playwright_scripts(scripts):
     results = []
     os.makedirs('tests/generated', exist_ok=True)
     for script in scripts:
-        script_path = f"tests/generated/{script['id']}.spec.ts"
+        script_path = f"tests/generated/{safe_file_stem(script['id'])}.spec.ts"
         with open(script_path, 'w') as f:
-            f.write(script['script'])
+            body = script['script']
+            # Generated scripts are bare test() calls; add the import the project exporter also adds
+            if '@playwright/test' not in body:
+                body = "import { test, expect } from '@playwright/test';\n\n" + body + "\n"
+            f.write(body)
         started = time.perf_counter()
         try:
             # Run Playwright test
-            command = ['npx', 'playwright', 'test', script_path]
+            # On Windows npx is npx.cmd, which subprocess only finds via its full path
+            npx = shutil.which('npx') or 'npx'
+            command = [npx, 'playwright', 'test', script_path]
             if RETRIES > 0:
                 command.append(f'--retries={RETRIES}')
             if TRACE_ENABLED:
                 command.append('--trace=retain-on-failure')
-            result = subprocess.run(command, capture_output=True, text=True)
+            # stdin is closed and a timeout is set so a missing package can't hang the API on an install prompt
+            result = subprocess.run(command, capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=300)
             status = 'PASS' if result.returncode == 0 else 'FAIL'
             elapsed = f"{time.perf_counter() - started:.2f}s"
             entry = {

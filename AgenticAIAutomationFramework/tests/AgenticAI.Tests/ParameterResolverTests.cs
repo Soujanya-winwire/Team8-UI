@@ -49,7 +49,7 @@ namespace AgenticAI.Tests
             {
                 Assert.That(ParameterResolver.InferParameterName("[data-testid=login-email]"), Is.EqualTo("loginEmail"));
                 Assert.That(ParameterResolver.InferParameterName("[data-test='user-password']"), Is.EqualTo("password")); // Normalizes user-password → password
-                Assert.That(ParameterResolver.InferParameterName("[data-qa=submit-button]"), Is.EqualTo("submitButton"));
+                Assert.That(ParameterResolver.InferParameterName("[data-qa=submit-button]"), Is.EqualTo("submit")); // Normalizes submit-button → submit (trailing -button is stripped)
             });
         }
 

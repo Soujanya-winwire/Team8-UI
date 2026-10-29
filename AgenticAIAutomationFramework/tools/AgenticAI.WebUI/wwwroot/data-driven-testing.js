@@ -2524,6 +2524,7 @@ function refreshAnalyticsDashboard() {
         `).join('') :
         '<div style="color:#999;text-align:center;padding:20px;">No failures</div>';
 
+        const failingElemDiv = document.getElementById('top-failing-datasets');
         if (failingElemDiv) failingElemDiv.innerHTML = failingHtml;
 
         // Top used datasets

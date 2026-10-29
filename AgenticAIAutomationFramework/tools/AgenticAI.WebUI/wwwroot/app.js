@@ -4196,7 +4196,8 @@ function viewEvidence(index) {
                                  onclick="openScreenshotModal('${normalizeScreenshotPath(step.screenshotPath)}')"
                                  style="max-width: 100%; cursor: pointer; border-radius: 6px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.2s;"
                                  onmouseover="this.style.transform='scale(1.02)'"
-                                 onmouseout="this.style.transform='scale(1)'">
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 onerror="this.onclick=null;this.outerHTML='<div style=&quot;color:#6b7280;padding:16px;font-size:13px;&quot;>Screenshot not available (image file no longer exists on this server)</div>'">
                         </div>
                     </div>
                 `).join('')}

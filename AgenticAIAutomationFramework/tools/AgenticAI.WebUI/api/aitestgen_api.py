@@ -21,6 +21,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5000", "http://127.0.0.1:5000"],
+    # Also allow any other local port, so the Web UI can run via ASPNETCORE_URLS on a custom port
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
     allow_credentials=True,
     allow_methods=["*"] ,
     allow_headers=["*"]

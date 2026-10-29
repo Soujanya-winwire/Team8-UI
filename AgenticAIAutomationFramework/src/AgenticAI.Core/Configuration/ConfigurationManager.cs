@@ -64,7 +64,10 @@ namespace AgenticAI.Core.Configuration
                 if (File.Exists(frameworkConfigPath))
                 {
                     var json = File.ReadAllText(frameworkConfigPath);
-                    var config = JsonConvert.DeserializeObject<FrameworkConfiguration>(json);
+                    // Replace (not append to) default collections such as ParallelBrowsers,
+                    // otherwise every load + save grows the list with duplicates
+                    var config = JsonConvert.DeserializeObject<FrameworkConfiguration>(json,
+                        new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace });
                     if (config != null)
                     {
                         _frameworkConfig = config;
