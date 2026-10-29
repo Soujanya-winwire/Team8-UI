@@ -240,28 +240,165 @@ function loadAITestGenView() {
     }
 
     function renderScripts(scripts) {
-        const blocks = scripts.map(s => `
+        const blocks = scripts.map((s, i) => `
             <div class="card script-card">
                 <div class="card-header">
                     <div class="card-title"><i class="fas fa-file-code"></i> ${escapeHtml(s.name || s.id || 'script')}</div>
-                    <button class="btn btn-sm btn-secondary aitestgen-copy-btn" data-script="${encodeURIComponent(s.script || '')}">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
+                    <div class="aitestgen-card-actions">
+                        <button class="btn btn-sm btn-success aitestgen-run-btn" data-index="${i}">
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                        <button class="btn btn-sm btn-secondary aitestgen-copy-btn" data-script="${encodeURIComponent(s.script || '')}">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
                 </div>
                 <pre class="aitestgen-code"><code>${escapeHtml(s.script || '')}</code></pre>
+                <div class="aitestgen-run-result" id="ai-run-result-${i}"></div>
             </div>`).join('');
 
         resultsPanel.innerHTML = `
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">${scripts.length} Playwright Script${scripts.length === 1 ? '' : 's'} Generated</div>
-                    <button class="btn btn-sm btn-primary" id="ai-download-project-btn">
-                        <i class="fas fa-file-zipper"></i> Download Project (.zip)
-                    </button>
+                    <div class="aitestgen-card-actions">
+                        <button class="btn btn-sm btn-success" id="ai-run-all-btn">
+                            <i class="fas fa-play"></i> Run All Tests
+                        </button>
+                        <button class="btn btn-sm btn-danger" id="ai-stop-btn" style="display:none;">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button class="btn btn-sm btn-primary" id="ai-download-project-btn">
+                            <i class="fas fa-file-zipper"></i> Download Project (.zip)
+                        </button>
+                    </div>
                 </div>
-                <p class="aitestgen-subtitle">A ready-to-run Playwright project: package.json, playwright.config.ts, and one spec file per test — unzip, <code>npm install</code>, <code>npm test</code>.</p>
+                <p class="aitestgen-subtitle">A ready-to-run Playwright project: package.json, playwright.config.ts, and one spec file per test — unzip, <code>npm install</code>, <code>npm test</code>. Or use <b>Run</b> / <b>Run All Tests</b> to execute them here (headless, on the machine running the AI Test Generator service).</p>
+                <div id="ai-run-summary" class="aitestgen-run-summary" style="display:none;"></div>
             </div>
             ${blocks}`;
+
+        const runResults = {};
+        let runInProgress = false;
+        let runStopRequested = false;
+        const stopBtn = document.getElementById('ai-stop-btn');
+        const runAllBtn = document.getElementById('ai-run-all-btn');
+
+        function setRunButtonsDisabled(disabled) {
+            resultsPanel.querySelectorAll('.aitestgen-run-btn, #ai-run-all-btn').forEach(b => { b.disabled = disabled; });
+        }
+
+        function updateRunSummary(message) {
+            const el = document.getElementById('ai-run-summary');
+            if (!el) return;
+            const all = Object.values(runResults);
+            const passed = all.filter(r => r.status === 'PASS').length;
+            const failed = all.filter(r => r.status === 'FAIL').length;
+            const errors = all.length - passed - failed;
+            el.style.display = 'flex';
+            el.innerHTML = `
+                ${message ? `<span class="aitestgen-run-message">${escapeHtml(message)}</span>` : ''}
+                <span class="badge badge-success">${passed} passed</span>
+                <span class="badge badge-danger">${failed} failed</span>
+                ${errors ? `<span class="badge badge-warning">${errors} error${errors === 1 ? '' : 's'}</span>` : ''}`;
+        }
+
+        function renderRunResult(index, result) {
+            const target = document.getElementById(`ai-run-result-${index}`);
+            if (!target) return;
+            if (result.running) {
+                target.innerHTML = '<div class="aitestgen-run-status"><i class="fas fa-spinner fa-spin"></i> Running...</div>';
+                return;
+            }
+            const status = result.status || 'ERROR';
+            const badge = status === 'PASS' ? 'badge-success' : status === 'FAIL' ? 'badge-danger' : 'badge-warning';
+            // Strip terminal colour codes and keep the tail, where Playwright prints the failure
+            const detail = [result.output, result.error].filter(Boolean).join('\n')
+                .replace(/\u001b\[[0-9;]*m/g, '').trim();
+            const shown = detail.length > 4000 ? '...' + detail.slice(-4000) : detail;
+            target.innerHTML = `
+                <div class="aitestgen-run-status">
+                    <span class="badge ${badge}">${escapeHtml(status)}</span>
+                    ${result.executionTime ? `<span>${escapeHtml(result.executionTime)}</span>` : ''}
+                    ${result.failureCategory ? `<span class="badge badge-info">${escapeHtml(result.failureCategory)}</span>` : ''}
+                    ${result.flaky ? '<span class="badge badge-warning">flaky</span>' : ''}
+                </div>
+                ${shown ? `<details ${status === 'PASS' ? '' : 'open'}><summary>Details</summary><pre class="aitestgen-code aitestgen-run-output">${escapeHtml(shown)}</pre></details>` : ''}`;
+        }
+
+        async function runOne(index) {
+            renderRunResult(index, { running: true });
+            let result;
+            try {
+                const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/execute-tests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scripts: [scripts[index]] })
+                });
+                const data = await response.json();
+                result = data.success && data.results && data.results.length
+                    ? data.results[0]
+                    : { status: 'ERROR', error: (data && data.error) || 'The service returned no result.' };
+            } catch (err) {
+                result = {
+                    status: 'ERROR',
+                    error: err instanceof TypeError
+                        ? `Could not reach the AI Test Generator service at ${AITESTGEN_API_BASE}. Make sure it's running (tools/AgenticAI.WebUI/api/run_fastapi_server.bat).`
+                        : String(err)
+                };
+            }
+            runResults[index] = result;
+            renderRunResult(index, result);
+            return result;
+        }
+
+        resultsPanel.querySelectorAll('.aitestgen-run-btn').forEach(btn => {
+            btn.onclick = async () => {
+                if (runInProgress) return;
+                const index = parseInt(btn.getAttribute('data-index'), 10);
+                runInProgress = true;
+                setRunButtonsDisabled(true);
+                try {
+                    await runOne(index);
+                    updateRunSummary('');
+                } finally {
+                    runInProgress = false;
+                    setRunButtonsDisabled(false);
+                }
+            };
+        });
+
+        runAllBtn.onclick = async () => {
+            if (runInProgress) return;
+            runInProgress = true;
+            runStopRequested = false;
+            Object.keys(runResults).forEach(k => delete runResults[k]);
+            scripts.forEach((_, i) => {
+                const target = document.getElementById(`ai-run-result-${i}`);
+                if (target) target.innerHTML = '';
+            });
+            setRunButtonsDisabled(true);
+            stopBtn.style.display = 'inline-flex';
+            try {
+                for (let i = 0; i < scripts.length; i++) {
+                    if (runStopRequested || !document.getElementById('ai-run-summary')) break;
+                    updateRunSummary(`Running ${i + 1} of ${scripts.length}...`);
+                    await runOne(i);
+                }
+                const done = Object.keys(runResults).length;
+                updateRunSummary(runStopRequested ? `Stopped after ${done} of ${scripts.length}` : `Finished ${done} of ${scripts.length}`);
+            } finally {
+                runInProgress = false;
+                setRunButtonsDisabled(false);
+                stopBtn.style.display = 'none';
+            }
+        };
+
+        // A running test cannot be aborted mid-flight, so Stop takes effect after the current test
+        stopBtn.onclick = () => {
+            runStopRequested = true;
+            updateRunSummary('Stopping after the current test...');
+        };
 
         resultsPanel.querySelectorAll('.aitestgen-copy-btn').forEach(btn => {
             btn.onclick = async () => {
@@ -2384,7 +2521,7 @@ async function loadExportView() {
 
         <div class="card mt-20">
             <div style="padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-                <div style="color:#64748b;">Framework-based export creates a downloadable ZIP project.</div>
+                <div style="color:#64748b;">Framework-based export creates a downloadable ZIP project. It includes <b>run-tests.bat</b> (Windows) and <b>run-tests.sh</b> (macOS/Linux) that install dependencies and run the tests in one step.</div>
                 <button class="btn btn-success" onclick="exportScriptsByFramework()" id="export-download-btn">
                     <i class="fas fa-download"></i> Export ZIP
                 </button>

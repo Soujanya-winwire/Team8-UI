@@ -1325,6 +1325,57 @@
             overflow-x: auto;
             font-family: 'Consolas', 'Monaco', monospace;
         }
+
+        .aitestgen-card-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .aitestgen-run-summary {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .aitestgen-run-message {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 6px;
+        }
+
+        .aitestgen-run-result:not(:empty) {
+            margin-top: 10px;
+        }
+
+        .aitestgen-run-status {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .aitestgen-run-result details {
+            margin-top: 8px;
+        }
+
+        .aitestgen-run-result summary {
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .aitestgen-run-output {
+            max-height: 260px;
+            overflow: auto;
+            white-space: pre-wrap;
+            margin-top: 6px;
+        }
     </style>
 </head>
 

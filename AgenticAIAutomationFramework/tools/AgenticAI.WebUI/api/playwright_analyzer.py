@@ -1,5 +1,37 @@
 from playwright.sync_api import sync_playwright
 
+# Shortest stable selector that contains no spaces or quotes (the script generator splits steps on
+# spaces): an id, then a name, then a short DOM path anchored at the nearest ancestor with an id.
+SELECTOR_JS = """el => {
+    if (el.getAttribute('id')) return '#' + el.getAttribute('id');
+    if (el.getAttribute('name')) return '[name=' + el.getAttribute('name') + ']';
+    const esc = s => (window.CSS && CSS.escape) ? CSS.escape(s) : s;
+    const parts = [];
+    let node = el;
+    while (node && node.nodeType === 1 && node.tagName.toLowerCase() !== 'html') {
+        if (node.id) { parts.unshift('#' + esc(node.id)); break; }
+        let index = 1;
+        let sibling = node.previousElementSibling;
+        while (sibling) { if (sibling.tagName === node.tagName) index++; sibling = sibling.previousElementSibling; }
+        parts.unshift(node.tagName.toLowerCase() + ':nth-of-type(' + index + ')');
+        node = node.parentElement;
+    }
+    return parts.join('>');
+}"""
+
+# Human-readable label: same priority as before, but whitespace-collapsed and capped so it never
+# carries markup or page-sized text into test case titles.
+LABEL_JS = """el => {
+    const clean = s => (s || '').replace(/\\s+/g, ' ').trim();
+    const img = el.querySelector && el.querySelector('img');
+    const text = clean(el.getAttribute('aria-label')) || clean(el.getAttribute('placeholder')) ||
+        clean(el.getAttribute('name')) || clean(el.getAttribute('id')) || clean(el.innerText || el.textContent) ||
+        clean(el.getAttribute('title')) || clean(el.getAttribute('alt')) || clean(img && img.getAttribute('alt')) ||
+        clean(el.getAttribute('value')) || clean(el.getAttribute('href'));
+    return text.length > 80 ? text.slice(0, 77) + '...' : text;
+}"""
+
+
 def analyze_url(url: str):
     elements = []
     with sync_playwright() as p:
@@ -9,16 +41,8 @@ def analyze_url(url: str):
         # Extract input fields
         for el in page.query_selector_all('input,button,select,textarea,a,table,th,td,label'):
             tag = el.evaluate('el => el.tagName.toLowerCase()')
-            selector = el.evaluate('el => el.getAttribute("id")')
-            if selector:
-                selector = f"#{selector}"
-            else:
-                selector = el.evaluate('el => el.getAttribute("name")')
-                if selector:
-                    selector = f"[name={selector}]"
-                else:
-                    selector = page.evaluate('el => el.outerHTML', el)
-            label = el.evaluate('el => el.getAttribute("aria-label") || el.getAttribute("placeholder") || el.getAttribute("name") || el.getAttribute("id") || el.textContent')
+            selector = el.evaluate(SELECTOR_JS)
+            label = el.evaluate(LABEL_JS) or tag
             entry = {
                 "type": tag,
                 "label": label,

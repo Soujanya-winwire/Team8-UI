@@ -72,6 +72,7 @@ TEXT_INPUT_TYPES = ('', 'text', 'email', 'password', 'search', 'tel', 'url', 'nu
 SCRIPT_PAYLOAD = '<script>alert(1)</script>'
 SQL_PAYLOAD = "' OR '1'='1"
 DEFAULT_LONG_LENGTH = 256
+SUBMIT_KEYWORDS = ('login', 'log in', 'log-in', 'sign in', 'signin', 'sign-in', 'submit', 'continue')
 
 
 def _is_clean_selector(selector):
@@ -123,8 +124,12 @@ def _login_form_cases(elements):
                      and any(k in text_of(e) for k in ('user', 'email', 'login', 'uname'))), None)
     if not username or not password:
         return []
-    submit = next((e for e in elements if _is_clean_selector(e.get('selector', ''))
-                   and (e.get('type', '').lower() == 'button' or _input_type(e) in ('submit', 'button'))), None)
+    # Pick the real submit control: a named one (login/submit/sign in) first, then a submit-type input;
+    # otherwise fall back to pressing Enter in the form rather than clicking an arbitrary button.
+    buttons = [e for e in elements if _is_clean_selector(e.get('selector', '')) and '>' not in e['selector']
+               and (e.get('type', '').lower() == 'button' or _input_type(e) in ('submit', 'button'))]
+    submit = (next((e for e in buttons if any(k in text_of(e) for k in SUBMIT_KEYWORDS)), None)
+              or next((e for e in buttons if _input_type(e) == 'submit'), None))
     u, p = username['selector'], password['selector']
     press = [f"Click {submit['selector']}"] if submit else ["Submit form if applicable"]
     expected = "Login is rejected, an error is shown and the user stays on the login page"
@@ -158,7 +163,7 @@ def generate_test_cases(elements):
     for el in elements:
         el_type = el.get('type', '').lower()
         selector = el.get('selector', '')
-        label = el.get('label', selector)
+        label = el.get('label') or selector
         tc_id = f"TC_{selector}"
 
         if el_type == 'input':
