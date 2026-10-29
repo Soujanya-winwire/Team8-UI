@@ -32,7 +32,8 @@ def _module_for(selector: str) -> str:
     return 'UI'
 
 
-def _build_case(id_, title, steps, expected, test_data, el_type, preconditions=None):
+def _build_case(id_, title, steps, expected, test_data, el_type, preconditions=None,
+                case_type='Positive', priority=None, module=None, tags=None):
     """
     Builds a test case in the original flat shape (id/name/steps/expected) that
     playwright_script_generator.py already consumes, extended with SQA template
@@ -53,17 +54,103 @@ def _build_case(id_, title, steps, expected, test_data, el_type, preconditions=N
         'id': id_,
         'name': title,
         'title': title,
-        'module': _module_for(id_),
-        'priority': PRIORITY_BY_TYPE.get(el_type, 'Medium'),
-        'type': 'Positive',
+        'module': module or _module_for(id_),
+        'priority': priority or PRIORITY_BY_TYPE.get(el_type, 'Medium'),
+        'type': case_type,
         'preconditions': preconditions or 'The page under test is loaded and the target element is visible and enabled.',
         'steps': steps,
         'detailed_steps': detailed_steps,
         'test_data': test_data,
         'expected': expected,
         'postconditions': 'No unintended side effects; application state is unchanged except for the tested action.',
-        'tags': [el_type, 'UI', 'Smoke'],
+        'tags': tags or [el_type, 'UI', 'Smoke'],
     }
+
+
+# Input types that take free text; others (submit, checkbox, file...) get no text-based negative cases.
+TEXT_INPUT_TYPES = ('', 'text', 'email', 'password', 'search', 'tel', 'url', 'number')
+SCRIPT_PAYLOAD = '<script>alert(1)</script>'
+SQL_PAYLOAD = "' OR '1'='1"
+DEFAULT_LONG_LENGTH = 256
+
+
+def _is_clean_selector(selector):
+    # The analyzer falls back to raw outerHTML when an element has neither id nor name
+    return bool(selector) and (selector.startswith('#') or selector.startswith('[name='))
+
+
+def _input_type(el):
+    return (el.get('input_type') or '').lower()
+
+
+def _negative_input_cases(el):
+    """Negative and boundary cases for one free-text input (additive to its positive case)."""
+    selector = el.get('selector', '')
+    label = el.get('label', selector)
+    base = f"TC_{selector}"
+    long_length = el['maxlength'] + 1 if el.get('maxlength') else DEFAULT_LONG_LENGTH
+    submit = "Submit form if applicable"
+    return [
+        _build_case(
+            f"{base}_NEG01", f"Verify input field {label} handles special characters and script injection safely",
+            ["Navigate to page", f'Fill {selector} with "{SCRIPT_PAYLOAD}"', submit, "Verify page remains responsive"],
+            f"Input {label} is sanitized or rejected; no script executes and the page stays usable",
+            SCRIPT_PAYLOAD, 'input', case_type='Negative', priority='High',
+            tags=['input', 'UI', 'Negative', 'Security', 'Regression']),
+        _build_case(
+            f"{base}_NEG02", f"Verify input field {label} rejects whitespace-only value",
+            ["Navigate to page", f'Fill {selector} with "   "', submit, "Verify user remains on the same page"],
+            f"Whitespace-only value in {label} is rejected or trimmed with a validation message",
+            '(3 spaces)', 'input', case_type='Negative', priority='Medium',
+            tags=['input', 'UI', 'Negative', 'Validation', 'Regression']),
+        _build_case(
+            f"{base}_BND01", f"Verify input field {label} handles a {long_length}-character value",
+            ["Navigate to page", f'Fill {selector} with "{{{long_length} chars}}"', "Verify page remains responsive"],
+            f"Input {label} truncates or rejects values over the length limit without errors",
+            f"{long_length} characters", 'input', case_type='Boundary', priority='Medium',
+            tags=['input', 'UI', 'Boundary', 'Validation', 'Regression']),
+    ]
+
+
+def _login_form_cases(elements):
+    """Credential-form negative cases, generated only when a username, password and submit control exist."""
+    def text_of(e):
+        return f"{e['selector']} {e.get('label', '')}".lower()
+
+    inputs = [e for e in elements if e.get('type', '').lower() == 'input' and _is_clean_selector(e.get('selector', ''))]
+    password = next((e for e in inputs if _input_type(e) == 'password' or 'pass' in text_of(e)), None)
+    username = next((e for e in inputs if e is not password and _input_type(e) in TEXT_INPUT_TYPES
+                     and any(k in text_of(e) for k in ('user', 'email', 'login', 'uname'))), None)
+    if not username or not password:
+        return []
+    submit = next((e for e in elements if _is_clean_selector(e.get('selector', ''))
+                   and (e.get('type', '').lower() == 'button' or _input_type(e) in ('submit', 'button'))), None)
+    u, p = username['selector'], password['selector']
+    press = [f"Click {submit['selector']}"] if submit else ["Submit form if applicable"]
+    expected = "Login is rejected, an error is shown and the user stays on the login page"
+
+    def case(suffix, title, fills, data, case_type='Negative', priority='High'):
+        steps = ["Navigate to page"] + fills + press + ["Verify user remains on the same page"]
+        return _build_case(f"TC_LOGIN_{suffix}", title, steps, expected, data, 'input',
+                           case_type=case_type, priority=priority, module='Authentication',
+                           tags=['Authentication', case_type, 'Regression'])
+
+    return [
+        case('NEG01', "Verify login is rejected with empty username and password", [], 'username: (empty), password: (empty)'),
+        case('NEG02', "Verify login is rejected with invalid credentials",
+             [f'Fill {u} with "invalid_user"', f'Fill {p} with "wrong_password_123"'],
+             'username: invalid_user, password: wrong_password_123'),
+        case('NEG03', "Verify login is rejected with username only",
+             [f'Fill {u} with "valid_user"'], 'username: valid_user, password: (empty)'),
+        case('NEG04', "Verify login is rejected with password only",
+             [f'Fill {p} with "some_password"'], 'username: (empty), password: some_password'),
+        case('NEG05', "Verify login is not bypassed by SQL injection",
+             [f'Fill {u} with "{SQL_PAYLOAD}"', f'Fill {p} with "{SQL_PAYLOAD}"'],
+             f'username: {SQL_PAYLOAD}, password: {SQL_PAYLOAD}', priority='Critical'),
+        case('BND01', f"Verify login handles a {DEFAULT_LONG_LENGTH}-character username",
+             [f'Fill {u} with "{{{DEFAULT_LONG_LENGTH} chars}}"', f'Fill {p} with "some_password"'],
+             f'username: {DEFAULT_LONG_LENGTH} characters', case_type='Boundary', priority='Medium'),
+    ]
 
 
 def generate_test_cases(elements):
@@ -119,4 +206,14 @@ def generate_test_cases(elements):
                 tc_id, f"Verify element {label} is present",
                 ["Navigate to page", f"Check presence of {selector}"],
                 f"Element {label} should be present", 'N/A', el_type))
+        if el_type == 'input' and _is_clean_selector(selector) and _input_type(el) in TEXT_INPUT_TYPES:
+            test_cases.extend(_negative_input_cases(el))
+    test_cases.extend(_login_form_cases(elements))
+    # Repeated selectors on a page would otherwise yield duplicate ids (and overwritten spec files)
+    seen = {}
+    for tc in test_cases:
+        n = seen.get(tc['id'], 0)
+        seen[tc['id']] = n + 1
+        if n:
+            tc['id'] = f"{tc['id']}_{n + 1}"
     return test_cases

@@ -19,10 +19,17 @@ def analyze_url(url: str):
                 else:
                     selector = page.evaluate('el => el.outerHTML', el)
             label = el.evaluate('el => el.getAttribute("aria-label") || el.getAttribute("placeholder") || el.getAttribute("name") || el.getAttribute("id") || el.textContent')
-            elements.append({
+            entry = {
                 "type": tag,
                 "label": label,
                 "selector": selector
-            })
+            }
+            if tag == "input":
+                # Extra attributes used to pick sensible negative/boundary test cases
+                entry["input_type"] = el.evaluate('el => (el.getAttribute("type") || "").toLowerCase()')
+                entry["required"] = el.evaluate('el => el.required')
+                maxlength = el.evaluate('el => el.maxLength')
+                entry["maxlength"] = maxlength if isinstance(maxlength, int) and maxlength > 0 else None
+            elements.append(entry)
         browser.close()
     return elements

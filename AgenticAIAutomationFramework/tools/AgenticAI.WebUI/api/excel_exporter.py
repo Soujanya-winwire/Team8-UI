@@ -20,7 +20,7 @@ COLUMNS = [
     ('tags_text', 'Tags', 20),
 ]
 
-HEADER_FILL = PatternFill(start_color='7C3AED', end_color='7C3AED', fill_type='solid')
+HEADER_FILL = PatternFill(start_color='0F766E', end_color='0F766E', fill_type='solid')
 HEADER_FONT = Font(color='FFFFFF', bold=True)
 WRAP = Alignment(wrap_text=True, vertical='top')
 
