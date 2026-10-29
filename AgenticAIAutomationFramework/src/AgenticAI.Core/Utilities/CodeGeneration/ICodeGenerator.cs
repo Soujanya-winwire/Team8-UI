@@ -75,6 +75,8 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
         public bool IncludeReadme { get; set; } = true;
         public string Author { get; set; } = "Agentic AI Framework";
         public bool HybridExport { get; set; } = false;
+        /// <summary>Add run-tests.bat / run-tests.sh so the exported project runs without reading the README.</summary>
+        public bool IncludeRunScripts { get; set; } = true;
     }
 
     /// <summary>

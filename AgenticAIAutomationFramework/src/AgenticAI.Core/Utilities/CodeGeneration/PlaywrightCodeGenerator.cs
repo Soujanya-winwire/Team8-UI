@@ -66,6 +66,7 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
             var methodName = NormalizeMethodName(scenario.Name);
 
             code.AppendLine("using Microsoft.Playwright;");
+            code.AppendLine("using static Microsoft.Playwright.Assertions;");
             code.AppendLine("using NUnit.Framework;");
             code.AppendLine("using System;");
             code.AppendLine("using System.Threading.Tasks;");
