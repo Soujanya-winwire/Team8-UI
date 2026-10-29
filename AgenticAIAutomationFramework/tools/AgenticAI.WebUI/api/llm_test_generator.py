@@ -1,6 +1,8 @@
 # Generates SQA-style test cases from analyzed page elements.
 # Replace with actual LLM integration (OpenAI, Azure, etc.) if desired.
 
+import re
+
 PRIORITY_BY_TYPE = {
     'button': 'High',
     'input': 'High',
@@ -158,13 +160,44 @@ def _login_form_cases(elements):
     ]
 
 
+ELEMENT_NOUNS = {'a': 'link', 'img': 'image', 'th': 'table header', 'td': 'table cell'}
+
+
+def _is_path_selector(selector):
+    # DOM-path fallback from the analyzer (element has neither id nor name)
+    return '>' in (selector or '') and ':nth-of-type' in selector
+
+
+def _short_id(el):
+    """Readable id for path-selector elements, e.g. TC_a_fork-me-on-github."""
+    slug = re.sub(r'[^a-z0-9]+', '-', (el.get('label') or '').lower()).strip('-')[:40]
+    return f"TC_{(el.get('type') or 'element').lower()}_{slug or 'element'}"
+
+
+def _humanize_steps(test_cases, elements):
+    """
+    Show readable names instead of DOM paths in the displayed/exported steps. Only the display copy
+    (detailed_steps) changes; 'steps' keeps the real selector for the script generator.
+    """
+    names = {}
+    for el in elements:
+        selector = el.get('selector', '')
+        if _is_path_selector(selector):
+            tag = (el.get('type') or 'element').lower()
+            names[selector] = f"the {ELEMENT_NOUNS.get(tag, tag)} \"{el.get('label') or tag}\""
+    for sel in sorted(names, key=len, reverse=True):
+        for tc in test_cases:
+            for step in tc['detailed_steps']:
+                step['action'] = step['action'].replace(sel, names[sel])
+
+
 def generate_test_cases(elements):
     test_cases = []
     for el in elements:
         el_type = el.get('type', '').lower()
         selector = el.get('selector', '')
         label = el.get('label') or selector
-        tc_id = f"TC_{selector}"
+        tc_id = _short_id(el) if _is_path_selector(selector) else f"TC_{selector}"
 
         if el_type == 'input':
             test_cases.append(_build_case(
@@ -221,4 +254,5 @@ def generate_test_cases(elements):
         seen[tc['id']] = n + 1
         if n:
             tc['id'] = f"{tc['id']}_{n + 1}"
+    _humanize_steps(test_cases, elements)
     return test_cases

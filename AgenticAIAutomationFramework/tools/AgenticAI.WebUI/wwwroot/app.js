@@ -51,6 +51,7 @@ function loadAITestGenView() {
                 <button class="btn btn-secondary" id="ai-generate-btn" disabled><i class="fas fa-magic"></i> Generate Test Cases</button>
                 <button class="btn btn-secondary" id="ai-excel-btn" disabled><i class="fas fa-file-excel"></i> Export to Excel</button>
                 <button class="btn btn-secondary" id="ai-scripts-btn" disabled><i class="fas fa-file-code"></i> Generate Playwright Scripts</button>
+                <button class="btn btn-success" id="ai-run-btn" disabled title="Generate the Playwright scripts and run them all"><i class="fas fa-play"></i> Run Tests</button>
                 <button class="btn btn-sm" id="ai-reset-btn" style="display:none;"><i class="fas fa-rotate-left"></i> Start Over</button>
             </div>
 
@@ -73,6 +74,7 @@ function loadAITestGenView() {
     const generateBtn = document.getElementById('ai-generate-btn');
     const excelBtn = document.getElementById('ai-excel-btn');
     const scriptsBtn = document.getElementById('ai-scripts-btn');
+    const runBtn = document.getElementById('ai-run-btn');
     const resetBtn = document.getElementById('ai-reset-btn');
     const urlInput = document.getElementById('ai-url-input');
     const loader = document.getElementById('ai-progress-loader');
@@ -106,6 +108,7 @@ function loadAITestGenView() {
         generateBtn.disabled = isBusy || extractedElements.length === 0;
         excelBtn.disabled = isBusy || generatedTestCases.length === 0;
         scriptsBtn.disabled = isBusy || generatedTestCases.length === 0;
+        runBtn.disabled = isBusy || generatedTestCases.length === 0;
         urlInput.disabled = isBusy;
     }
 
@@ -234,7 +237,7 @@ function loadAITestGenView() {
                 <div class="card-header">
                     <div class="card-title">${testCases.length} Test Case${testCases.length === 1 ? '' : 's'} Generated</div>
                 </div>
-                <p class="aitestgen-subtitle">SQA-style test cases, ready to export to Excel or turn into Playwright scripts.</p>
+                <p class="aitestgen-subtitle">SQA-style test cases, ready to export to Excel, turn into Playwright scripts, or run right now with <b>Run Tests</b>.</p>
             </div>
             ${cards}`;
     }
@@ -507,6 +510,13 @@ function loadAITestGenView() {
         } finally {
             setBusy(false);
         }
+    };
+
+    // One-click path: generate the scripts (same as the button above), then start Run All Tests
+    runBtn.onclick = async () => {
+        await scriptsBtn.onclick();
+        const runAll = document.getElementById('ai-run-all-btn');
+        if (runAll) runAll.click();
     };
 
     scriptsBtn.onclick = async () => {
