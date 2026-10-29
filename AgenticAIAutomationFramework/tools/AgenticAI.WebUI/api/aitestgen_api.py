@@ -40,6 +40,7 @@ class GenerateScriptsRequest(BaseModel):
 
 class ExecuteTestsRequest(BaseModel):
     scripts: list
+    headed: bool = False
 
 class ExportExcelRequest(BaseModel):
     test_cases: list
@@ -102,7 +103,7 @@ def export_project_endpoint(request: ExportProjectRequest):
 @app.post("/aitestgen/execute-tests")
 def execute_tests_endpoint(request: ExecuteTestsRequest):
     try:
-        results = execute_playwright_scripts(request.scripts)
+        results = execute_playwright_scripts(request.scripts, request.headed)
         return JSONResponse({"success": True, "results": results})
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)})

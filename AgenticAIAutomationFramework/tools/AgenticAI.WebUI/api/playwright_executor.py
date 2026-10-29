@@ -10,6 +10,15 @@ import time
 TRACE_ENABLED = os.getenv('AITESTGEN_TRACE', '0') == '1'
 RETRIES = int(os.getenv('AITESTGEN_RETRIES', '0') or 0)
 
+# "Show browser" runs: a visible browser, slowed down so each action can be followed.
+HEADED_CONFIG = 'playwright.headed.config.ts'
+HEADED_CONFIG_BODY = (
+    "import { defineConfig } from '@playwright/test';\n\n"
+    "export default defineConfig({\n"
+    "  use: { headless: false, launchOptions: { slowMo: 400 } },\n"
+    "});\n"
+)
+
 # Ordered (category, keywords) heuristics used to classify a failure.
 FAILURE_CATEGORIES = [
     # Most specific first: Playwright prints "Timeout: Nms" inside assertion and locator
@@ -37,9 +46,12 @@ def safe_file_stem(test_id):
     return stem or 'test'
 
 
-def execute_playwright_scripts(scripts):
+def execute_playwright_scripts(scripts, headed=False):
     results = []
     os.makedirs('tests/generated', exist_ok=True)
+    if headed:
+        with open(HEADED_CONFIG, 'w') as f:
+            f.write(HEADED_CONFIG_BODY)
     for script in scripts:
         script_path = f"tests/generated/{safe_file_stem(script['id'])}.spec.ts"
         with open(script_path, 'w') as f:
@@ -54,6 +66,8 @@ def execute_playwright_scripts(scripts):
             # On Windows npx is npx.cmd, which subprocess only finds via its full path
             npx = shutil.which('npx') or 'npx'
             command = [npx, 'playwright', 'test', script_path]
+            if headed:
+                command.append(f'--config={HEADED_CONFIG}')
             if RETRIES > 0:
                 command.append(f'--retries={RETRIES}')
             if TRACE_ENABLED:

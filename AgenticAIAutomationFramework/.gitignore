@@ -86,3 +86,6 @@ TestScenarios/**/Test_*.json
 TestScenarios/**/Quick_*.json
 
 
+
+# Generated at run time by "Show browser" runs
+tools/AgenticAI.WebUI/api/playwright.headed.config.ts

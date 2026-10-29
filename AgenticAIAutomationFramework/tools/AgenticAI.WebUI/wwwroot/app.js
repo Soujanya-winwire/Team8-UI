@@ -52,6 +52,7 @@ function loadAITestGenView() {
                 <button class="btn btn-secondary" id="ai-excel-btn" disabled><i class="fas fa-file-excel"></i> Export to Excel</button>
                 <button class="btn btn-secondary" id="ai-scripts-btn" disabled><i class="fas fa-file-code"></i> Generate Playwright Scripts</button>
                 <button class="btn btn-success" id="ai-run-btn" disabled title="Generate the Playwright scripts and run them all"><i class="fas fa-play"></i> Run Tests</button>
+                <label class="aitestgen-headed-toggle" title="Run in a visible browser window on the machine hosting the AI Test Generator service"><input type="checkbox" id="ai-headed-chk"> Show browser</label>
                 <button class="btn btn-sm" id="ai-reset-btn" style="display:none;"><i class="fas fa-rotate-left"></i> Start Over</button>
             </div>
 
@@ -276,7 +277,7 @@ function loadAITestGenView() {
                         </button>
                     </div>
                 </div>
-                <p class="aitestgen-subtitle">A ready-to-run Playwright project: package.json, playwright.config.ts, and one spec file per test — unzip, <code>npm install</code>, <code>npm test</code>. Or use <b>Run</b> / <b>Run All Tests</b> to execute them here (headless, on the machine running the AI Test Generator service).</p>
+                <p class="aitestgen-subtitle">A ready-to-run Playwright project: package.json, playwright.config.ts, and one spec file per test — unzip, <code>npm install</code>, <code>npm test</code>. Or use <b>Run</b> / <b>Run All Tests</b> to execute them here (headless by default; tick <b>Show browser</b> to watch them run, on the machine hosting the AI Test Generator service).</p>
                 <div id="ai-run-summary" class="aitestgen-run-summary" style="display:none;"></div>
             </div>
             ${blocks}`;
@@ -336,7 +337,10 @@ function loadAITestGenView() {
                 const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/execute-tests`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ scripts: [scripts[index]] })
+                    body: JSON.stringify({
+                        scripts: [scripts[index]],
+                        headed: !!(document.getElementById('ai-headed-chk') || {}).checked
+                    })
                 });
                 const data = await response.json();
                 result = data.success && data.results && data.results.length
