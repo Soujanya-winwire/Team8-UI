@@ -116,8 +116,6 @@ namespace AgenticAI.Core.Configuration
 
         private void CreateDefaultEnvironmentConfigs()
         {
-            var envConfigPath = "Configuration/Environments";
-
             // Dev environment
             var devConfig = new EnvironmentConfiguration
             {

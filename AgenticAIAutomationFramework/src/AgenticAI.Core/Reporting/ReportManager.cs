@@ -79,10 +79,7 @@ namespace AgenticAI.Core.Reporting
 
         public void EndExecution()
         {
-            if (_executionSummary == null)
-            {
-                throw new InvalidOperationException("Execution summary not initialized");
-            }
+            _executionSummary ??= new TestExecutionSummary { StartTime = DateTime.Now };
 
             _executionSummary.EndTime = DateTime.Now;
             _executionSummary.TestResults = _testResults.ToList();

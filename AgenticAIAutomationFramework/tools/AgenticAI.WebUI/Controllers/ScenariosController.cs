@@ -258,13 +258,13 @@ namespace AgenticAI.WebUI.Controllers
             var actionsWithBeforeAssertions = new HashSet<int>(
                 scenario.Assertions
                     .Where(a => a.ExecuteBeforeActionIndex.HasValue)
-                    .Select(a => a.ExecuteBeforeActionIndex.Value)
+                    .Select(a => a.ExecuteBeforeActionIndex!.Value)
             );
 
             var actionsWithAfterAssertions = new HashSet<int>(
                 scenario.Assertions
                     .Where(a => a.ExecuteAfterActionIndex.HasValue)
-                    .Select(a => a.ExecuteAfterActionIndex.Value)
+                    .Select(a => a.ExecuteAfterActionIndex!.Value)
             );
 
             bool addedNewAssertions = false;
@@ -591,10 +591,9 @@ namespace AgenticAI.WebUI.Controllers
                 {
                     dataEntryActions.AddRange(
                         scenario.Steps
-                            .Where(s => s.StepType == "Action" && s.Action != null && 
+                            .Where(s => s.StepType == "Action" && s.Action != null &&
                                    dataEntryActionTypes.Contains(s.Action.ActionType ?? string.Empty))
-                            .Select(s => s.Action)
-                            .Where(a => a != null)
+                            .Select(s => s.Action!)
                     );
                 }
                 

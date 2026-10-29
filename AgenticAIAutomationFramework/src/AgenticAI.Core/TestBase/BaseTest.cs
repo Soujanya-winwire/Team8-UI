@@ -30,9 +30,20 @@ namespace AgenticAI.Core.TestBase
 
             // Setup reporters
             ReportManager.Instance.AddReporter(new HtmlReporter(Config.ReportPath));
+            ReportManager.Instance.StartExecution(new TestExecutionSummary
+            {
+                StartTime = DateTime.Now,
+                Browser = Config.Browser,
+                OperatingSystem = Config.OperatingSystem,
+                Environment = Config.Environment,
+                ExecutionMode = Config.ExecutionMode
+            });
 
             // Create necessary directories
             CreateDirectories();
+
+            // Load historical flakiness data so flaky tests can be detected across runs
+            Utilities.FlakinessDetector.Instance.LoadFromFile(FlakinessHistoryPath);
 
             Logger.Info($"Framework: {Config.AutomationFramework}");
             Logger.Info($"Environment: {Config.Environment}");
@@ -88,6 +99,13 @@ namespace AgenticAI.Core.TestBase
 
             CurrentTestResult.RetryCount = CurrentRetryCount;
 
+            Utilities.FlakinessDetector.Instance.RecordExecution(
+                $"{CurrentTestResult.Module}.{testName}",
+                CurrentTestResult.Status,
+                (long)CurrentTestResult.Duration.TotalMilliseconds,
+                CurrentTestResult.ErrorMessage,
+                CurrentTestResult.StackTrace);
+
             Logger.TestInfo(testName, $"Test ended with status: {CurrentTestResult.Status}");
             ReportManager.Instance.EndTest(CurrentTestResult);
         }
@@ -96,17 +114,20 @@ namespace AgenticAI.Core.TestBase
         public virtual void OneTimeTearDown()
         {
             Logger.Info("=== Test Suite Cleanup ===");
-            
+
             try
             {
                 ReportManager.Instance.EndExecution();
                 var reportPaths = ReportManager.Instance.GetReportPaths();
-                
+
                 Logger.Info("Test reports generated:");
                 foreach (var path in reportPaths)
                 {
                     Logger.Info($"  - {Path.GetFullPath(path)}");
                 }
+
+                Utilities.FlakinessDetector.Instance.SaveToFile(FlakinessHistoryPath);
+                ReportFlakyTests();
             }
             catch (Exception ex)
             {
@@ -116,6 +137,30 @@ namespace AgenticAI.Core.TestBase
             {
                 Logger.Close();
             }
+        }
+
+        /// <summary>
+        /// Path to the persisted flakiness history file, used to detect intermittently failing tests across runs
+        /// </summary>
+        protected string FlakinessHistoryPath => Path.Combine(Config.LogPath, "flakiness-history.json");
+
+        private void ReportFlakyTests()
+        {
+            var flakyTests = Utilities.FlakinessDetector.Instance.GetFlakyTests();
+            if (flakyTests.Count == 0)
+            {
+                return;
+            }
+
+            Logger.Warning($"Detected {flakyTests.Count} flaky test(s):");
+            foreach (var flaky in flakyTests)
+            {
+                Logger.Warning($"  - {flaky.TestName}: {flaky.FailureRate:P0} failure rate over {flaky.TotalRuns} runs ({flaky.FlakinessSeverity} severity)");
+            }
+
+            var reportPath = Path.Combine(Config.ReportPath, "flakiness-report.txt");
+            File.WriteAllText(reportPath, Utilities.FlakinessDetector.Instance.GenerateReport());
+            Logger.Info($"Flakiness report generated: {Path.GetFullPath(reportPath)}");
         }
 
         protected void LogStep(string stepName, string description, TestStatus status, 

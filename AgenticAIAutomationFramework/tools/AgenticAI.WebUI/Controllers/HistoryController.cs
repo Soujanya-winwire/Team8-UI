@@ -1,3 +1,4 @@
+using AgenticAI.Core.Logging;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -53,6 +54,7 @@ namespace AgenticAI.WebUI.Controllers
             }
             catch (Exception ex)
             {
+                Logger.Error($"Failed to load test execution history: {ex.Message}");
                 return Ok(new
                 {
                     success = true,
@@ -335,9 +337,10 @@ namespace AgenticAI.WebUI.Controllers
 
             foreach (var item in selected)
             {
-                var statusClass = item.Status.Equals("Passed", StringComparison.OrdinalIgnoreCase)
+                var itemStatus = item.Status ?? string.Empty;
+                var statusClass = itemStatus.Equals("Passed", StringComparison.OrdinalIgnoreCase)
                     ? "passed"
-                    : item.Status.Equals("Failed", StringComparison.OrdinalIgnoreCase) ? "failed" : "other";
+                    : itemStatus.Equals("Failed", StringComparison.OrdinalIgnoreCase) ? "failed" : "other";
 
                                 var module = string.IsNullOrWhiteSpace(item.Module) ? "N/A" : item.Module;
                                 var browser = string.IsNullOrWhiteSpace(item.Browser) ? "Chrome" : item.Browser;

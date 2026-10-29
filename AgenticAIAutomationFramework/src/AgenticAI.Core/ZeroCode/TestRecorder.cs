@@ -33,12 +33,6 @@ namespace AgenticAI.Core.ZeroCode
         /// Event fired when a new action is captured
         /// </summary>
         public event Action<RecordedAction>? OnActionCaptured;
-        
-        /// <summary>
-        /// Event fired when recorder needs a placeholder name for a typed value
-        /// Arguments: (fieldName, actualValue) => placeholderName
-        /// </summary>
-        public event Func<string, string, Task<string>>? OnPlaceholderNeeded;
 
         public TestRecorder(string scenarioName, string module = "Default")
         {

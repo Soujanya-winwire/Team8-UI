@@ -659,7 +659,7 @@ namespace AgenticAI.Core.ZeroCode
                 }
 
                 step.Status = TestStatus.Passed;
-                Logger.StepInfo(action.ActionType, $"Action executed successfully");
+                Logger.StepInfo(action.ActionType ?? string.Empty, $"Action executed successfully");
             }
             catch (Exception ex)
             {

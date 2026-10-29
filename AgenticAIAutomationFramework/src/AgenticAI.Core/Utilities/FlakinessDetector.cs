@@ -1,6 +1,7 @@
 using AgenticAI.Core.Enums;
 using AgenticAI.Core.Logging;
 using System.Collections.Concurrent;
+using Newtonsoft.Json;
 
 namespace AgenticAI.Core.Utilities
 {
@@ -227,6 +228,75 @@ namespace AgenticAI.Core.Utilities
         public void Clear()
         {
             _executionHistory.Clear();
+        }
+
+        /// <summary>
+        /// Maximum executions retained per test when persisting, to keep the history file bounded
+        /// </summary>
+        private const int MaxExecutionsPerTest = 50;
+
+        /// <summary>
+        /// Load previously persisted execution history so flakiness can be tracked across runs
+        /// </summary>
+        public void LoadFromFile(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                {
+                    return;
+                }
+
+                var json = File.ReadAllText(filePath);
+                var loaded = JsonConvert.DeserializeObject<Dictionary<string, TestExecutionHistory>>(json);
+                if (loaded == null)
+                {
+                    return;
+                }
+
+                _executionHistory = new ConcurrentDictionary<string, TestExecutionHistory>(loaded);
+                Logger.Debug($"Loaded flakiness history for {loaded.Count} test(s) from {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"Could not load flakiness history from {filePath}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Persist execution history so flakiness can be tracked across runs
+        /// </summary>
+        public void SaveToFile(string filePath)
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                // Trim each test's history so the file doesn't grow unbounded over time
+                foreach (var history in _executionHistory.Values)
+                {
+                    if (history.Executions.Count > MaxExecutionsPerTest)
+                    {
+                        history.Executions = history.Executions
+                            .OrderByDescending(e => e.ExecutionTime)
+                            .Take(MaxExecutionsPerTest)
+                            .OrderBy(e => e.ExecutionTime)
+                            .ToList();
+                    }
+                }
+
+                var json = JsonConvert.SerializeObject(_executionHistory, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+                Logger.Debug($"Saved flakiness history for {_executionHistory.Count} test(s) to {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"Could not save flakiness history to {filePath}: {ex.Message}");
+            }
         }
 
         /// <summary>
