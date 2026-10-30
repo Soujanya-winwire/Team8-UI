@@ -255,8 +255,8 @@ namespace AgenticAI.Core.DataDriven
 
                 return new RecordedAction
             {
-                ActionType = action.ActionType,
-                Locator = substitutedLocator,
+                ActionType = action.ActionType ?? string.Empty,
+                Locator = substitutedLocator ?? string.Empty,
                 Value = substitutedValue,
                 Description = action.Description,
                 Metadata = metadata

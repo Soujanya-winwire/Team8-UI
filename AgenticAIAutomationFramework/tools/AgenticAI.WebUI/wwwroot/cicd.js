@@ -21,28 +21,28 @@ async function loadCICDView() {
 
         <!-- Statistics Cards -->
         <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
-            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="stat-card" style="background: #0f766e; color: white;">
                 <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-success-rate">--%</h3>
                     <p>Success Rate</p>
                 </div>
             </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+            <div class="stat-card" style="background: #b91c1c; color: white;">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-avg-duration">--</h3>
                     <p>Avg Duration</p>
                 </div>
             </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+            <div class="stat-card" style="background: #0e7490; color: white;">
                 <div class="stat-icon"><i class="fas fa-vial"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-tests-passed">--</h3>
                     <p>Tests Passed</p>
                 </div>
             </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+            <div class="stat-card" style="background: #15803d; color: white;">
                 <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-coverage">--%</h3>

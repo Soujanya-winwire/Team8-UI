@@ -374,7 +374,7 @@ namespace AgenticAI.WebUI.Controllers
                         Error = result.Result.ErrorMessage,
                         Screenshots = result.Result.Steps
                             .Where(s => !string.IsNullOrEmpty(s.ScreenshotPath))
-                            .Select(s => s.ScreenshotPath)
+                            .Select(s => s.ScreenshotPath!)
                             .ToList()
                     };
                     

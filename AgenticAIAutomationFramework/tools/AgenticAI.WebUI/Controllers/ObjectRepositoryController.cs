@@ -312,7 +312,7 @@ namespace AgenticAI.WebUI.Controllers
         /// Export objects from repository
         /// </summary>
         [HttpGet("export")]
-        public async Task<IActionResult> ExportObjects([FromQuery] string category = null)
+        public async Task<IActionResult> ExportObjects([FromQuery] string? category = null)
         {
             try
             {
@@ -353,6 +353,6 @@ namespace AgenticAI.WebUI.Controllers
     /// </summary>
     public class UpdateLocatorRequest
     {
-        public string NewLocator { get; set; }
+        public string NewLocator { get; set; } = string.Empty;
     }
 }

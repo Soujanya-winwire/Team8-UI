@@ -283,7 +283,7 @@ function renderCompactStepsList() {
             // Render the ACTION row - SECOND
             html += `
                 <tr style="border-bottom: 1px solid #f3f4f6; ${isAutoWait ? 'background: #fef9c3; opacity: 0.85;' : ''}">
-                    <td style="padding: 6px 10px; color: ${isAutoWait ? '#ca8a04' : '#3b82f6'}; font-weight: 600; font-size: 11px;">
+                    <td style="padding: 6px 10px; color: ${isAutoWait ? '#ca8a04' : '#0f766e'}; font-weight: 600; font-size: 11px;">
                         ${isAutoWait ? '<i class="fas fa-robot" style="font-size: 10px; margin-right: 3px;"></i>' : ''}${visibleIdx + 1}
                     </td>
                     <td style="padding: 6px 10px;">
@@ -703,7 +703,7 @@ function addNewStep(position, type) {
                 </div>
             </div>
             
-            <div class="card" style="border: 1px solid rgba(102, 126, 234, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
+            <div class="card" style="border: 1px solid rgba(15, 118, 110, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
                 <div class="form-group">
                     <label class="premium-form-label">${isAction ? 'Action' : 'Assertion'} Type</label>
                     <select id="new-step-type" class="form-control premium-input" onchange="handleStepTypeChange(this.value, document.getElementById('step-category-selector').value === 'action')">
@@ -890,7 +890,7 @@ function editStep(index, type) {
                 </div>
             </div>
             
-            <div class="card" style="border: 1px solid rgba(102, 126, 234, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
+            <div class="card" style="border: 1px solid rgba(15, 118, 110, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
                 <div class="form-group">
                     <label class="premium-form-label">${isAction ? 'Action' : 'Assertion'} Type</label>
                     <select id="edit-step-type" class="form-control premium-input" onchange="handleStepTypeChange(this.value, document.getElementById('edit-step-category-selector').value === 'action')">

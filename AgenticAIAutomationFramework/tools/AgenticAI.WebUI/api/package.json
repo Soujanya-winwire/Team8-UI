@@ -1,0 +1,11 @@
+{
+  "name": "agenticai-aitestgen-runner",
+  "private": true,
+  "description": "Node project the AI Test Generator API runs generated Playwright specs from (playwright_executor.py). Run `npm install` here once.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}

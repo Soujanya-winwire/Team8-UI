@@ -132,6 +132,16 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
                 }
             }
 
+            // Launchers so the exported project is runnable straight after unzipping
+            if (options.IncludeRunScripts)
+            {
+                foreach (var script in GenerateRunScripts(options))
+                {
+                    if (!project.Files.ContainsKey(script.Key))
+                        project.Files[script.Key] = script.Value;
+                }
+            }
+
             // Add README if requested
             if (options.IncludeReadme && !project.Files.ContainsKey("README_EXPORT.md"))
             {
@@ -193,6 +203,8 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
                 foreach (var file in project.Files)
                 {
                     var entry = archive.CreateEntry(file.Key);
+                    if (file.Key.EndsWith(".sh", StringComparison.OrdinalIgnoreCase))
+                        entry.ExternalAttributes = 0x81ED << 16; // -rwxr-xr-x, so ./run-tests.sh works after unzip
                     using (var entryStream = entry.Open())
                     using (var writer = new StreamWriter(entryStream))
                     {
@@ -282,6 +294,146 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
             return results;
         }
 
+        #region Run scripts
+
+        private sealed record RunStep(string Label, string Windows, string Unix, bool IsTestRun = false);
+
+        /// <summary>
+        /// Builds run-tests.bat (CRLF) and run-tests.sh (LF) for the exported project:
+        /// check prerequisites, install dependencies/browsers, then run the tests.
+        /// </summary>
+        private Dictionary<string, string> GenerateRunScripts(CodeGenerationOptions options)
+        {
+            var steps = new List<RunStep>();
+            var prerequisites = new List<(string Tool, string Hint)>();
+
+            switch (options.Format)
+            {
+                case ExportFormat.Selenium:
+                    prerequisites.Add(("dotnet", ".NET SDK 9 from https://dotnet.microsoft.com/download"));
+                    steps.Add(new RunStep("Running tests", "dotnet test %*", "dotnet test \"$@\"", true));
+                    break;
+
+                case ExportFormat.Cypress:
+                    prerequisites.Add(("node", "Node.js 18+ from https://nodejs.org"));
+                    steps.Add(new RunStep("Installing dependencies", "call npm install", "npm install"));
+                    steps.Add(new RunStep("Running tests", "call npx cypress run %*", "npx cypress run \"$@\"", true));
+                    break;
+
+                case ExportFormat.Playwright when options.Language == ExportLanguage.CSharp:
+                    prerequisites.Add(("dotnet", ".NET SDK 9 from https://dotnet.microsoft.com/download"));
+                    steps.Add(new RunStep("Building project", "dotnet build", "dotnet build"));
+                    steps.Add(new RunStep("Installing Playwright browsers",
+                        "powershell -NoProfile -ExecutionPolicy Bypass -File bin\\Debug\\net9.0\\playwright.ps1 install chromium",
+                        "pwsh bin/Debug/net9.0/playwright.ps1 install chromium"));
+                    steps.Add(new RunStep("Running tests", "dotnet test --no-build %*", "dotnet test --no-build \"$@\"", true));
+                    prerequisites.Add(("pwsh", "PowerShell 7 from https://aka.ms/powershell (macOS/Linux only; used to install browsers)"));
+                    break;
+
+                case ExportFormat.Playwright when options.Language == ExportLanguage.Python:
+                    prerequisites.Add(("python", "Python 3.9+ from https://www.python.org"));
+                    steps.Add(new RunStep("Creating virtual environment",
+                        "if not exist .venv python -m venv .venv", "[ -d .venv ] || python3 -m venv .venv"));
+                    steps.Add(new RunStep("Installing dependencies",
+                        ".venv\\Scripts\\python -m pip install -r requirements.txt",
+                        ".venv/bin/python -m pip install -r requirements.txt"));
+                    steps.Add(new RunStep("Installing Playwright browsers",
+                        ".venv\\Scripts\\python -m playwright install chromium",
+                        ".venv/bin/python -m playwright install chromium"));
+                    steps.Add(new RunStep("Running tests",
+                        ".venv\\Scripts\\python -m pytest %*", ".venv/bin/python -m pytest \"$@\"", true));
+                    break;
+
+                default: // Playwright JavaScript / TypeScript
+                    prerequisites.Add(("node", "Node.js 18+ from https://nodejs.org"));
+                    steps.Add(new RunStep("Installing dependencies", "call npm install", "npm install"));
+                    steps.Add(new RunStep("Installing Playwright browsers", "call npx playwright install chromium", "npx playwright install chromium"));
+                    steps.Add(new RunStep("Running tests", "call npx playwright test %*", "npx playwright test \"$@\"", true));
+                    break;
+            }
+
+            return new Dictionary<string, string>
+            {
+                ["run-tests.bat"] = BuildBatchScript(options, prerequisites, steps),
+                ["run-tests.sh"] = BuildShellScript(options, prerequisites, steps)
+            };
+        }
+
+        private static string BuildBatchScript(CodeGenerationOptions options, List<(string Tool, string Hint)> prerequisites, List<RunStep> steps)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("@echo off");
+            sb.AppendLine("REM Generated by Agentic AI Framework: installs dependencies and runs the tests");
+            sb.AppendLine("setlocal");
+            sb.AppendLine("cd /d \"%~dp0\"");
+            sb.AppendLine($"echo === {options.ProjectName} ({options.Format} / {options.Language}) ===");
+            sb.AppendLine();
+
+            foreach (var (tool, hint) in prerequisites.Where(p => p.Tool != "pwsh")) // Windows ships PowerShell
+            {
+                var windowsTool = tool == "python" ? "python" : tool;
+                sb.AppendLine($"where {windowsTool} >nul 2>nul");
+                sb.AppendLine($"if errorlevel 1 (echo ERROR: {tool} was not found. Install {hint} & set EXITCODE=1 & goto :end)");
+            }
+            sb.AppendLine();
+
+            var number = 0;
+            foreach (var step in steps)
+            {
+                number++;
+                sb.AppendLine($"echo [{number}/{steps.Count}] {step.Label}...");
+                sb.AppendLine(step.Windows);
+                sb.AppendLine("set EXITCODE=%errorlevel%");
+                sb.AppendLine(step.IsTestRun
+                    ? "goto :end"
+                    : $"if not \"%EXITCODE%\"==\"0\" (echo ERROR: {step.Label} failed. & goto :end)");
+                sb.AppendLine();
+            }
+
+            sb.AppendLine(":end");
+            sb.AppendLine("if \"%EXITCODE%\"==\"0\" (echo All tests passed.) else (echo Finished with errors, exit code %EXITCODE%.)");
+            sb.AppendLine("if \"%CI%\"==\"\" pause");
+            sb.AppendLine("exit /b %EXITCODE%");
+            return sb.ToString().Replace("\r\n", "\n").Replace("\n", "\r\n");
+        }
+
+        private static string BuildShellScript(CodeGenerationOptions options, List<(string Tool, string Hint)> prerequisites, List<RunStep> steps)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append("#!/usr/bin/env bash\n");
+            sb.Append("# Generated by Agentic AI Framework: installs dependencies and runs the tests\n");
+            sb.Append("cd \"$(dirname \"$0\")\" || exit 1\n");
+            sb.Append($"echo \"=== {options.ProjectName} ({options.Format} / {options.Language}) ===\"\n\n");
+
+            foreach (var (tool, hint) in prerequisites)
+            {
+                var unixTool = tool == "python" ? "python3" : tool;
+                sb.Append($"command -v {unixTool} >/dev/null 2>&1 || {{ echo \"ERROR: {unixTool} was not found. Install {hint}\"; exit 1; }}\n");
+            }
+            sb.Append('\n');
+
+            var number = 0;
+            foreach (var step in steps)
+            {
+                number++;
+                sb.Append($"echo \"[{number}/{steps.Count}] {step.Label}...\"\n");
+                if (step.IsTestRun)
+                {
+                    sb.Append(step.Unix + "\n");
+                    sb.Append("code=$?\n");
+                    sb.Append("if [ $code -eq 0 ]; then echo \"All tests passed.\"; else echo \"Finished with errors, exit code $code.\"; fi\n");
+                    sb.Append("exit $code\n");
+                }
+                else
+                {
+                    sb.Append($"{step.Unix} || {{ echo \"ERROR: {step.Label} failed.\"; exit 1; }}\n\n");
+                }
+            }
+            return sb.ToString();
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private string NormalizeFileName(string name)
@@ -322,6 +474,17 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
             }
 
             readme.AppendLine("## Quick Start");
+            if (options.IncludeRunScripts)
+            {
+                readme.AppendLine("Run everything (install dependencies, install browsers, execute tests) with one command:");
+                readme.AppendLine("```bash");
+                readme.AppendLine("run-tests.bat        # Windows");
+                readme.AppendLine("./run-tests.sh       # macOS / Linux");
+                readme.AppendLine("```");
+                readme.AppendLine("Extra arguments are passed to the test runner, e.g. `run-tests.bat --headed` for Playwright (Node).");
+                readme.AppendLine();
+                readme.AppendLine("Or run the steps manually:");
+            }
             switch (options.Format)
             {
                 case ExportFormat.Selenium:
@@ -332,8 +495,9 @@ namespace AgenticAI.Core.Utilities.CodeGeneration
                 case ExportFormat.Playwright:
                     readme.AppendLine(options.Language switch
                     {
-                        ExportLanguage.Python => "```bash\npip install -r requirements.txt\npytest\n```",
-                        _ => "```bash\nnpm install\nnpm test\n```"
+                        ExportLanguage.Python => "```bash\npip install -r requirements.txt\npython -m playwright install chromium\npytest\n```",
+                        ExportLanguage.CSharp => "```bash\ndotnet build\npwsh bin/Debug/net9.0/playwright.ps1 install chromium\ndotnet test\n```",
+                        _ => "```bash\nnpm install\nnpx playwright install chromium\nnpm test\n```"
                     });
                     break;
                 case ExportFormat.Cypress:

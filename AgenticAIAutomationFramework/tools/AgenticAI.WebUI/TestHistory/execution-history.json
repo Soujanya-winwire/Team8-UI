@@ -1,5 +1,281 @@
 [
   {
+    "ExecutionId": "f1746d31-0e84-41a6-8479-04bc41ade3a6",
+    "ScenarioName": "ZZ_Smoke",
+    "Module": "ZZ_Smoke",
+    "ExecutedAt": "2026-10-27T18:00:23.9341954\u002B05:30",
+    "Duration": 2,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "go",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\ZZ_Smoke\\ZZ_Smoke_Navigate_LAST_2026-10-27_18-00-20_636.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ZZ_Smoke\\ZZ_Smoke_Navigate_LAST_2026-10-27_18-00-20_636.png"
+    ]
+  },
+  {
+    "ExecutionId": "16c47f74-b88e-45be-a7c3-53755d34a493",
+    "ScenarioName": "Demo_Test [DDT \u2022 Iteration 2]",
+    "Module": "Test",
+    "ExecutedAt": "2026-10-27T17:49:34.4238183\u002B05:30",
+    "Duration": 9,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-32_034.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-32_034.png"
+    ]
+  },
+  {
+    "ExecutionId": "20326dcb-e5a4-4731-b9c4-2e91bcd8d687",
+    "ScenarioName": "Demo_Test [DDT \u2022 Iteration 1]",
+    "Module": "Test",
+    "ExecutedAt": "2026-10-27T17:49:34.4238024\u002B05:30",
+    "Duration": 9,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-32_270.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-32_270.png"
+    ]
+  },
+  {
+    "ExecutionId": "1b68e841-5767-4cb4-af9f-cf1450994b12",
+    "ScenarioName": "Demo_Test [DDT \u2022 Iteration 2]",
+    "Module": "Test",
+    "ExecutedAt": "2026-10-27T17:49:20.7493720\u002B05:30",
+    "Duration": 7,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-18_990.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-18_990.png"
+    ]
+  },
+  {
+    "ExecutionId": "63b8ace1-ed45-4873-a371-87452dc8d5a3",
+    "ScenarioName": "Demo_Test [DDT \u2022 Iteration 1]",
+    "Module": "Test",
+    "ExecutedAt": "2026-10-27T17:49:20.7491742\u002B05:30",
+    "Duration": 9,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-07_600.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-49-07_600.png"
+    ]
+  },
+  {
+    "ExecutionId": "d8b67266-3e79-4023-9711-001e7aabfa51",
+    "ScenarioName": "Invalid_URL_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-10-27T17:47:47.6300461\u002B05:30",
+    "Duration": 27,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "INTENTIONAL FAILURE: Navigate to non-existent domain",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "This won\u0027t execute because navigation fails",
+        "Status": "Failed",
+        "Error": "Element not found: #some-element",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Invalid_URL_Failure_Test_Click_FAILED_LAST_2026-10-27_17-47-43_670.png"
+      }
+    ],
+    "Error": "Element not found: #some-element",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Invalid_URL_Failure_Test_Click_FAILED_LAST_2026-10-27_17-47-43_670.png"
+    ]
+  },
+  {
+    "ExecutionId": "0f30ea50-adf3-4c26-bda1-e6093a34415e",
+    "ScenarioName": "Wrong_Locator_Failure_Test",
+    "Module": "ErrorVerification",
+    "ExecutedAt": "2026-10-27T17:47:14.1290853\u002B05:30",
+    "Duration": 27,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to SauceDemo",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "INTENTIONAL FAILURE: Click on wrong username field locator",
+        "Status": "Failed",
+        "Error": "Element not found: #wrong-username-field-id",
+        "ScreenshotPath": "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Click_FAILED_2026-10-27_17-47-10_926.png"
+      }
+    ],
+    "Error": "Element not found: #wrong-username-field-id",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\ErrorVerification\\Wrong_Locator_Failure_Test_Click_FAILED_2026-10-27_17-47-10_926.png"
+    ]
+  },
+  {
+    "ExecutionId": "6ee5b972-c9fa-4b65-8f23-cb364bc54d9e",
+    "ScenarioName": "Demo_Test",
+    "Module": "Test",
+    "ExecutedAt": "2026-10-27T17:46:41.2955162\u002B05:30",
+    "Duration": 10,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022All-Access\u0022 (\u0022All-Access\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on text=\u0022Learning Paths\u0022 (\u0022Learning Paths\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-46-39_586.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Test\\Demo_Test_Click_LAST_2026-10-27_17-46-39_586.png"
+    ]
+  },
+  {
     "ExecutionId": "4283f4ad-14a7-430e-8790-ab356604d701",
     "ScenarioName": "Test-14 [DDT \u2022 Iteration 2]",
     "Module": "Test_Module",

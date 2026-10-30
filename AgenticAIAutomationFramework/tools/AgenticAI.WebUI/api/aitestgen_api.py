@@ -1,8 +1,9 @@
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
+import io
 import uvicorn
 import sys
 import os
@@ -11,6 +12,8 @@ from playwright_analyzer import analyze_url
 from llm_test_generator import generate_test_cases
 from playwright_script_generator import generate_playwright_scripts
 from playwright_executor import execute_playwright_scripts
+from excel_exporter import export_test_cases_to_excel
+from project_exporter import build_playwright_project_zip
 
 
 app = FastAPI()
@@ -18,6 +21,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5000", "http://127.0.0.1:5000"],
+    # Also allow any other local port, so the Web UI can run via ASPNETCORE_URLS on a custom port
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1):\d+",
     allow_credentials=True,
     allow_methods=["*"] ,
     allow_headers=["*"]
@@ -31,9 +36,18 @@ class GenerateTestsRequest(BaseModel):
 
 class GenerateScriptsRequest(BaseModel):
     test_cases: list
+    url: str = ''
 
 class ExecuteTestsRequest(BaseModel):
     scripts: list
+    headed: bool = False
+
+class ExportExcelRequest(BaseModel):
+    test_cases: list
+
+class ExportProjectRequest(BaseModel):
+    scripts: list
+    url: str = ''
 
 @app.post("/aitestgen/analyze-url")
 def analyze_url_endpoint(request: AnalyzeRequest):
@@ -54,17 +68,42 @@ def generate_tests_endpoint(request: GenerateTestsRequest):
 @app.post("/aitestgen/generate-scripts")
 def generate_scripts_endpoint(request: GenerateScriptsRequest):
     try:
-        # Assume test_cases contains 'url' in each test case or pass url separately
-        url = request.test_cases[0].get('url', '') if request.test_cases else ''
+        # Prefer the URL passed explicitly by the caller (the page that was analyzed);
+        # fall back to a per-test-case 'url' field for backward compatibility.
+        url = request.url or (request.test_cases[0].get('url', '') if request.test_cases else '')
         scripts = generate_playwright_scripts(request.test_cases, url)
         return JSONResponse({"success": True, "scripts": scripts})
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)})
 
+@app.post("/aitestgen/export-excel")
+def export_excel_endpoint(request: ExportExcelRequest):
+    try:
+        workbook_bytes = export_test_cases_to_excel(request.test_cases)
+        return StreamingResponse(
+            io.BytesIO(workbook_bytes),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=AI_Test_Cases.xlsx"},
+        )
+    except Exception as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
+@app.post("/aitestgen/export-project")
+def export_project_endpoint(request: ExportProjectRequest):
+    try:
+        zip_bytes = build_playwright_project_zip(request.scripts, request.url)
+        return StreamingResponse(
+            io.BytesIO(zip_bytes),
+            media_type="application/zip",
+            headers={"Content-Disposition": "attachment; filename=ai-generated-tests.zip"},
+        )
+    except Exception as e:
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
+
 @app.post("/aitestgen/execute-tests")
 def execute_tests_endpoint(request: ExecuteTestsRequest):
     try:
-        results = execute_playwright_scripts(request.scripts)
+        results = execute_playwright_scripts(request.scripts, request.headed)
         return JSONResponse({"success": True, "results": results})
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)})

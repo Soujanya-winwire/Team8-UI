@@ -1,100 +1,588 @@
 // AI Test Generator View Loader
+// Pinned to the IPv4 loopback address (not "localhost") because uvicorn binds 0.0.0.0 only;
+// on Windows, browsers often resolve "localhost" to the IPv6 ::1 first, which is unreachable here.
+const AITESTGEN_API_BASE = 'http://127.0.0.1:8000';
+const AITESTGEN_EXAMPLE_URLS = [
+    { label: 'SauceDemo', url: 'https://www.saucedemo.com/' },
+    { label: 'The Internet (Login)', url: 'https://the-internet.herokuapp.com/login' },
+    { label: 'Practice Test Login', url: 'https://practicetestautomation.com/practice-test-login/' }
+];
+const AITESTGEN_ELEMENT_ICONS = {
+    input: 'fa-keyboard',
+    button: 'fa-hand-pointer',
+    select: 'fa-caret-down',
+    textarea: 'fa-align-left',
+    a: 'fa-link',
+    table: 'fa-table',
+    th: 'fa-table-cells',
+    td: 'fa-table-cells',
+    label: 'fa-tag'
+};
+
 function loadAITestGenView() {
     const view = document.getElementById('aitestgen-view');
     view.innerHTML = `
         <div class="header">
             <h2><i class="fas fa-robot"></i> AI Test Generator</h2>
         </div>
+
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Generate Tests from URL</div>
+                <div class="card-title">Generate Tests from a Live URL</div>
+                <div class="aitestgen-steps" id="ai-steps">
+                    <span class="aitestgen-step active" data-step="1"><i class="fas fa-magnifying-glass"></i> Analyze</span>
+                    <span class="aitestgen-step" data-step="2"><i class="fas fa-list-check"></i> Test Cases</span>
+                    <span class="aitestgen-step" data-step="3"><i class="fas fa-code"></i> Scripts</span>
+                </div>
             </div>
+            <p class="aitestgen-subtitle">Point this at any page. The AI Test Generator scans its interactive elements with a headless browser, proposes test cases for them, and turns those into ready-to-run Playwright scripts.</p>
+
             <div class="form-group">
                 <label for="ai-url-input">Website URL</label>
-                <input type="text" class="form-control" id="ai-url-input" placeholder="Enter website URL...">
+                <input type="text" class="form-control" id="ai-url-input" placeholder="https://example.com" autocomplete="off">
+                <div class="aitestgen-examples">
+                    <span>Try:</span>
+                    ${AITESTGEN_EXAMPLE_URLS.map(ex => `<button type="button" class="chip" data-url="${escapeHtml(ex.url)}">${escapeHtml(ex.label)}</button>`).join('')}
+                </div>
             </div>
-            <button class="btn btn-primary" id="ai-analyze-btn"><i class="fas fa-search"></i> Analyze</button>
-            <button class="btn btn-secondary" id="ai-generate-btn" disabled><i class="fas fa-magic"></i> Generate Test Cases</button>
-            <div id="ai-progress-loader" style="display:none;margin-top:10px;">
+
+            <div class="aitestgen-actions">
+                <button class="btn btn-primary" id="ai-analyze-btn"><i class="fas fa-search"></i> Analyze Page</button>
+                <button class="btn btn-secondary" id="ai-generate-btn" disabled><i class="fas fa-magic"></i> Generate Test Cases</button>
+                <button class="btn btn-secondary" id="ai-excel-btn" disabled><i class="fas fa-file-excel"></i> Export to Excel</button>
+                <button class="btn btn-secondary" id="ai-scripts-btn" disabled><i class="fas fa-file-code"></i> Generate Playwright Scripts</button>
+                <button class="btn btn-success" id="ai-run-btn" disabled title="Generate the Playwright scripts and run them all"><i class="fas fa-play"></i> Run Tests</button>
+                <label class="aitestgen-headed-toggle" title="Run in a visible browser window on the machine hosting the AI Test Generator service"><input type="checkbox" id="ai-headed-chk"> Show browser</label>
+                <button class="btn btn-sm" id="ai-reset-btn" style="display:none;"><i class="fas fa-rotate-left"></i> Start Over</button>
+            </div>
+
+            <div id="ai-progress-loader" class="aitestgen-loader" style="display:none;">
                 <div class="spinner"></div>
-                <span>Analyzing...</span>
+                <span id="ai-progress-message">Working...</span>
             </div>
-            <div id="ai-results-panel" style="margin-top:20px;"></div>
+        </div>
+
+        <div id="ai-results-panel">
+            <div class="card empty-state">
+                <i class="fas fa-robot"></i>
+                <h3>No analysis yet</h3>
+                <p>Enter a URL above and click <b>Analyze Page</b> to get started.</p>
+            </div>
         </div>
     `;
 
-    // Event listeners and backend integration
     const analyzeBtn = document.getElementById('ai-analyze-btn');
     const generateBtn = document.getElementById('ai-generate-btn');
+    const excelBtn = document.getElementById('ai-excel-btn');
+    const scriptsBtn = document.getElementById('ai-scripts-btn');
+    const runBtn = document.getElementById('ai-run-btn');
+    const resetBtn = document.getElementById('ai-reset-btn');
     const urlInput = document.getElementById('ai-url-input');
     const loader = document.getElementById('ai-progress-loader');
+    const loaderMessage = document.getElementById('ai-progress-message');
     const resultsPanel = document.getElementById('ai-results-panel');
+    const exampleChips = view.querySelectorAll('.chip[data-url]');
 
     let extractedElements = [];
+    let generatedTestCases = [];
+    let analyzedUrl = '';
+
+    exampleChips.forEach(chip => {
+        chip.onclick = () => {
+            urlInput.value = chip.getAttribute('data-url');
+            urlInput.focus();
+        };
+    });
+
+    function setStep(stepNumber) {
+        view.querySelectorAll('.aitestgen-step').forEach(el => {
+            const n = parseInt(el.getAttribute('data-step'), 10);
+            el.classList.toggle('active', n === stepNumber);
+            el.classList.toggle('done', n < stepNumber);
+        });
+    }
+
+    function setBusy(isBusy, message) {
+        loader.style.display = isBusy ? 'flex' : 'none';
+        loaderMessage.textContent = message || 'Working...';
+        analyzeBtn.disabled = isBusy;
+        generateBtn.disabled = isBusy || extractedElements.length === 0;
+        excelBtn.disabled = isBusy || generatedTestCases.length === 0;
+        scriptsBtn.disabled = isBusy || generatedTestCases.length === 0;
+        runBtn.disabled = isBusy || generatedTestCases.length === 0;
+        urlInput.disabled = isBusy;
+    }
+
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function renderBackendError(context, err, data) {
+        let message = data && data.error ? data.error : `${context}.`;
+        if (err && err instanceof TypeError) {
+            message = `Could not reach the AI Test Generator service at ${AITESTGEN_API_BASE}. ` +
+                `Make sure it's running (tools/AgenticAI.WebUI/api/run_fastapi_server.bat).`;
+        }
+        resultsPanel.innerHTML = `
+            <div class="card">
+                <div class="aitestgen-alert aitestgen-alert-danger">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>${escapeHtml(context)}</strong>
+                        <p>${escapeHtml(message)}</p>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function elementIcon(type) {
+        return AITESTGEN_ELEMENT_ICONS[(type || '').toLowerCase()] || 'fa-cube';
+    }
+
+    function renderElements(elements) {
+        const counts = {};
+        elements.forEach(el => {
+            const type = (el.type || 'unknown').toLowerCase();
+            counts[type] = (counts[type] || 0) + 1;
+        });
+
+        const statCards = Object.keys(counts).sort().map(type => `
+            <div class="stat-card">
+                <div class="stat-icon primary"><i class="fas ${elementIcon(type)}"></i></div>
+                <div class="stat-details">
+                    <h3>${counts[type]}</h3>
+                    <p>${escapeHtml(type)}${counts[type] === 1 ? '' : 's'}</p>
+                </div>
+            </div>`).join('');
+
+        const rows = elements.map(el => `
+            <tr>
+                <td><span class="badge badge-info"><i class="fas ${elementIcon(el.type)}"></i> ${escapeHtml(el.type || 'unknown')}</span></td>
+                <td>${escapeHtml(el.label || '-')}</td>
+                <td><code>${escapeHtml(el.selector || '-')}</code></td>
+            </tr>`).join('');
+
+        resultsPanel.innerHTML = `
+            <div class="stats-grid">${statCards}</div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${elements.length} Element${elements.length === 1 ? '' : 's'} Found</div>
+                </div>
+                <div class="aitestgen-table-wrap">
+                    <table>
+                        <thead><tr><th>Type</th><th>Label</th><th>Selector</th></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="3">No interactive elements found on this page.</td></tr>'}</tbody>
+                    </table>
+                </div>
+            </div>`;
+    }
+
+    const PRIORITY_BADGE = { High: 'badge-danger', Medium: 'badge-warning', Low: 'badge-info' };
+    const TYPE_BADGE = { Positive: 'badge-success', Negative: 'badge-danger', Boundary: 'badge-warning' };
+
+    function renderTestCases(testCases) {
+        const cards = testCases.map(tc => {
+            const steps = tc.detailed_steps && tc.detailed_steps.length
+                ? tc.detailed_steps
+                : (tc.steps || []).map((s, i) => ({ step_number: i + 1, action: s, expected: '' }));
+
+            const stepRows = steps.map(s => `
+                <tr>
+                    <td>${s.step_number}</td>
+                    <td>${escapeHtml(s.action)}</td>
+                    <td>${escapeHtml(s.expected || '-')}</td>
+                </tr>`).join('');
+
+            const tags = (tc.tags || []).map(t => `<span class="badge badge-info">${escapeHtml(t)}</span>`).join(' ');
+
+            return `
+            <div class="card test-case-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-vial"></i> ${escapeHtml(tc.title || tc.name || tc.id || 'Test case')}</div>
+                    <div class="aitestgen-tc-badges">
+                        <span class="badge badge-primary">${escapeHtml(tc.id || '')}</span>
+                        <span class="badge ${PRIORITY_BADGE[tc.priority] || 'badge-info'}">${escapeHtml(tc.priority || 'Medium')}</span>
+                        <span class="badge ${TYPE_BADGE[tc.type] || 'badge-info'}">${escapeHtml(tc.type || 'Positive')}</span>
+                    </div>
+                </div>
+                <div class="aitestgen-tc-meta">
+                    <div><strong>Module:</strong> ${escapeHtml(tc.module || '-')}</div>
+                    <div><strong>Test Data:</strong> ${escapeHtml(tc.test_data || 'N/A')}</div>
+                </div>
+                <div class="aitestgen-tc-meta">
+                    <strong>Preconditions:</strong> ${escapeHtml(tc.preconditions || '-')}
+                </div>
+                <div class="aitestgen-table-wrap">
+                    <table>
+                        <thead><tr><th style="width:40px">#</th><th>Action</th><th>Expected</th></tr></thead>
+                        <tbody>${stepRows}</tbody>
+                    </table>
+                </div>
+                <div class="aitestgen-expected"><strong>Expected Result:</strong> ${escapeHtml(tc.expected || '-')}</div>
+                <div class="aitestgen-tc-meta">
+                    <strong>Postconditions:</strong> ${escapeHtml(tc.postconditions || '-')}
+                </div>
+                ${tags ? `<div class="aitestgen-tc-tags">${tags}</div>` : ''}
+            </div>`;
+        }).join('');
+
+        resultsPanel.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${testCases.length} Test Case${testCases.length === 1 ? '' : 's'} Generated</div>
+                </div>
+                <p class="aitestgen-subtitle">SQA-style test cases, ready to export to Excel, turn into Playwright scripts, or run right now with <b>Run Tests</b>.</p>
+            </div>
+            ${cards}`;
+    }
+
+    function renderScripts(scripts) {
+        const blocks = scripts.map((s, i) => `
+            <div class="card script-card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-file-code"></i> ${escapeHtml(s.name || s.id || 'script')}</div>
+                    <div class="aitestgen-card-actions">
+                        <button class="btn btn-sm btn-success aitestgen-run-btn" data-index="${i}">
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                        <button class="btn btn-sm btn-secondary aitestgen-copy-btn" data-script="${encodeURIComponent(s.script || '')}">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <pre class="aitestgen-code"><code>${escapeHtml(s.script || '')}</code></pre>
+                <div class="aitestgen-run-result" id="ai-run-result-${i}"></div>
+            </div>`).join('');
+
+        resultsPanel.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">${scripts.length} Playwright Script${scripts.length === 1 ? '' : 's'} Generated</div>
+                    <div class="aitestgen-card-actions">
+                        <button class="btn btn-sm btn-success" id="ai-run-all-btn">
+                            <i class="fas fa-play"></i> Run All Tests
+                        </button>
+                        <button class="btn btn-sm btn-danger" id="ai-stop-btn" style="display:none;">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button class="btn btn-sm btn-primary" id="ai-download-project-btn">
+                            <i class="fas fa-file-zipper"></i> Download Project (.zip)
+                        </button>
+                    </div>
+                </div>
+                <p class="aitestgen-subtitle">A ready-to-run Playwright project: package.json, playwright.config.ts, and one spec file per test — unzip, <code>npm install</code>, <code>npm test</code>. Or use <b>Run</b> / <b>Run All Tests</b> to execute them here (headless by default; tick <b>Show browser</b> to watch them run, on the machine hosting the AI Test Generator service).</p>
+                <div id="ai-run-summary" class="aitestgen-run-summary" style="display:none;"></div>
+            </div>
+            ${blocks}`;
+
+        const runResults = {};
+        let runInProgress = false;
+        let runStopRequested = false;
+        const stopBtn = document.getElementById('ai-stop-btn');
+        const runAllBtn = document.getElementById('ai-run-all-btn');
+
+        function setRunButtonsDisabled(disabled) {
+            resultsPanel.querySelectorAll('.aitestgen-run-btn, #ai-run-all-btn').forEach(b => { b.disabled = disabled; });
+        }
+
+        function updateRunSummary(message) {
+            const el = document.getElementById('ai-run-summary');
+            if (!el) return;
+            const all = Object.values(runResults);
+            const passed = all.filter(r => r.status === 'PASS').length;
+            const failed = all.filter(r => r.status === 'FAIL').length;
+            const errors = all.length - passed - failed;
+            el.style.display = 'flex';
+            el.innerHTML = `
+                ${message ? `<span class="aitestgen-run-message">${escapeHtml(message)}</span>` : ''}
+                <span class="badge badge-success">${passed} passed</span>
+                <span class="badge badge-danger">${failed} failed</span>
+                ${errors ? `<span class="badge badge-warning">${errors} error${errors === 1 ? '' : 's'}</span>` : ''}`;
+        }
+
+        function renderRunResult(index, result) {
+            const target = document.getElementById(`ai-run-result-${index}`);
+            if (!target) return;
+            if (result.running) {
+                target.innerHTML = '<div class="aitestgen-run-status"><i class="fas fa-spinner fa-spin"></i> Running...</div>';
+                return;
+            }
+            const status = result.status || 'ERROR';
+            const badge = status === 'PASS' ? 'badge-success' : status === 'FAIL' ? 'badge-danger' : 'badge-warning';
+            // Strip terminal colour codes and keep the tail, where Playwright prints the failure
+            const detail = [result.output, result.error].filter(Boolean).join('\n')
+                .replace(/\u001b\[[0-9;]*m/g, '').trim();
+            const shown = detail.length > 4000 ? '...' + detail.slice(-4000) : detail;
+            target.innerHTML = `
+                <div class="aitestgen-run-status">
+                    <span class="badge ${badge}">${escapeHtml(status)}</span>
+                    ${result.executionTime ? `<span>${escapeHtml(result.executionTime)}</span>` : ''}
+                    ${result.failureCategory ? `<span class="badge badge-info">${escapeHtml(result.failureCategory)}</span>` : ''}
+                    ${result.flaky ? '<span class="badge badge-warning">flaky</span>' : ''}
+                </div>
+                ${shown ? `<details ${status === 'PASS' ? '' : 'open'}><summary>Details</summary><pre class="aitestgen-code aitestgen-run-output">${escapeHtml(shown)}</pre></details>` : ''}`;
+        }
+
+        async function runOne(index) {
+            renderRunResult(index, { running: true });
+            let result;
+            try {
+                const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/execute-tests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        scripts: [scripts[index]],
+                        headed: !!(document.getElementById('ai-headed-chk') || {}).checked
+                    })
+                });
+                const data = await response.json();
+                result = data.success && data.results && data.results.length
+                    ? data.results[0]
+                    : { status: 'ERROR', error: (data && data.error) || 'The service returned no result.' };
+            } catch (err) {
+                result = {
+                    status: 'ERROR',
+                    error: err instanceof TypeError
+                        ? `Could not reach the AI Test Generator service at ${AITESTGEN_API_BASE}. Make sure it's running (tools/AgenticAI.WebUI/api/run_fastapi_server.bat).`
+                        : String(err)
+                };
+            }
+            runResults[index] = result;
+            renderRunResult(index, result);
+            return result;
+        }
+
+        resultsPanel.querySelectorAll('.aitestgen-run-btn').forEach(btn => {
+            btn.onclick = async () => {
+                if (runInProgress) return;
+                const index = parseInt(btn.getAttribute('data-index'), 10);
+                runInProgress = true;
+                setRunButtonsDisabled(true);
+                try {
+                    await runOne(index);
+                    updateRunSummary('');
+                } finally {
+                    runInProgress = false;
+                    setRunButtonsDisabled(false);
+                }
+            };
+        });
+
+        runAllBtn.onclick = async () => {
+            if (runInProgress) return;
+            runInProgress = true;
+            runStopRequested = false;
+            Object.keys(runResults).forEach(k => delete runResults[k]);
+            scripts.forEach((_, i) => {
+                const target = document.getElementById(`ai-run-result-${i}`);
+                if (target) target.innerHTML = '';
+            });
+            setRunButtonsDisabled(true);
+            stopBtn.style.display = 'inline-flex';
+            try {
+                for (let i = 0; i < scripts.length; i++) {
+                    if (runStopRequested || !document.getElementById('ai-run-summary')) break;
+                    updateRunSummary(`Running ${i + 1} of ${scripts.length}...`);
+                    await runOne(i);
+                }
+                const done = Object.keys(runResults).length;
+                updateRunSummary(runStopRequested ? `Stopped after ${done} of ${scripts.length}` : `Finished ${done} of ${scripts.length}`);
+            } finally {
+                runInProgress = false;
+                setRunButtonsDisabled(false);
+                stopBtn.style.display = 'none';
+            }
+        };
+
+        // A running test cannot be aborted mid-flight, so Stop takes effect after the current test
+        stopBtn.onclick = () => {
+            runStopRequested = true;
+            updateRunSummary('Stopping after the current test...');
+        };
+
+        resultsPanel.querySelectorAll('.aitestgen-copy-btn').forEach(btn => {
+            btn.onclick = async () => {
+                const script = decodeURIComponent(btn.getAttribute('data-script'));
+                try {
+                    await navigator.clipboard.writeText(script);
+                    showSuccess('Script copied to clipboard.');
+                } catch (err) {
+                    showError('Could not copy script to clipboard.');
+                }
+            };
+        });
+
+        document.getElementById('ai-download-project-btn').onclick = async (ev) => {
+            const btn = ev.currentTarget;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Building...';
+            try {
+                const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/export-project`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scripts, url: analyzedUrl })
+                });
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+                const blob = await response.blob();
+                downloadBlob(blob, 'ai-generated-tests.zip');
+                showSuccess('Project downloaded.');
+            } catch (err) {
+                showError('Could not download the project zip.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        };
+    }
 
     analyzeBtn.onclick = async () => {
-        const url = urlInput.value.trim();
+        let url = urlInput.value.trim();
         if (!url) {
             showWarning('Please enter a website URL.');
             return;
         }
-        loader.style.display = 'block';
-        resultsPanel.innerHTML = '';
-        generateBtn.disabled = true;
+        if (!/^https?:\/\//i.test(url)) {
+            url = `https://${url}`;
+            urlInput.value = url;
+        }
+
+        extractedElements = [];
+        generatedTestCases = [];
+        analyzedUrl = url;
+        setStep(1);
+        setBusy(true, 'Launching a headless browser and scanning the page...');
+
         try {
-            const response = await fetch('http://localhost:8000/aitestgen/analyze-url', {
+            const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/analyze-url`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url })
             });
             const data = await response.json();
-            loader.style.display = 'none';
             if (data.success && data.elements) {
                 extractedElements = data.elements;
-                resultsPanel.innerHTML = `<pre>${JSON.stringify(data.elements, null, 2)}</pre>`;
-                generateBtn.disabled = false;
+                renderElements(extractedElements);
+                if (extractedElements.length === 0) {
+                    showWarning('No interactive elements were found on that page.');
+                }
             } else {
-                resultsPanel.innerHTML = '<span class="text-danger">Failed to analyze URL.</span>';
+                renderBackendError('Failed to analyze URL', null, data);
             }
         } catch (err) {
-            loader.style.display = 'none';
-            resultsPanel.innerHTML = '<span class="text-danger">Error analyzing URL.</span>';
+            renderBackendError('Failed to analyze URL', err);
+        } finally {
+            setBusy(false);
         }
     };
 
     generateBtn.onclick = async () => {
-        loader.style.display = 'block';
-        resultsPanel.innerHTML = '';
+        if (extractedElements.length === 0) {
+            showWarning('Analyze a page first.');
+            return;
+        }
+
+        generatedTestCases = [];
+        setStep(2);
+        setBusy(true, 'Generating test cases...');
+
         try {
-            const response = await fetch('http://localhost:8000/aitestgen/generate-tests', {
+            const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/generate-tests`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ elements: extractedElements })
             });
             const data = await response.json();
-            loader.style.display = 'none';
             if (data.success && data.test_cases) {
-                // Format test cases in a friendly way
-                let html = '';
-                data.test_cases.forEach(tc => {
-                    html += `<div class="test-case-card">
-                        <h5>${tc.name || tc.id}</h5>
-                        <ul>`;
-                    tc.steps.forEach(step => {
-                        html += `<li>${step}</li>`;
-                    });
-                    html += `</ul>
-                        <div><b>Expected:</b> ${tc.expected}</div>
-                    </div><hr/>`;
-                });
-                resultsPanel.innerHTML = html;
+                generatedTestCases = data.test_cases;
+                renderTestCases(generatedTestCases);
+                resetBtn.style.display = 'inline-flex';
             } else {
-                resultsPanel.innerHTML = '<span class="text-danger">Failed to generate test cases.</span>';
+                renderBackendError('Failed to generate test cases', null, data);
             }
         } catch (err) {
-            loader.style.display = 'none';
-            resultsPanel.innerHTML = '<span class="text-danger">Error generating test cases.</span>';
+            renderBackendError('Failed to generate test cases', err);
+        } finally {
+            setBusy(false);
         }
+    };
+
+    // One-click path: generate the scripts (same as the button above), then start Run All Tests
+    runBtn.onclick = async () => {
+        await scriptsBtn.onclick();
+        const runAll = document.getElementById('ai-run-all-btn');
+        if (runAll) runAll.click();
+    };
+
+    scriptsBtn.onclick = async () => {
+        if (generatedTestCases.length === 0) {
+            showWarning('Generate test cases first.');
+            return;
+        }
+
+        setStep(3);
+        setBusy(true, 'Generating Playwright scripts...');
+
+        try {
+            const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/generate-scripts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ test_cases: generatedTestCases, url: analyzedUrl })
+            });
+            const data = await response.json();
+            if (data.success && data.scripts) {
+                renderScripts(data.scripts);
+                resetBtn.style.display = 'inline-flex';
+            } else {
+                renderBackendError('Failed to generate Playwright scripts', null, data);
+            }
+        } catch (err) {
+            renderBackendError('Failed to generate Playwright scripts', err);
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    excelBtn.onclick = async () => {
+        if (generatedTestCases.length === 0) {
+            showWarning('Generate test cases first.');
+            return;
+        }
+
+        setBusy(true, 'Building Excel workbook...');
+        try {
+            const response = await fetch(`${AITESTGEN_API_BASE}/aitestgen/export-excel`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ test_cases: generatedTestCases })
+            });
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}`);
+            }
+            const blob = await response.blob();
+            downloadBlob(blob, 'AI_Test_Cases.xlsx');
+            showSuccess('Test cases exported to Excel.');
+        } catch (err) {
+            showError('Could not export test cases to Excel. Make sure the AI Test Generator service is running.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    resetBtn.onclick = () => {
+        extractedElements = [];
+        generatedTestCases = [];
+        urlInput.value = '';
+        loadAITestGenView();
     };
 }
 // API Configuration
@@ -775,8 +1263,8 @@ function generateScenariosPageButtons(currentPage, totalPages) {
         const isActive = i === currentPage;
         buttons += `
             <button onclick="goToScenariosPage(${i})" 
-                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#3b82f6' : '#d1d5db'}; 
-                           background: ${isActive ? '#3b82f6' : 'white'}; 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#0f766e' : '#d1d5db'}; 
+                           background: ${isActive ? '#0f766e' : 'white'}; 
                            color: ${isActive ? 'white' : '#374151'};
                            border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
                 ${i}
@@ -1148,7 +1636,7 @@ async function loadRecordView() {
                 </div>
             </div>
 
-            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
+            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(15, 118, 110, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
                 Enter scenario details, click Start Recording, perform actions in the opened browser, then click Stop Recording to save your scenario.
             </div>
 
@@ -2047,7 +2535,7 @@ async function loadExportView() {
 
         <div class="card mt-20">
             <div style="padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-                <div style="color:#64748b;">Framework-based export creates a downloadable ZIP project.</div>
+                <div style="color:#64748b;">Framework-based export creates a downloadable ZIP project. It includes <b>run-tests.bat</b> (Windows) and <b>run-tests.sh</b> (macOS/Linux) that install dependencies and run the tests in one step.</div>
                 <button class="btn btn-success" onclick="exportScriptsByFramework()" id="export-download-btn">
                     <i class="fas fa-download"></i> Export ZIP
                 </button>
@@ -2697,8 +3185,8 @@ async function loadConfigurationView() {
 
                         <!-- Cross-Browser Parallel Execution Options -->
                         <div id="cross-browser-options" class="${configuration.executionMode === 'Parallel' ? '' : 'hidden'}" style="margin-top: 20px;">
-                            <div class="card" style="border: 2px solid #3b82f6; background: rgba(59, 130, 246, 0.05);">
-                                <div class="card-header" style="background: rgba(59, 130, 246, 0.1);">
+                            <div class="card" style="border: 2px solid #0f766e; background: rgba(15, 118, 110, 0.05);">
+                                <div class="card-header" style="background: rgba(15, 118, 110, 0.1);">
                                     <div class="card-title">
                                         <i class="fas fa-globe"></i> Cross-Browser Parallel Execution
                                     </div>
@@ -2742,7 +3230,7 @@ async function loadConfigurationView() {
                                         </div>
                                     </div>
 
-                                    <div class="alert alert-info" style="margin-top: 20px; background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px;">
+                                    <div class="alert alert-info" style="margin-top: 20px; background: rgba(15, 118, 110, 0.1); border-left: 4px solid #0f766e; padding: 15px; border-radius: 6px;">
                                         <strong><i class="fas fa-info-circle"></i> How it works:</strong><br>
                                         Tests will be distributed across selected browsers in round-robin fashion.<br>
                                         <strong>Example:</strong> Test1→Chrome, Test2→Firefox, Test3→Edge, Test4→Chrome...
@@ -3012,9 +3500,9 @@ async function loadResultsView() {
                     <div class="form-group" style="margin: 0;">
                         <label>Date Range</label>
                         <select class="form-control" id="filter-date-range" onchange="applyTestFilters()">
-                            <option value="all">All Time</option>
+                            <option value="all" selected>All Time</option>
                             <option value="today">Today</option>
-                            <option value="last7days" selected>Last 7 Days</option>
+                            <option value="last7days">Last 7 Days</option>
                             <option value="last30days">Last 30 Days</option>
                         </select>
                     </div>
@@ -3243,7 +3731,7 @@ function clearAllTestFilters() {
     document.getElementById('filter-status').selectedIndex = 0;
     document.getElementById('filter-browser').selectedIndex = 0;
     document.getElementById('filter-environment').selectedIndex = 0;
-    document.getElementById('filter-date-range').value = 'last7days';
+    document.getElementById('filter-date-range').value = 'all';
     applyTestFilters();
 }
 
@@ -3484,8 +3972,8 @@ function generatePageButtons(currentPage, totalPages) {
         const isActive = i === currentPage;
         buttons += `
             <button onclick="goToPage(${i})" 
-                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#3b82f6' : '#d1d5db'}; 
-                           background: ${isActive ? '#3b82f6' : 'white'}; 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#0f766e' : '#d1d5db'}; 
+                           background: ${isActive ? '#0f766e' : 'white'}; 
                            color: ${isActive ? 'white' : '#374151'};
                            border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
                 ${i}
@@ -3842,7 +4330,7 @@ function viewEvidence(index) {
                 ${stepsWithScreenshots.map((step, idx) => `
                     <div style="margin-bottom: 30px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: #f9fafb;">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="background: #3b82f6; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                            <div style="background: #0f766e; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
                                 ${idx + 1}
                             </div>
                             <div style="flex: 1;">
@@ -3859,7 +4347,8 @@ function viewEvidence(index) {
                                  onclick="openScreenshotModal('${normalizeScreenshotPath(step.screenshotPath)}')"
                                  style="max-width: 100%; cursor: pointer; border-radius: 6px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.2s;"
                                  onmouseover="this.style.transform='scale(1.02)'"
-                                 onmouseout="this.style.transform='scale(1)'">
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 onerror="this.onclick=null;this.outerHTML='<div style=&quot;color:#6b7280;padding:16px;font-size:13px;&quot;>Screenshot not available (image file no longer exists on this server)</div>'">
                         </div>
                     </div>
                 `).join('')}
@@ -3923,7 +4412,7 @@ function viewLogs(index) {
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px;">
                     <div style="background: #f3f4f6; padding: 12px; border-radius: 6px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">${totalSteps}</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #0f766e;">${totalSteps}</div>
                         <div style="font-size: 13px; color: #6b7280;">Total Steps</div>
                     </div>
                     <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; text-align: center;">
@@ -3961,7 +4450,7 @@ function viewLogs(index) {
 
         return `
                                     <tr style="border-bottom: 1px solid #e5e7eb; background: ${rowBg};">
-                                        <td style="padding: 16px; font-weight: 600; color: #3b82f6;">${idx + 1}</td>
+                                        <td style="padding: 16px; font-weight: 600; color: #0f766e;">${idx + 1}</td>
                                         <td style="padding: 16px;">
                                             <strong style="color: #1f2937;">${escapeHtml(step.stepName)}</strong>
                                         </td>

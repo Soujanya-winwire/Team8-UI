@@ -9,18 +9,18 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
     public class TestObject
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public string Name { get; set; }
-        public string Category { get; set; } // e.g., LoginPage, CheckoutPage
-        public string Description { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty; // e.g., LoginPage, CheckoutPage
+        public string Description { get; set; } = string.Empty;
         public string LocatorType { get; set; } = "CSS"; // CSS, XPath, ID, Class
-        public string LocatorValue { get; set; }
+        public string LocatorValue { get; set; } = string.Empty;
         public List<string> AlternateLocators { get; set; } = new();
         public Dictionary<string, string> Attributes { get; set; } = new();
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public int UsageCount { get; set; } = 0;
         public bool IsActive { get; set; } = true;
-        public string ElementType { get; set; } // Button, TextBox, Link, etc.
+        public string ElementType { get; set; } = string.Empty; // Button, TextBox, Link, etc.
         public List<TestObjectTag> Tags { get; set; } = new();
     }
 
@@ -29,8 +29,8 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
     /// </summary>
     public class TestObjectTag
     {
-        public string Name { get; set; }
-        public string Color { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Color { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -40,10 +40,10 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
     {
         // CRUD Operations
         Task<TestObject> CreateObjectAsync(TestObject obj);
-        Task<TestObject> GetObjectAsync(string id);
+        Task<TestObject?> GetObjectAsync(string id);
         Task<List<TestObject>> GetObjectsByCategoryAsync(string category);
         Task<List<TestObject>> GetAllObjectsAsync();
-        Task<TestObject> UpdateObjectAsync(TestObject obj);
+        Task<TestObject?> UpdateObjectAsync(TestObject obj);
         Task<bool> DeleteObjectAsync(string id);
 
         // Search & Filter
@@ -59,7 +59,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
 
         // Batch Operations
         Task<int> ImportObjectsAsync(List<TestObject> objects);
-        Task<List<TestObject>> ExportObjectsAsync(string category = null);
+        Task<List<TestObject>> ExportObjectsAsync(string? category = null);
         Task<bool> UpdateLocatorAsync(string objectId, string newLocator);
     }
 
@@ -71,7 +71,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
         /// <summary>
         /// Generate optimal CSS selector
         /// </summary>
-        public static string GenerateCSSSelector(Dictionary<string, string> attributes)
+        public static string? GenerateCSSSelector(Dictionary<string, string> attributes)
         {
             if (!attributes.Any()) return null;
 
@@ -106,7 +106,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
         /// <summary>
         /// Generate XPath expression
         /// </summary>
-        public static string GenerateXPath(Dictionary<string, string> attributes)
+        public static string? GenerateXPath(Dictionary<string, string> attributes)
         {
             if (!attributes.Any()) return null;
 
@@ -149,7 +149,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
         /// <summary>
         /// Validate locator works
         /// </summary>
-        public static bool ValidateLocator(string locator)
+        public static bool ValidateLocator(string? locator)
         {
             if (string.IsNullOrEmpty(locator)) return false;
             
@@ -180,15 +180,16 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
         /// <summary>
         /// Analyze captured element and extract features
         /// </summary>
-        public static TestObject AnalyzeElement(Dictionary<string, string> elementAttributes, string elementName = null)
+        public static TestObject AnalyzeElement(Dictionary<string, string> elementAttributes, string? elementName = null)
         {
             var testObject = new TestObject
             {
                 Name = elementName ?? GenerateElementName(elementAttributes),
                 Attributes = elementAttributes,
                 ElementType = DetectElementType(elementAttributes),
-                LocatorValue = SmartLocatorEngine.GenerateCSSSelector(elementAttributes) 
+                LocatorValue = SmartLocatorEngine.GenerateCSSSelector(elementAttributes)
                     ?? SmartLocatorEngine.GenerateXPath(elementAttributes)
+                    ?? string.Empty
             };
 
             // Generate alternate locators
@@ -288,7 +289,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
             return await Task.FromResult(obj);
         }
 
-        public async Task<TestObject> GetObjectAsync(string id)
+        public async Task<TestObject?> GetObjectAsync(string id)
         {
             return await Task.FromResult(_objects.FirstOrDefault(o => o.Id == id));
         }
@@ -303,7 +304,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
             return await Task.FromResult(_objects.Where(o => o.IsActive).ToList());
         }
 
-        public async Task<TestObject> UpdateObjectAsync(TestObject obj)
+        public async Task<TestObject?> UpdateObjectAsync(TestObject obj)
         {
             var existing = _objects.FirstOrDefault(o => o.Id == obj.Id);
             if (existing == null)
@@ -401,7 +402,7 @@ namespace AgenticAI.Core.Utilities.ObjectRepository
             return await Task.FromResult(count);
         }
 
-        public async Task<List<TestObject>> ExportObjectsAsync(string category = null)
+        public async Task<List<TestObject>> ExportObjectsAsync(string? category = null)
         {
             var query = _objects.Where(o => o.IsActive);
             

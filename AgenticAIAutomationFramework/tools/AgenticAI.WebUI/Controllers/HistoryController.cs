@@ -1,3 +1,4 @@
+using AgenticAI.Core.Logging;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -53,6 +54,7 @@ namespace AgenticAI.WebUI.Controllers
             }
             catch (Exception ex)
             {
+                Logger.Error($"Failed to load test execution history: {ex.Message}");
                 return Ok(new
                 {
                     success = true,
@@ -335,9 +337,10 @@ namespace AgenticAI.WebUI.Controllers
 
             foreach (var item in selected)
             {
-                var statusClass = item.Status.Equals("Passed", StringComparison.OrdinalIgnoreCase)
+                var itemStatus = item.Status ?? string.Empty;
+                var statusClass = itemStatus.Equals("Passed", StringComparison.OrdinalIgnoreCase)
                     ? "passed"
-                    : item.Status.Equals("Failed", StringComparison.OrdinalIgnoreCase) ? "failed" : "other";
+                    : itemStatus.Equals("Failed", StringComparison.OrdinalIgnoreCase) ? "failed" : "other";
 
                                 var module = string.IsNullOrWhiteSpace(item.Module) ? "N/A" : item.Module;
                                 var browser = string.IsNullOrWhiteSpace(item.Browser) ? "Chrome" : item.Browser;
@@ -415,14 +418,18 @@ namespace AgenticAI.WebUI.Controllers
         th, td {{ padding: 10px; border-bottom: 1px solid #edf2f7; text-align: left; vertical-align: top; font-size: 0.92rem; }}
         th {{ background: #f8fafc; font-weight: 600; color: #334155; position: sticky; top: 0; z-index: 1; }}
         .badge {{ padding: 3px 9px; border-radius: 999px; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.2px; }}
-        .passed {{ background: var(--green); }}
-        .failed {{ background: var(--red); }}
-        .other {{ background: var(--amber); }}
+        .badge.passed {{ background: var(--green); }}
+        .badge.failed {{ background: var(--red); }}
+        .badge.other {{ background: var(--amber); }}
         details > summary {{ cursor: pointer; color: var(--blue); font-weight: 600; }}
-        .steps {{ margin-top: 8px; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; max-width: 560px; }}
-        .step {{ padding: 6px 0; border-bottom: 1px dashed #e5e7eb; }}
-        .step:last-child {{ border-bottom: none; }}
-        .err {{ color: #b91c1c; margin-top: 4px; }}
+        /* Compact multi-column step list so long runs need far less vertical scrolling */
+        .steps {{ margin-top: 8px; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 8px; }}
+        .step {{ padding: 3px 6px; font-size: 0.8rem; line-height: 1.3; border-left: 3px solid #94a3b8; background: #fff; border-radius: 3px; }}
+        .step.passed {{ border-left-color: var(--green); }}
+        .step.failed {{ border-left-color: var(--red); background: #fef2f2; }}
+        .step.skipped {{ border-left-color: var(--amber); }}
+        .err {{ color: #b91c1c; margin-top: 4px; word-break: break-word; }}
+        th:last-child, td:last-child {{ width: 46%; }}
         .muted {{ color: var(--muted); }}
         .footer {{ color: var(--muted); font-size: 0.82rem; margin-top: 10px; }}
         @media (max-width: 1024px) {{ .stats {{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }} }}

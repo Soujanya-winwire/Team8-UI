@@ -87,4 +87,5 @@ Console.WriteLine();
 Console.WriteLine("? Server is running...");
 Console.WriteLine();
 
-app.Run("http://localhost:5000");
+// Default to port 5000; ASPNETCORE_URLS overrides it (e.g. to run alongside another instance)
+app.Run(Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://localhost:5000");

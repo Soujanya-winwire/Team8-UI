@@ -33,7 +33,7 @@ async function initRepositoryView() {
             <div class="card" style="padding: 12px; max-height: 600px; overflow-y: auto;">
                 <div style="font-weight: 600; margin-bottom: 12px; font-size: 0.9em;">Categories</div>
                 <div id="category-list" style="display: flex; flex-direction: column; gap: 6px;">
-                    <div class="repo-category active" onclick="filterByCategory('all')" style="cursor: pointer; padding: 8px; border-radius: 4px; background: #f3e8ff; color: #7c3aed; font-weight: 500;">
+                    <div class="repo-category active" onclick="filterByCategory('all')" style="cursor: pointer; padding: 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 500;">
                         <i class="fas fa-cube"></i> All Objects
                     </div>
                 </div>
@@ -119,7 +119,7 @@ async function initRepositoryView() {
                         <div style="margin-bottom: 12px;">
                             <label style="display: block; font-weight: 500; font-size: 0.85em; margin-bottom: 4px;">Primary Locator</label>
                             <div style="display: grid; grid-template-columns: 80px 1fr; gap: 8px;">
-                                <div id="details-locator-type" style="padding: 8px; background: #ede9fe; border-radius: 4px; font-weight: 500; font-size: 0.85em;"></div>
+                                <div id="details-locator-type" style="padding: 8px; background: #e2e8f0; border-radius: 4px; font-weight: 500; font-size: 0.85em;"></div>
                                 <div id="details-locator-value" style="padding: 8px; background: #f9fafb; border-radius: 4px; font-family: monospace; word-break: break-all;"></div>
                             </div>
                         </div>
@@ -202,7 +202,7 @@ function displayRepositoryObjects() {
         <tr style="border-bottom: 1px solid #e9d5ff; ${idx % 2 === 0 ? 'background: #faf5ff;' : ''}">
             <td style="padding: 10px 12px;"><strong>${escapeHtml(obj.name)}</strong></td>
             <td style="padding: 10px 12px;">
-                <span style="background: #ede9fe; color: #7c3aed; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">
+                <span style="background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">
                     ${escapeHtml(obj.category || 'Uncategorized')}
                 </span>
             </td>
@@ -276,7 +276,7 @@ function viewObjectDetails(objectId) {
     if (obj.alternateLocators && obj.alternateLocators.length > 0) {
         alternatesDiv.innerHTML = obj.alternateLocators.map((alt, idx) => `
             <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e9d5ff;">
-                <div style="font-weight: 500; font-size: 0.8em; color: #7c3aed; margin-bottom: 2px;">${escapeHtml(alt.locatorType)}</div>
+                <div style="font-weight: 500; font-size: 0.8em; color: #475569; margin-bottom: 2px;">${escapeHtml(alt.locatorType)}</div>
                 <div style="font-family: monospace; font-size: 0.8em; word-break: break-all; color: #666;">${escapeHtml(alt.locatorValue)}</div>
             </div>
         `).join('');
@@ -576,7 +576,7 @@ function updateRepositoryStatistics() {
     const categoryList = document.getElementById('category-list');
     if (categoryList) {
         categoryList.innerHTML = `
-            <div class="repo-category active" onclick="filterByCategory('all')" style="cursor: pointer; padding: 8px; border-radius: 4px; background: #f3e8ff; color: #7c3aed; font-weight: 500;">
+            <div class="repo-category active" onclick="filterByCategory('all')" style="cursor: pointer; padding: 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 500;">
                 <i class="fas fa-cube"></i> All Objects
             </div>
             ${repositoryState.categories.map(cat => `

@@ -98,6 +98,7 @@ namespace AgenticAI.UIAutomation.TestBase
             {
                 action();
                 LogStep(stepName, description, TestStatus.Passed);
+                CheckVisualRegressionAsync(stepName).Wait();
             }
             catch (Exception ex)
             {
@@ -114,12 +115,49 @@ namespace AgenticAI.UIAutomation.TestBase
             {
                 await action();
                 LogStep(stepName, description, TestStatus.Passed);
+                await CheckVisualRegressionAsync(stepName);
             }
             catch (Exception ex)
             {
                 var screenshotPath = await CaptureScreenshotAsync($"{stepName}_Failed");
                 LogStep(stepName, description, TestStatus.Failed, ex.Message, screenshotPath);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// When visual regression is enabled (Config.EnableVisualRegression), captures a screenshot for the
+        /// step and compares it against a stored baseline, logging any detected difference. Disabled by
+        /// default, so this is a no-op unless a test explicitly opts in via configuration.
+        /// </summary>
+        private async Task CheckVisualRegressionAsync(string stepName)
+        {
+            if (!Config.EnableVisualRegression)
+            {
+                return;
+            }
+
+            try
+            {
+                var screenshotPath = await CaptureScreenshotAsync($"{stepName}_visual");
+                if (string.IsNullOrEmpty(screenshotPath))
+                {
+                    return;
+                }
+
+                var baselineDirectory = Path.Combine(Config.ScreenshotPath, "VisualBaselines");
+                var result = await Core.Utilities.ScreenshotComparison.CompareWithBaselineAsync(
+                    screenshotPath, baselineDirectory, stepName);
+
+                if (!result.AreIdentical)
+                {
+                    Core.Logging.Logger.Warning(
+                        $"Visual regression detected for step '{stepName}': {result.SimilarityPercentage:F1}% similar to baseline");
+                }
+            }
+            catch (Exception ex)
+            {
+                Core.Logging.Logger.Error($"Visual regression check failed for step '{stepName}': {ex.Message}");
             }
         }
     }
