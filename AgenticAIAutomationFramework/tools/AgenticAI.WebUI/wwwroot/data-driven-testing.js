@@ -1,4 +1,4 @@
-// Advanced Data-Driven Testing Module - WinUITest Edition
+// Advanced Data-Driven Testing Module - Win Test Hub
 // Integrates with Data-Driven Testing Engine (20 features)
 
 let ddtUIState = {
@@ -40,7 +40,7 @@ async function initDataDrivenTestingView() {
     const html = `
         <div class="header">
             <h2><i class="fas fa-brain"></i> Advanced Data-Driven Testing Engine</h2>
-            <p style="color:#666;font-size:0.88em;margin-block-start:4px;">WinUITest data-driven execution with CSV/JSON data injection, validation, and parallel runs.</p>
+            <p style="color:#666;font-size:0.88em;margin-block-start:4px;">Win Test Hub data-driven execution with CSV/JSON data injection, validation, and parallel runs.</p>
         </div>
 
         <!-- TAB NAVIGATION -->
@@ -55,8 +55,8 @@ async function initDataDrivenTestingView() {
 
         <!-- EXECUTION TAB -->
         <div id="ddt-execution-tab" class="ddt-tab" style="display:block;">
-            <div class="card" style="border:2px solid var(--info-color);box-shadow:0 6px 16px rgba(15,118,110,0.15);margin-block-start:14px;">
-                <div class="card-header" style="background:linear-gradient(135deg,rgba(15,118,110,0.08),rgba(15,118,110,0.04));">
+            <div class="card" style="border:2px solid var(--info-color);box-shadow:0 6px 16px rgba(30, 58, 138,0.15);margin-block-start:14px;">
+                <div class="card-header" style="background:linear-gradient(135deg,rgba(30, 58, 138,0.08),rgba(30, 58, 138,0.04));">
                     <div class="card-title" style="display:flex;align-items:center;gap:10px;color:var(--info-color);">
                         <i class="fas fa-rocket"></i> Intelligent Test Execution
                     </div>
@@ -158,7 +158,7 @@ async function initDataDrivenTestingView() {
                         <button class="btn btn-primary" id="dd-execute-btn" onclick="executeDataDriven();" style="flex:1;min-inline-size:250px;">
                             <i class="fas fa-play"></i> Execute Data-Driven Test
                         </button>
-                        <button class="btn" style="background:#92400e;color:#white;border:1px solid #b45309;min-inline-size:160px;" onclick="executeDataDrivenParallel();">
+                        <button class="btn" style="background:#5b6b8c;color:#fff;border:1px solid #4a5a7a;min-inline-size:160px;" onclick="executeDataDrivenParallel();">
                             <i class="fas fa-bolt"></i> Parallel Execution
                         </button>
                     </div>
@@ -225,8 +225,8 @@ async function initDataDrivenTestingView() {
                         <i class="fas fa-sparkles"></i> Generate Test Data
                     </button>
 
-                    <div id="generated-data-preview" class="hidden" style="padding:14px;background:#f0fdf4;border-radius:8px;border-inline-start:4px solid var(--success-color);margin-block-start:16px;">
-                        <div style="font-weight:600;color:#15803d;margin-block-end:8px;">Generated Data Preview</div>
+                    <div id="generated-data-preview" class="hidden" style="padding:14px;background:#eef3fc;border-radius:8px;border-inline-start:4px solid var(--success-color);margin-block-start:16px;">
+                        <div style="font-weight:600;color:#3f64a3;margin-block-end:8px;">Generated Data Preview</div>
                         <div id="generated-data-content"></div>
                     </div>
                 </div>
@@ -589,7 +589,7 @@ function renderDataTable(data) {
     // Build professional table HTML
     let tableHTML = '<div style="overflow-x:auto;border-radius:6px;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,0.08);">';
     tableHTML += '<table style="inline-size:100%;border-collapse:collapse;background:#fff;table-layout:auto;">';
-    tableHTML += '<thead style="background:linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);position:sticky;inset-block-start:0;">';
+    tableHTML += '<thead style="background:linear-gradient(135deg, #e4ebfa 0%, #c3d3f3 100%);position:sticky;inset-block-start:0;">';
     tableHTML += '<tr>';
     tableHTML += '<th style="padding:12px 10px;border:1px solid #7dd3fc;text-align:center;inline-size:50px;color:#0369a1;font-weight:700;font-size:0.9em;">#</th>';
     
@@ -625,9 +625,9 @@ function renderDataTable(data) {
     tableHTML += '<div style="margin-block-start:16px;display:flex;gap:8px;flex-wrap:wrap;">';
     tableHTML += '<button class="btn btn-sm btn-success" onclick="insertDataRow()" style="padding:10px 14px;font-weight:600;cursor:pointer;">';
     tableHTML += '<i class="fas fa-plus-circle"></i> Insert New Row</button>';
-    tableHTML += '<button class="btn btn-sm" onclick="editTableData()" style="padding:10px 14px;font-weight:600;background:#0f766e;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
+    tableHTML += '<button class="btn btn-sm" onclick="editTableData()" style="padding:10px 14px;font-weight:600;background:#1e3a8a;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
     tableHTML += '<i class="fas fa-pencil"></i> Edit Data</button>';
-    tableHTML += '<button class="btn btn-sm" onclick="clearTableData()" style="padding:10px 14px;font-weight:600;background:#ef4444;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
+    tableHTML += '<button class="btn btn-sm" onclick="clearTableData()" style="padding:10px 14px;font-weight:600;background:#a85b61;color:#fff;border:none;border-radius:4px;cursor:pointer;">';
     tableHTML += '<i class="fas fa-trash-alt"></i> Clear All</button>';
     tableHTML += '</div>';
 
@@ -646,8 +646,8 @@ function renderDataTable(data) {
  */
 function buildInsertRowUI(columns) {
     const rowId = 'row-' + Date.now();
-    let formHTML = '<div id="' + rowId + '" style="background:#f1f8f7;border:2px solid #0f766e;padding:16px;border-radius:8px;margin:16px 0;">';
-    formHTML += '<h4 style="margin:0 0 12px 0;color:#115e59;">New Row - Insert Details</h4>';
+    let formHTML = '<div id="' + rowId + '" style="background:#f1f8f7;border:2px solid #1e3a8a;padding:16px;border-radius:8px;margin:16px 0;">';
+    formHTML += '<h4 style="margin:0 0 12px 0;color:#172554;">New Row - Insert Details</h4>';
     formHTML += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-block-end:12px;">';
     
     columns.forEach((col, idx) => {
@@ -661,7 +661,7 @@ function buildInsertRowUI(columns) {
     formHTML += '</div>';
     formHTML += '<div style="display:flex;gap:8px;justify-content:flex-end;">';
     formHTML += '<button type="button" onclick="cancelInsertRow()" style="padding:8px 16px;background:#e5e7eb;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;font-weight:500;"><i class="fas fa-times"></i> Cancel</button>';
-    formHTML += '<button type="button" onclick="confirmInsertRow(\'' + rowId + '\', [' + columns.map(c => '\'' + c + '\'').join(',') + '])" style="padding:8px 16px;background:#10b981;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:500;"><i class="fas fa-plus"></i> Add Row</button>';
+    formHTML += '<button type="button" onclick="confirmInsertRow(\'' + rowId + '\', [' + columns.map(c => '\'' + c + '\'').join(',') + '])" style="padding:8px 16px;background:#3f64a3;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:500;"><i class="fas fa-plus"></i> Add Row</button>';
     formHTML += '</div></div>';
     return formHTML;
 }
@@ -1501,7 +1501,7 @@ function editTableData() {
         });
         table.setAttribute('data-editing', 'true');
         editBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-        editBtn.style.background = '#10b981';
+        editBtn.style.background = '#3f64a3';
         editBtn.style.color = '#fff';
         addDDConsoleLog('Edit mode enabled - Click cells to edit values', 'info');
     } else {
@@ -1605,14 +1605,14 @@ async function validateLoadedData() {
             content.innerHTML = `
                 <div style="margin-block-end:10px;">
                     <strong style="color:#0369a1;">${d.rowCount} row(s)</strong> · 
-                    <span style="color:#059669;">✓ Valid Schema</span>
+                    <span style="color:#3f64a3;">✓ Valid Schema</span>
                 </div>
                 <div style="margin-block-end:10px;color:#666;font-size:0.9em;">
-                    Columns: ${displayColumns.map(c => `<code style="background:#e0f2f1;padding:2px 6px;border-radius:4px;margin:0 2px;">${escapeHtml(c)}</code>`).join(' ')}
+                    Columns: ${displayColumns.map(c => `<code style="background:#e4ebfa;padding:2px 6px;border-radius:4px;margin:0 2px;">${escapeHtml(c)}</code>`).join(' ')}
                 </div>
                 <div style="overflow-x:auto;">
                     <table style="font-size:0.85em;border-collapse:collapse;inline-size:100%;">
-                        <thead style="background:#b2dfdb;">
+                        <thead style="background:#c3d3f3;">
                             <tr>${displayColumns.map(c => `<th style="padding:6px 10px;text-align:start;border:1px solid #93c5fd;">${escapeHtml(c)}</th>`).join('')}</tr>
                         </thead>
                         <tbody>
@@ -1694,8 +1694,8 @@ function generateTestData() {
 
         content.innerHTML = `
             <div style="margin-block-end:12px;display:flex;justify-content:space-between;align-items:center;">
-                <div style="color:#059669;font-weight:500;">✓ Generated ${result.count} test records</div>
-                <button class="btn btn-sm" style="background:#10b981;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;" onclick="editAIGeneratedData()">
+                <div style="color:#3f64a3;font-weight:500;">✓ Generated ${result.count} test records</div>
+                <button class="btn btn-sm" style="background:#3f64a3;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;" onclick="editAIGeneratedData()">
                     <i class="fas fa-pencil"></i> Edit
                 </button>
             </div>
@@ -1706,10 +1706,10 @@ function generateTestData() {
                     </thead>
                     <tbody>
                         ${result.data.slice(0, 5).map((row, idx) => `
-                            <tr style="background:${idx % 2 === 0 ? '#fff' : '#f0fdf4'};">
-                                ${Object.keys(fields).map(f => `<td style="padding:6px 10px;border:1px solid #d1fae5;">${escapeHtml(row[f])}</td>`).join('')}
+                            <tr style="background:${idx % 2 === 0 ? '#fff' : '#eef3fc'};">
+                                ${Object.keys(fields).map(f => `<td style="padding:6px 10px;border:1px solid #dbe5fa;">${escapeHtml(row[f])}</td>`).join('')}
                             </tr>`).join('')}
-                        ${result.count > 5 ? `<tr style="background:#f0fdf4;"><td colspan="${Object.keys(fields).length}" style="padding:10px;text-align:center;color:#999;">... and ${result.count - 5} more rows</td></tr>` : ''}
+                        ${result.count > 5 ? `<tr style="background:#eef3fc;"><td colspan="${Object.keys(fields).length}" style="padding:10px;text-align:center;color:#999;">... and ${result.count - 5} more rows</td></tr>` : ''}
                     </tbody>
                 </table>
             </div>
@@ -1768,7 +1768,7 @@ function editAIGeneratedData() {
         });
         table.setAttribute('data-editing', 'true');
         editBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-        editBtn.style.background = '#10b981';
+        editBtn.style.background = '#3f64a3';
         editBtn.style.color = '#fff';
         addDDConsoleLog('AI Data: Edit mode enabled - Click cells to edit', 'info');
     } else {
@@ -2202,7 +2202,7 @@ function renderDataDrivenResults(data) {
     const durationSeconds = (executionDuration / 1000).toFixed(2);
 
     // Professional Summary Header
-    summary.style.background = allPassed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)';
+    summary.style.background = allPassed ? 'rgba(63, 100, 163,0.12)' : 'rgba(168, 91, 97,0.1)';
     summary.style.borderLeft = `4px solid ${allPassed ? 'var(--success-color)' : 'var(--danger-color)'}`;
     
     summary.innerHTML = `
@@ -2218,7 +2218,7 @@ function renderDataDrivenResults(data) {
                     <span class="badge badge-success">✅ ${data.passed || 0} Passed</span>
                     <span class="badge badge-danger" style="margin-inline-start:0;">❌ ${data.failed || 0} Failed</span>
                     <span class="badge badge-info" style="margin-inline-start:0;">📊 ${data.totalRows || 0} Total</span>
-                    <span class="badge" style="background:#ccfbf1;color:#0f766e;border:none;margin-inline-start:0;">⏱️ ${durationSeconds}s</span>
+                    <span class="badge" style="background:#dbe5fa;color:#1e3a8a;border:none;margin-inline-start:0;">⏱️ ${durationSeconds}s</span>
                 </div>
             </div>
             <div style="text-align:end;font-size:1.2em;font-weight:600;color:${allPassed ? 'var(--success-color)' : 'var(--danger-color)'};padding:10px 0;">
@@ -2232,7 +2232,7 @@ function renderDataDrivenResults(data) {
             </button>
             <div id="execution-logs-section" style="display:none;margin-block-start:12px;background:rgba(0,0,0,0.03);padding:12px;border-radius:6px;max-block-size:300px;overflow-y:auto;font-family:monospace;font-size:0.85em;line-height:1.5;">
                 ${(data.executionLogs || []).map(log => `
-                    <div style="margin-block-end:6px;padding:4px 6px;border-radius:3px;background:${log.type === 'error' ? '#fee2e2' : log.type === 'success' ? '#ecfdf5' : log.type === 'warning' ? '#fef3c7' : '#f3f4f6'};color:${log.type === 'error' ? '#991b1b' : log.type === 'success' ? '#065f46' : log.type === 'warning' ? '#92400e' : '#374151'};">
+                    <div style="margin-block-end:6px;padding:4px 6px;border-radius:3px;background:${log.type === 'error' ? '#f3e4e6' : log.type === 'success' ? '#ecfdf5' : log.type === 'warning' ? '#fef3c7' : '#f3f4f6'};color:${log.type === 'error' ? '#7a3a40' : log.type === 'success' ? '#172554' : log.type === 'warning' ? '#6b5530' : '#374151'};">
                         <span style="font-weight:500;color:#999;">[${log.timestamp}]</span> ${escapeHtml(log.message)}
                     </div>
                 `).join('')}
@@ -2268,8 +2268,8 @@ function renderDataDrivenResults(data) {
                     <tbody>
                         ${resultRows.map((r, idx) => {
                             const passed = r.status === 'Passed';
-                            const statusColor = passed ? '#ecfdf5' : '#fee2e2';
-                            const textColor = passed ? '#065f46' : '#991b1b';
+                            const statusColor = passed ? '#ecfdf5' : '#f3e4e6';
+                            const textColor = passed ? '#172554' : '#7a3a40';
                             const testCaseTitle = `${data.scenarioName} Row ${r.rowNumber || idx + 1}`;
                             const errorMsg = r.errorMessage ? ` - ${r.errorMessage}` : '';
                             return `<tr style="background:${idx % 2 === 0 ? '#fff' : '#f9fafb'};border-block-end:1px solid #e5e7eb;">
@@ -2300,11 +2300,11 @@ function renderDataDrivenResults(data) {
         };
         
         resultsHtml += `
-            <div style="margin-block-start:20px;border-block-start:2px solid #fee2e2;padding-block-start:16px;">
+            <div style="margin-block-start:20px;border-block-start:2px solid #f3e4e6;padding-block-start:16px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-block-end:16px;">
-                    <div style="font-weight:600;font-size:0.95em;color:#991b1b;">⚠️ Error Details & Diagnostics (${failedTests.length} failed)</div>
+                    <div style="font-weight:600;font-size:0.95em;color:#7a3a40;">⚠️ Error Details & Diagnostics (${failedTests.length} failed)</div>
                     <div style="display:flex;gap:8px;">
-                        <button onclick="expandAllErrors()" style="padding:6px 12px;font-size:0.85em;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:4px;cursor:pointer;font-weight:500;transition:all 0.2s;">📂 Expand All</button>
+                        <button onclick="expandAllErrors()" style="padding:6px 12px;font-size:0.85em;background:#f3e4e6;color:#7a3a40;border:1px solid #fecaca;border-radius:4px;cursor:pointer;font-weight:500;transition:all 0.2s;">📂 Expand All</button>
                         <button onclick="collapseAllErrors()" style="padding:6px 12px;font-size:0.85em;background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:4px;cursor:pointer;font-weight:500;transition:all 0.2s;">📁 Collapse All</button>
                     </div>
                 </div>
@@ -2317,13 +2317,13 @@ function renderDataDrivenResults(data) {
                     const hasSteps = r.steps && r.steps.length > 0;
                     
                     return `
-                    <div id="${errorId}" style="background:#fee2e2;border:1px solid #fecaca;border-radius:6px;margin-block-end:12px;overflow:hidden;transition:all 0.2s;">
+                    <div id="${errorId}" style="background:#f3e4e6;border:1px solid #fecaca;border-radius:6px;margin-block-end:12px;overflow:hidden;transition:all 0.2s;">
                         <!-- Error Card Header - Clickable -->
-                        <div onclick="toggleErrorCard('${errorId}')" style="padding:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#fee2e2;transition:background 0.2s;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">
+                        <div onclick="toggleErrorCard('${errorId}')" style="padding:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#f3e4e6;transition:background 0.2s;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#f3e4e6'">
                             <div style="display:flex;align-items:center;gap:10px;flex:1;">
                                 <span id="${errorId}-icon" style="font-size:1.1em;transition:transform 0.2s;">▶</span>
                                 <div style="flex:1;">
-                                    <div style="font-weight:600;color:#991b1b;font-size:0.95em;">Row ${r.rowNumber || idx + 1} - ${escapeHtml(r.testCaseName || 'Unknown')}</div>
+                                    <div style="font-weight:600;color:#7a3a40;font-size:0.95em;">Row ${r.rowNumber || idx + 1} - ${escapeHtml(r.testCaseName || 'Unknown')}</div>
                                     <div style="font-size:0.8em;color:#7f1d1d;margin-block-start:4px;">Status: <strong>Failed</strong> | Dataset: <strong>Row ${r.rowNumber || idx + 1}</strong></div>
                                 </div>
                             </div>
@@ -2334,12 +2334,12 @@ function renderDataDrivenResults(data) {
                             <!-- Error Summary Section -->
                             ${r.errorMessage ? `
                             <div style="margin-block-end:12px;">
-                                <div style="font-weight:600;font-size:0.9em;color:#991b1b;margin-block-end:6px;">📋 Error Summary:</div>
-                                <div id="${errorTextId}-truncated" style="color:#7f1d1d;font-family:monospace;font-size:0.85em;background:#fff5f5;padding:10px;border-radius:4px;border-inline-start:3px solid #dc2626;line-height:1.4;">
+                                <div style="font-weight:600;font-size:0.9em;color:#7a3a40;margin-block-end:6px;">📋 Error Summary:</div>
+                                <div id="${errorTextId}-truncated" style="color:#7f1d1d;font-family:monospace;font-size:0.85em;background:#fff5f5;padding:10px;border-radius:4px;border-inline-start:3px solid #a85b61;line-height:1.4;">
                                     ${escapeHtml(firstLineError)}
                                 </div>
                                 ${hasFullError ? `
-                                <div id="${errorTextId}-full" style="display:none;color:#7f1d1d;font-family:monospace;font-size:0.85em;background:#fff5f5;padding:10px;border-radius:4px;border-inline-start:3px solid #dc2626;line-height:1.4;margin-block-start:8px;white-space:pre-wrap;word-break:break-word;">
+                                <div id="${errorTextId}-full" style="display:none;color:#7f1d1d;font-family:monospace;font-size:0.85em;background:#fff5f5;padding:10px;border-radius:4px;border-inline-start:3px solid #a85b61;line-height:1.4;margin-block-start:8px;white-space:pre-wrap;word-break:break-word;">
                                     ${escapeHtml(r.errorMessage)}
                                 </div>
                                 <div style="margin-block-start:8px;">
@@ -2352,26 +2352,26 @@ function renderDataDrivenResults(data) {
                             <!-- Step Details Section -->
                             ${hasSteps ? `
                             <div style="margin-block-start:12px;border-block-start:1px solid #fecaca;padding-block-start:12px;">
-                                <div onclick="toggleStepDetails('${stepsId}')" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:4px;background:#fff5f5;margin-block-end:10px;transition:background 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fff5f5'">
+                                <div onclick="toggleStepDetails('${stepsId}')" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px;border-radius:4px;background:#fff5f5;margin-block-end:10px;transition:background 0.2s;" onmouseover="this.style.background='#f3e4e6'" onmouseout="this.style.background='#fff5f5'">
                                     <span id="${stepsId}-icon" style="font-size:1em;">▶</span>
-                                    <span style="font-weight:600;font-size:0.9em;color:#991b1b;">📍 Step Details (${r.steps.length} steps)</span>
+                                    <span style="font-weight:600;font-size:0.9em;color:#7a3a40;">📍 Step Details (${r.steps.length} steps)</span>
                                 </div>
                                 
                                 <div id="${stepsId}" style="display:none;padding-inline-start:8px;border-inline-start:3px solid #fecaca;">
                                     ${r.steps.map((s, stepIdx) => `
-                                        <div style="margin-block-end:10px;padding:10px;background:${s.status === 'Passed' ? '#f0fdf4' : '#fef2f2'};border-inline-start:3px solid ${s.status === 'Passed' ? '#16a34a' : '#dc2626'};border-radius:3px;">
+                                        <div style="margin-block-end:10px;padding:10px;background:${s.status === 'Passed' ? '#eef3fc' : '#fef2f2'};border-inline-start:3px solid ${s.status === 'Passed' ? '#3f64a3' : '#a85b61'};border-radius:3px;">
                                             <div style="display:flex;justify-content:space-between;align-items:start;">
                                                 <div style="flex:1;">
                                                     <div style="font-weight:500;font-size:0.87em;color:#374151;">Step ${stepIdx + 1}: ${escapeHtml(s.stepName)}</div>
                                                     <div style="font-size:0.8em;color:#666;margin-block-start:2px;">${escapeHtml(s.description || 'No description')}</div>
                                                     <div style="font-size:0.8em;margin-block-start:4px;">
-                                                        <span style="padding:2px 6px;border-radius:3px;background:${s.status === 'Passed' ? '#dcfce7' : '#fee2e2'};color:${s.status === 'Passed' ? '#166534' : '#991b1b'};">
+                                                        <span style="padding:2px 6px;border-radius:3px;background:${s.status === 'Passed' ? '#dbe5fa' : '#f3e4e6'};color:${s.status === 'Passed' ? '#172554' : '#7a3a40'};">
                                                             ${s.status === 'Passed' ? '✅ Passed' : '❌ Failed'}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            ${s.errorMessage ? `<div style="color:#991b1b;font-size:0.8em;margin-block-start:6px;padding:6px;background:#fff5f5;border-radius:3px;font-family:monospace;"><strong>Error:</strong> ${escapeHtml(s.errorMessage)}</div>` : ''}
+                                            ${s.errorMessage ? `<div style="color:#7a3a40;font-size:0.8em;margin-block-start:6px;padding:6px;background:#fff5f5;border-radius:3px;font-family:monospace;"><strong>Error:</strong> ${escapeHtml(s.errorMessage)}</div>` : ''}
                                             ${s.screenshotPath ? `<div style="margin-block-start:6px;"><a href="${escapeHtml(s.screenshotPath)}" target="_blank" style="color:#0066cc;text-decoration:none;font-size:0.8em;font-weight:500;">📸 View Screenshot</a></div>` : ''}
                                         </div>
                                     `).join('')}

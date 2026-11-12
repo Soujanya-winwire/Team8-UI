@@ -21,28 +21,28 @@ async function loadCICDView() {
 
         <!-- Statistics Cards -->
         <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr);">
-            <div class="stat-card" style="background: #0f766e; color: white;">
+            <div class="stat-card" style="background: #1e3a8a; color: white;">
                 <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-success-rate">--%</h3>
                     <p>Success Rate</p>
                 </div>
             </div>
-            <div class="stat-card" style="background: #b91c1c; color: white;">
+            <div class="stat-card" style="background: #2a4cab; color: white;">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-avg-duration">--</h3>
                     <p>Avg Duration</p>
                 </div>
             </div>
-            <div class="stat-card" style="background: #0e7490; color: white;">
+            <div class="stat-card" style="background: #1d4f9f; color: white;">
                 <div class="stat-icon"><i class="fas fa-vial"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-tests-passed">--</h3>
                     <p>Tests Passed</p>
                 </div>
             </div>
-            <div class="stat-card" style="background: #15803d; color: white;">
+            <div class="stat-card" style="background: #3a5ca8; color: white;">
                 <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="stat-details">
                     <h3 id="ci-coverage">--%</h3>
@@ -106,7 +106,7 @@ async function loadCIPipelines() {
                     <i class="fas fa-inbox"></i>
                     <h3>No pipeline runs found</h3>
                     <p>${data.message || 'Trigger a build to see pipeline history'}</p>
-                    ${data.message && data.message.includes('mock') ? '<p style="color: #f59e0b; margin-top: 10px;"><i class="fas fa-info-circle"></i> Configure GitHub token in appsettings.json for live data</p>' : ''}
+                    ${data.message && data.message.includes('mock') ? '<p style="color: #8a6d3b; margin-top: 10px;"><i class="fas fa-info-circle"></i> Configure GitHub token in appsettings.json for live data</p>' : ''}
                 </div>
             `;
             return;
@@ -254,16 +254,16 @@ function renderCIBuildTrendsChart() {
                 {
                     label: 'Successful Builds',
                     data: [12, 19, 15, 17, 14, 18, 16],
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: '#3f64a3',
+                    backgroundColor: 'rgba(63, 100, 163, 0.1)',
                     tension: 0.4,
                     fill: true
                 },
                 {
                     label: 'Failed Builds',
                     data: [1, 2, 1, 0, 2, 1, 1],
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderColor: '#a85b61',
+                    backgroundColor: 'rgba(168, 91, 97, 0.1)',
                     tension: 0.4,
                     fill: true
                 }

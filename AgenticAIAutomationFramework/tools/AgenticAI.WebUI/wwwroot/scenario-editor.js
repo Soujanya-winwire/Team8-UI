@@ -246,18 +246,18 @@ function renderCompactStepsList() {
             beforeAssertions.forEach(assertion => {
                 const globalAssertionIndex = assertions.indexOf(assertion);
                 html += `
-                    <tr style="background: #fef3c7; border-left: 4px solid #f59e0b;">
-                        <td style="padding: 6px 10px; color: #d97706; font-weight: 600; font-size: 11px; padding-left: 20px;">
+                    <tr style="background: #fef3c7; border-left: 4px solid #8a6d3b;">
+                        <td style="padding: 6px 10px; color: #8a6d3b; font-weight: 600; font-size: 11px; padding-left: 20px;">
                             <i class="fas fa-shield-alt" style="font-size: 10px;"></i>
                         </td>
                         <td style="padding: 6px 10px;">
-                            <span class="badge" style="background: #f59e0b; color: white; font-size: 10px; padding: 3px 8px;">${escapeHtml(assertion.type)}</span>
+                            <span class="badge" style="background: #8a6d3b; color: white; font-size: 10px; padding: 3px 8px;">${escapeHtml(assertion.type)}</span>
                         </td>
-                        <td style="padding: 6px 10px; color: #d97706; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                        <td style="padding: 6px 10px; color: #8a6d3b; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
                             ${escapeHtml(assertion.locator || '-')}
                         </td>
-                        <td style="padding: 6px 10px; color: #b45309; font-size: 11px; word-break: break-all; line-height: 1.3;">
-                            <span style="font-style: italic; color: #92400e;">BEFORE: ${assertion.description || assertion.expectedValue || '-'}</span>
+                        <td style="padding: 6px 10px; color: #6b5530; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                            <span style="font-style: italic; color: #6b5530;">BEFORE: ${assertion.description || assertion.expectedValue || '-'}</span>
                         </td>
                         <td style="padding: 6px 10px; text-align: center;">
                             <div style="display: flex; gap: 3px; justify-content: center; align-items: center;">
@@ -283,12 +283,12 @@ function renderCompactStepsList() {
             // Render the ACTION row - SECOND
             html += `
                 <tr style="border-bottom: 1px solid #f3f4f6; ${isAutoWait ? 'background: #fef9c3; opacity: 0.85;' : ''}">
-                    <td style="padding: 6px 10px; color: ${isAutoWait ? '#ca8a04' : '#0f766e'}; font-weight: 600; font-size: 11px;">
+                    <td style="padding: 6px 10px; color: ${isAutoWait ? '#ca8a04' : '#1e3a8a'}; font-weight: 600; font-size: 11px;">
                         ${isAutoWait ? '<i class="fas fa-robot" style="font-size: 10px; margin-right: 3px;"></i>' : ''}${visibleIdx + 1}
                     </td>
                     <td style="padding: 6px 10px;">
                         <span class="badge ${isAutoWait ? '' : 'badge-primary'}" style="font-size: 10px; padding: 3px 8px; ${isAutoWait ? 'background: #fbbf24; color: #78350f;' : ''}">${escapeHtml(action.actionType)}</span>
-                        ${isAutoWait ? '<span style="font-size: 9px; color: #92400e; margin-left: 4px;">(auto)</span>' : ''}
+                        ${isAutoWait ? '<span style="font-size: 9px; color: #6b5530; margin-left: 4px;">(auto)</span>' : ''}
                     </td>
                     <td style="padding: 6px 10px; color: #374151; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
                         ${escapeHtml(action.locator)}
@@ -299,13 +299,13 @@ function renderCompactStepsList() {
                             // Show auto-wait with helpful note
                             if (isAutoWait) {
                                 return `<span style="color: #ca8a04; font-weight: 600;">${escapeHtml(action.value)}s</span>` +
-                                       `<span style="color: #92400e; font-size: 9px; margin-left: 4px;">(editable)</span>`;
+                                       `<span style="color: #6b5530; font-size: 9px; margin-left: 4px;">(editable)</span>`;
                             }
                             // Check if this field has parameter metadata for data-driven execution
                             if (action.metadata && action.metadata.ParameterName) {
                                 const paramName = action.metadata.ParameterName;
                                 // Show placeholder with visual indicator
-                                return `<span style="color: #059669; font-weight: 600;">{{${escapeHtml(paramName)}}}</span>` +
+                                return `<span style="color: #3f64a3; font-weight: 600;">{{${escapeHtml(paramName)}}}</span>` +
                                        `<span style="color: #94a3b8; font-size: 10px; margin-left: 4px;">(default: ${escapeHtml(action.value)})</span>`;
                             }
                             return escapeHtml(action.value);
@@ -321,7 +321,7 @@ function renderCompactStepsList() {
                                     onclick="moveStepDown(${idx})" title="Move Down" ${!canMoveDown ? 'disabled' : ''}>
                                 <i class="fas fa-arrow-down"></i>
                             </button>
-                            <button class="btn btn-sm" style="padding: 3px 6px; background: transparent; color: #059669; border: none; cursor: pointer; font-size: 12px;" 
+                            <button class="btn btn-sm" style="padding: 3px 6px; background: transparent; color: #3f64a3; border: none; cursor: pointer; font-size: 12px;" 
                                     onclick="addNewStep(${idx + 1}, 'action')" title="Add Step Below">
                                 <i class="fas fa-plus"></i>
                             </button>
@@ -344,18 +344,18 @@ function renderCompactStepsList() {
             afterAssertions.forEach(assertion => {
                 const globalAssertionIndex = assertions.indexOf(assertion);
                 html += `
-                    <tr style="background: #f0fdf4; border-left: 4px solid #10b981;">
-                        <td style="padding: 6px 10px; color: #059669; font-weight: 600; font-size: 11px; padding-left: 20px;">
+                    <tr style="background: #eef3fc; border-left: 4px solid #3f64a3;">
+                        <td style="padding: 6px 10px; color: #3f64a3; font-weight: 600; font-size: 11px; padding-left: 20px;">
                             <i class="fas fa-check-circle" style="font-size: 10px;"></i>
                         </td>
                         <td style="padding: 6px 10px;">
                             <span class="badge badge-success" style="font-size: 10px; padding: 3px 8px;">${escapeHtml(assertion.type)}</span>
                         </td>
-                        <td style="padding: 6px 10px; color: #059669; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                        <td style="padding: 6px 10px; color: #3f64a3; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; line-height: 1.3;">
                             ${escapeHtml(assertion.locator || '-')}
                         </td>
-                        <td style="padding: 6px 10px; color: #047857; font-size: 11px; word-break: break-all; line-height: 1.3;">
-                            <span style="font-style: italic; color: #065f46;">AFTER: ${assertion.description || assertion.expectedValue || '-'}</span>
+                        <td style="padding: 6px 10px; color: #172554; font-size: 11px; word-break: break-all; line-height: 1.3;">
+                            <span style="font-style: italic; color: #172554;">AFTER: ${assertion.description || assertion.expectedValue || '-'}</span>
                         </td>
                         <td style="padding: 6px 10px; text-align: center;">
                             <div style="display: flex; gap: 3px; justify-content: center; align-items: center;">
@@ -400,12 +400,12 @@ function renderCompactStepsList() {
             </div>
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; background: white;">
                 <thead>
-                    <tr style="background: #f0fdf4; border-bottom: 1px solid #d1fae5;">
-                        <th style="padding: 8px 10px; text-align: left; width: 40px; color: #059669; font-weight: 600; font-size: 11px;">#</th>
-                        <th style="padding: 8px 10px; text-align: left; width: 110px; color: #059669; font-weight: 600; font-size: 11px;">Type</th>
-                        <th style="padding: 8px 10px; text-align: left; color: #059669; font-weight: 600; font-size: 11px;">Locator</th>
-                        <th style="padding: 8px 10px; text-align: left; color: #059669; font-weight: 600; font-size: 11px;">Expected Value</th>
-                        <th style="padding: 8px 10px; text-align: center; width: 80px; color: #059669; font-weight: 600; font-size: 11px;">Actions</th>
+                    <tr style="background: #eef3fc; border-bottom: 1px solid #dbe5fa;">
+                        <th style="padding: 8px 10px; text-align: left; width: 40px; color: #3f64a3; font-weight: 600; font-size: 11px;">#</th>
+                        <th style="padding: 8px 10px; text-align: left; width: 110px; color: #3f64a3; font-weight: 600; font-size: 11px;">Type</th>
+                        <th style="padding: 8px 10px; text-align: left; color: #3f64a3; font-weight: 600; font-size: 11px;">Locator</th>
+                        <th style="padding: 8px 10px; text-align: left; color: #3f64a3; font-weight: 600; font-size: 11px;">Expected Value</th>
+                        <th style="padding: 8px 10px; text-align: center; width: 80px; color: #3f64a3; font-weight: 600; font-size: 11px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -414,8 +414,8 @@ function renderCompactStepsList() {
         unassignedAssertions.forEach((assertion, idx) => {
             const globalIndex = assertions.indexOf(assertion);
             html += `
-                <tr style="border-bottom: 1px solid #f0fdf4;">
-                    <td style="padding: 6px 10px; color: #10b981; font-weight: 600; font-size: 11px;">${idx + 1}</td>
+                <tr style="border-bottom: 1px solid #eef3fc;">
+                    <td style="padding: 6px 10px; color: #3f64a3; font-weight: 600; font-size: 11px;">${idx + 1}</td>
                     <td style="padding: 6px 10px;">
                         <span class="badge badge-success" style="font-size: 10px; padding: 3px 8px;">${escapeHtml(assertion.type)}</span>
                     </td>
@@ -638,7 +638,7 @@ function renderStepItem(item, index, type) {
         );
 
         if (linkedAssertions.length > 0) {
-            html += '<div style="margin-left: 20px; margin-top: 20px; border-left: 2px dashed rgba(16, 185, 129, 0.2); padding-left: 20px;">';
+            html += '<div style="margin-left: 20px; margin-top: 20px; border-left: 2px dashed rgba(63, 100, 163, 0.2); padding-left: 20px;">';
             linkedAssertions.forEach(assertion => {
                 const globalAssertionIndex = currentEditingScenario.assertions.indexOf(assertion);
                 html += renderStepItem(assertion, globalAssertionIndex, 'assertion');
@@ -703,7 +703,7 @@ function addNewStep(position, type) {
                 </div>
             </div>
             
-            <div class="card" style="border: 1px solid rgba(15, 118, 110, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
+            <div class="card" style="border: 1px solid rgba(30, 58, 138, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
                 <div class="form-group">
                     <label class="premium-form-label">${isAction ? 'Action' : 'Assertion'} Type</label>
                     <select id="new-step-type" class="form-control premium-input" onchange="handleStepTypeChange(this.value, document.getElementById('step-category-selector').value === 'action')">
@@ -890,7 +890,7 @@ function editStep(index, type) {
                 </div>
             </div>
             
-            <div class="card" style="border: 1px solid rgba(15, 118, 110, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
+            <div class="card" style="border: 1px solid rgba(30, 58, 138, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); padding: 15px; border-radius: 12px;">
                 <div class="form-group">
                     <label class="premium-form-label">${isAction ? 'Action' : 'Assertion'} Type</label>
                     <select id="edit-step-type" class="form-control premium-input" onchange="handleStepTypeChange(this.value, document.getElementById('edit-step-category-selector').value === 'action')">

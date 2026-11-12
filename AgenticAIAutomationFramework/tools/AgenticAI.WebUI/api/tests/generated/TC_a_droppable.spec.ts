@@ -1,0 +1,6 @@
+import { test, expect } from '@playwright/test';
+
+test('Verify element Droppable is present', async ({ page }) => {
+    await page.goto('https://demoqa.com/text-box')
+    await expect(page.locator('#item-3>a:nth-of-type(1)').first()).toBeAttached()
+})

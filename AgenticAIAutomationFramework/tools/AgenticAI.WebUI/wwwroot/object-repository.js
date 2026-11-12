@@ -208,7 +208,7 @@ function displayRepositoryObjects() {
             </td>
             <td style="padding: 10px 12px;"><code style="background: #f9fafb; padding: 2px 4px; border-radius: 2px; font-size: 0.8em;">${obj.locatorType}</code></td>
             <td style="padding: 10px 12px; text-align: center;">
-                <span style="background: #d1fae5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-size: 0.75em;">
+                <span style="background: #dbe5fa; color: #172554; padding: 2px 6px; border-radius: 4px; font-size: 0.75em;">
                     ${obj.usageCount || 0}
                 </span>
             </td>
