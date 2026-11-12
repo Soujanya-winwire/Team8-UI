@@ -1,5 +1,263 @@
 [
   {
+    "ExecutionId": "d1d810ac-84b3-4827-b7ec-fb94ea583d9a",
+    "ScenarioName": "Test_0002",
+    "Module": "Practice",
+    "ExecutedAt": "2026-11-12T10:40:37.6573132\u002B05:30",
+    "Duration": 26,
+    "Status": "Passed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://www.saucedemo.com/",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after click (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022standard_user\u0022 into [data-test=\u0022username\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after click (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secre\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Type",
+        "Description": "Type \u0022secret_sauce\u0022 into [data-test=\u0022password\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after type (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Submit",
+        "Description": "Submit form [aria-label=\u0022Login\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after submit (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022login-button\u0022]",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after click (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022add-to-cart-sauce-labs-bolt-t-shirt\u0022] (\u0022Add to cart\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after click (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022shopping-cart-link\u0022] (\u00221\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after click (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Click",
+        "Description": "Click on [data-test=\u0022continue-shopping\u0022] (\u0022Continue Shopping\u0022)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": null
+      },
+      {
+        "StepName": "Wait",
+        "Description": "Wait 1s after click (configured delay)",
+        "Status": "Passed",
+        "Error": null,
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_0002_Wait_LAST_2026-11-12_10-40-36_554.png"
+      }
+    ],
+    "Error": null,
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_0002_Wait_LAST_2026-11-12_10-40-36_554.png"
+    ]
+  },
+  {
+    "ExecutionId": "df84fdbf-4805-4468-9402-ee6e19428961",
+    "ScenarioName": "Test_0001",
+    "Module": "Practice",
+    "ExecutedAt": "2026-11-12T10:38:20.1746670\u002B05:30",
+    "Duration": 30,
+    "Status": "Failed",
+    "Browser": "Chrome",
+    "Environment": "QA",
+    "Steps": [
+      {
+        "StepName": "Navigate",
+        "Description": "Navigate to https://rahulshettyacademy.com/AutomationPractice/",
+        "Status": "Failed",
+        "Error": "Timeout 30000ms exceeded.\nCall log:\n  - navigating to \u0022https://rahulshettyacademy.com/AutomationPractice/\u0022, waiting until \u0022networkidle\u0022",
+        "ScreenshotPath": "TestResults/Screenshots\\Practice\\Test_0001_Navigate_FAILED_2026-11-12_10-38-18_884.png"
+      }
+    ],
+    "Error": "Timeout 30000ms exceeded.\nCall log:\n  - navigating to \u0022https://rahulshettyacademy.com/AutomationPractice/\u0022, waiting until \u0022networkidle\u0022",
+    "VideoPath": null,
+    "Screenshots": [
+      "TestResults/Screenshots\\Practice\\Test_0001_Navigate_FAILED_2026-11-12_10-38-18_884.png"
+    ]
+  },
+  {
     "ExecutionId": "10cfd00f-5e25-4c8a-8b25-8e503b5c43e7",
     "ScenarioName": "UI_Action_Type_Testing_001",
     "Module": "Practice",
