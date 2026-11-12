@@ -89,3 +89,7 @@ TestScenarios/**/Quick_*.json
 
 # Generated at run time by "Show browser" runs
 tools/AgenticAI.WebUI/api/playwright.headed.config.ts
+
+# Python bytecode caches (created when the AI Test Generator service runs)
+__pycache__/
+*.pyc
