@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinUITest - Advanced Data-Driven Testing Engine</title>
+    <title>Win Test Hub - Agentic AI Test Automation Platform</title>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@7.0.0/dist/browser/signalr.min.js"></script>
     <!-- Font Awesome with fallback -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
@@ -19,19 +19,19 @@
         }
 
         :root {
-            --primary-color: #0f766e;
-            --secondary-color: #0d9488;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --info-color: #0e7490;
+            --primary-color: #1e3a8a;
+            --secondary-color: #2a4cab;
+            --success-color: #3f64a3;
+            --danger-color: #a85b61;
+            --warning-color: #8a6d3b;
+            --info-color: #1d4f9f;
             --dark: #1e293b;
             --light: #f8fafc;
             --border: #e2e8f0;
             --accent-purple: #475569;
             --soft-purple: #e2e8f0;
-            --soft-green: #d1fae5;
-            --soft-blue: #e0f2f1;
+            --soft-green: #dbe5fa;
+            --soft-blue: #e4ebfa;
             --soft-orange: #fed7aa;
             --text-primary: #374151;
             --text-secondary: #6b7280;
@@ -58,14 +58,35 @@
         }
 
         .logo {
-            padding: 10px 12px;
-            background: white;
-            color: #333;
+            padding: 16px 14px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .logo-badge {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25em;
+            color: white;
+        }
+
+        .logo-text {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            border-bottom: 2px solid #e2e8f0;
+            gap: 3px;
+            min-width: 0;
         }
 
         .logo-image {
@@ -83,11 +104,20 @@
         }
 
         .logo h1 {
-            display: none;
+            font-size: 1.45em;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 0.3px;
+            line-height: 1.15;
+            text-align: left;
         }
 
         .logo p {
-            display: none;
+            font-size: 0.66em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.25;
+            text-align: left;
         }
 
         .nav-menu {
@@ -184,6 +214,160 @@
             margin-bottom: 10px;
         }
 
+        .dashboard-split {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+            gap: 24px;
+            align-items: center;
+        }
+
+        .module-panel {
+            padding: 4px 8px 4px 0;
+        }
+
+        .panel-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .module-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 44px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-size: 0.82em;
+            color: var(--text-primary);
+        }
+
+        .module-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .module-bar {
+            display: flex;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #eef2f6;
+            border: 1px solid #cbd5e1;
+        }
+
+        .module-bar span {
+            display: block;
+            height: 100%;
+        }
+
+        .module-total {
+            text-align: right;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84em;
+        }
+
+        /* Dashboard fills the screen: Recent Executions absorbs the spare height so
+           Quick Actions sits at the bottom edge, and the list scrolls inside its card */
+        #dashboard-view:not(.hidden) {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 20px);
+        }
+
+        #dashboard-view > .card:last-child {
+            margin-bottom: 0;
+        }
+
+        .dashboard-overview-card {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-overview-card .dashboard-split {
+            flex: 1 1 auto;
+            align-items: stretch;
+        }
+
+        .chart-col {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .pie-wrap {
+            flex: 1 1 0;
+            position: relative;
+            min-height: 190px;
+            max-height: 420px;
+            width: 100%;
+        }
+
+        .pie-wrap canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .module-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #dashboard-module-breakdown {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            max-height: 420px;
+        }
+
+        .recent-scroll {
+            max-height: 230px;
+            overflow-y: auto;
+        }
+
+        .recent-table th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            text-align: left;
+            padding: 6px 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .recent-table td {
+            padding: 5px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-split {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .stat-card {
             background: white;
             border-radius: 6px;
@@ -211,28 +395,28 @@
         }
 
         .stat-icon.primary {
-            background: rgba(15, 118, 110, 0.1);
+            background: rgba(30, 58, 138, 0.1);
             color: var(--primary-color);
         }
 
         .stat-icon.success {
-            background: rgba(16, 185, 129, 0.12);
-            color: #059669;
+            background: rgba(63, 100, 163, 0.12);
+            color: #3f64a3;
         }
 
         .stat-icon.danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
+            background: rgba(168, 91, 97, 0.12);
+            color: #a85b61;
         }
 
         .stat-icon.warning {
-            background: rgba(245, 158, 11, 0.12);
-            color: #d97706;
+            background: rgba(138, 109, 59, 0.14);
+            color: #8a6d3b;
         }
 
         .stat-icon.info {
-            background: rgba(15, 118, 110, 0.12);
-            color: #115e59;
+            background: rgba(30, 58, 138, 0.12);
+            color: #172554;
         }
 
         .stat-details h3 {
@@ -244,6 +428,12 @@
         .stat-details p {
             color: #64748b;
             font-size: 0.78em;
+        }
+
+        /* Cards with a solid background (e.g. CI/CD) set white text inline; let the numbers follow it */
+        .stat-card[style*="color: white"] .stat-details h3,
+        .stat-card[style*="color: white"] .stat-details p {
+            color: inherit;
         }
 
         /* Buttons */
@@ -266,33 +456,33 @@
         }
 
         .btn-primary {
-            background: #0f766e;
+            background: #1e3a8a;
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.35);
         }
 
         .btn-success {
-            background: #10b981;
+            background: #3f64a3;
             color: white;
         }
 
         .btn-success:hover {
-            background: #059669;
+            background: #34548a;
             transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 3px 10px rgba(63, 100, 163, 0.3);
         }
 
         .btn-danger {
-            background: var(--danger-color);
+            background: #a85b61;
             color: white;
         }
 
         .btn-danger:hover {
-            background: #dc2626;
+            background: #924a50;
         }
 
         .btn-secondary {
@@ -348,28 +538,28 @@
         }
 
         .badge-primary {
-            background: rgba(15, 118, 110, 0.12);
-            color: #0f766e;
+            background: rgba(30, 58, 138, 0.12);
+            color: #1e3a8a;
         }
 
         .badge-success {
-            background: rgba(16, 185, 129, 0.12);
-            color: #059669;
+            background: #7ea3e6;
+            color: #172554;
         }
 
         .badge-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
+            background: #a9c2ee;
+            color: #172554;
         }
 
         .badge-warning {
-            background: rgba(245, 158, 11, 0.12);
-            color: #d97706;
+            background: #c8c9ee;
+            color: #172554;
         }
 
         .badge-info {
-            background: rgba(15, 118, 110, 0.12);
-            color: #115e59;
+            background: rgba(30, 58, 138, 0.12);
+            color: #172554;
         }
 
         /* Form Elements - COMPACT */
@@ -434,17 +624,17 @@
         }
 
         .execution-status.running {
-            background: rgba(15, 118, 110, 0.1);
+            background: rgba(30, 58, 138, 0.1);
             border-left: 4px solid var(--info-color);
         }
 
         .execution-status.success {
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(63, 100, 163, 0.1);
             border-left: 4px solid var(--success-color);
         }
 
         .execution-status.failed {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(168, 91, 97, 0.1);
             border-left: 4px solid var(--danger-color);
         }
 
@@ -480,7 +670,7 @@
         }
 
         .console-line.success {
-            color: #10b981;
+            color: #8fb0ea;
         }
 
         .console-line.error {
@@ -492,7 +682,7 @@
         }
 
         .console-line.info {
-            color: #2dd4bf;
+            color: #8fb0ee;
         }
 
         /* Modal */
@@ -627,9 +817,9 @@
 
         /* Enhanced Record Test Section Colors */
         .record-highlight {
-            background: rgba(15, 118, 110, 0.08);
+            background: rgba(30, 58, 138, 0.08);
             border: 2px solid var(--primary-color);
-            box-shadow: 0 8px 16px rgba(15, 118, 110, 0.2);
+            box-shadow: 0 8px 16px rgba(30, 58, 138, 0.2);
         }
 
         .record-highlight h3 {
@@ -644,15 +834,15 @@
 
         /* Info Box Styling */
         .info-box {
-            background: rgba(16, 185, 129, 0.10);
+            background: rgba(63, 100, 163, 0.10);
             border-left: 4px solid var(--success-color);
-            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.15);
+            box-shadow: 0 4px 8px rgba(63, 100, 163, 0.15);
             padding: 20px;
             border-radius: 10px;
         }
 
         .info-box-title {
-            color: #047857;
+            color: #172554;
             font-size: 1.1em;
             font-weight: 600;
             display: flex;
@@ -753,19 +943,19 @@
         }
 
         .toast-success {
-            background: #10b981;
+            background: #3f64a3;
         }
 
         .toast-error {
-            background: #ef4444;
+            background: #a85b61;
         }
 
         .toast-warning {
-            background: #f59e0b;
+            background: #8a6d3b;
         }
 
         .toast-info {
-            background: #0f766e;
+            background: #1e3a8a;
         }
 
         .toast-fade-out {
@@ -873,11 +1063,12 @@
                 display: none;
             }
 
-            .logo h1 {
-                font-size: 1.2em;
+            .logo {
+                justify-content: center;
+                padding: 12px 8px;
             }
 
-            .logo p {
+            .logo-text {
                 display: none;
             }
 
@@ -1072,7 +1263,7 @@
 
         .step-item-premium:hover .step-content-card {
             border-color: var(--primary-color);
-            box-shadow: 0 12px 20px -5px rgba(15, 118, 110, 0.15);
+            box-shadow: 0 12px 20px -5px rgba(30, 58, 138, 0.15);
             transform: translateY(-3px);
         }
 
@@ -1095,15 +1286,15 @@
         }
 
         .step-type-badge.action {
-            background: rgba(15, 118, 110, 0.12);
+            background: rgba(30, 58, 138, 0.12);
             color: var(--primary-color);
-            border: 1px solid rgba(15, 118, 110, 0.2);
+            border: 1px solid rgba(30, 58, 138, 0.2);
         }
 
         .step-type-badge.assertion {
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(63, 100, 163, 0.12);
             color: var(--success-color);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(63, 100, 163, 0.2);
         }
 
         .step-actions {
@@ -1146,7 +1337,7 @@
         .premium-input:focus {
             background: white;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.15);
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15);
             outline: none;
         }
 
@@ -1176,7 +1367,7 @@
 
         .aitestgen-step.done {
             background: var(--soft-green);
-            color: #059669;
+            color: #1e3a8a;
         }
 
         .aitestgen-subtitle {
@@ -1243,8 +1434,8 @@
         }
 
         .aitestgen-alert-danger {
-            background: rgba(239, 68, 68, 0.08);
-            color: #991b1b;
+            background: rgba(168, 91, 97, 0.1);
+            color: #7a3a40;
         }
 
         .aitestgen-alert-danger i {
@@ -1394,12 +1585,10 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo">
-                <div class="logo-image">
-                    <svg width="220" height="50" viewBox="0 0 220 50" style="display: block;">
-                        <text x="5" y="38" font-family="Arial, sans-serif" font-size="32" font-weight="bold">
-                            <tspan fill="#003da5">WinUI</tspan><tspan fill="#dc2626">Test</tspan>
-                        </text>
-                    </svg>
+                <div class="logo-badge"><i class="fas fa-diagram-project"></i></div>
+                <div class="logo-text">
+                    <h1>Win Test Hub</h1>
+                    <p>Agentic AI Test Automation Platform</p>
                 </div>
             </div>
 
@@ -1489,6 +1678,15 @@
                         </div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-icon info">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="total-notrun">0</h3>
+                            <p>Not Run</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-icon warning">
                             <i class="fas fa-folder"></i>
                         </div>
@@ -1499,27 +1697,49 @@
                     </div>
                 </div>
 
-                <div class="card" style="padding: 16px;">
+                <div class="card dashboard-overview-card" style="padding: 16px;">
                     <div class="card-header" style="margin-bottom: 12px; padding-bottom: 10px;">
                         <div class="card-title" style="font-size: 1.05em;">Test Execution Overview</div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: center; padding: 10px 0;">
-                        <canvas id="testResultsChart" width="180" height="180" style="max-width: 180px; max-height: 180px;"></canvas>
+                    <div class="dashboard-split">
+                    <div class="chart-col">
+                    <div class="pie-wrap">
+                        <canvas id="testResultsChart"></canvas>
                     </div>
-                    <div id="chart-legend" style="display: flex; justify-content: center; gap: 15px; padding: 10px 0; font-size: 0.8em;">
+                    <div id="chart-legend" style="display: flex; justify-content: center; gap: 15px; padding: 12px 0 0; font-size: 0.8em;">
                         <div style="display: flex; align-items: center; gap: 4px;">
-                            <div style="width: 12px; height: 12px; background: #10b981; border-radius: 2px;"></div>
+                            <div style="width: 12px; height: 12px; background: #7ea3e6; border: 1px solid #1e293b; border-radius: 2px;"></div>
                             <span><strong id="legend-passed">0</strong> Passed</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 4px;">
-                            <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 2px;"></div>
+                            <div style="width: 12px; height: 12px; background: #a9c2ee; border: 1px solid #1e293b; border-radius: 2px;"></div>
                             <span><strong id="legend-failed">0</strong> Failed</span>
                         </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <div style="width: 12px; height: 12px; background: #d3def5; border: 1px solid #1e293b; border-radius: 2px;"></div>
+                            <span><strong id="legend-notrun">0</strong> Not Run</span>
+                        </div>
                         <div id="legend-skipped-container" style="display: flex; align-items: center; gap: 4px;">
-                            <div style="width: 12px; height: 12px; background: #f59e0b; border-radius: 2px;"></div>
+                            <div style="width: 12px; height: 12px; background: #c8c9ee; border: 1px solid #1e293b; border-radius: 2px;"></div>
                             <span><strong id="legend-skipped">0</strong> Skipped</span>
                         </div>
                     </div>
+                    </div>
+                    <div class="module-panel">
+                        <div class="panel-title">Results by Module</div>
+                        <div id="dashboard-module-breakdown"></div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Executions</div>
+                        <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8em;" onclick="showView('results')">
+                            View all
+                        </button>
+                    </div>
+                    <div id="dashboard-recent"></div>
                 </div>
 
                 <div class="card">

@@ -788,38 +788,150 @@ async function loadDashboard() {
                 totalScenariosEl.textContent = data.count;
             }
 
-            // Get modules
-            const modules = [...new Set(scenarios.map(s => s.module))];
+            // Get modules (case-insensitive, so "DataDriven" and "Datadriven" count once)
+            const modules = [...new Set(scenarios.map(s => (s.module || '').trim().toLowerCase()))];
             const totalModulesEl = document.getElementById('total-modules');
             if (totalModulesEl) {
                 totalModulesEl.textContent = modules.length;
             }
 
-            // Calculate execution statistics from history
+            // Latest execution result per scenario, keyed by scenario name
             const history = historyData.history || [];
-            const passedTests = history.filter(h => h.status === 'Passed').length;
-            const failedTests = history.filter(h => h.status === 'Failed').length;
-            const skippedTests = history.filter(h => h.status === 'Skipped').length;
+            const latestByName = new Map();
+            history.forEach(h => {
+                const key = (h.scenarioName || '').trim().toLowerCase();
+                const time = Date.parse(h.executedAt) || 0;
+                const prev = latestByName.get(key);
+                if (!prev || time >= prev.time) {
+                    latestByName.set(key, { time, status: h.status });
+                }
+            });
+
+            // Statistics cover only the current scenarios, so they add up to the total
+            let passedTests = 0, failedTests = 0, skippedTests = 0;
+            scenarios.forEach(s => {
+                const latest = latestByName.get((s.name || '').trim().toLowerCase());
+                if (!latest) return;
+                if (latest.status === 'Passed') passedTests++;
+                else if (latest.status === 'Failed') failedTests++;
+                else if (latest.status === 'Skipped') skippedTests++;
+            });
+            const notRunTests = scenarios.length - passedTests - failedTests - skippedTests;
 
             // Update execution stats
             const totalPassedEl = document.getElementById('total-passed');
             if (totalPassedEl) {
                 totalPassedEl.textContent = passedTests;
             }
-            
+
             const totalFailedEl = document.getElementById('total-failed');
             if (totalFailedEl) {
                 totalFailedEl.textContent = failedTests;
             }
 
+            const totalNotRunEl = document.getElementById('total-notrun');
+            if (totalNotRunEl) {
+                totalNotRunEl.textContent = notRunTests;
+            }
+
             // Display pie chart with test results
-            displayTestResultsPieChart({ passed: passedTests, failed: failedTests, skipped: skippedTests });
+            displayTestResultsPieChart({ passed: passedTests, failed: failedTests, skipped: skippedTests, notRun: notRunTests });
+
+            renderDashboardModuleBreakdown(scenarios, latestByName);
+            renderDashboardRecentExecutions(history);
         }
     } catch (error) {
         hideLoading();
         console.error('Error loading dashboard:', error);
         handleError(error, 'Failed to load dashboard data');
     }
+}
+
+const DASHBOARD_STATUS_COLORS = {
+    Passed: '#7ea3e6',
+    Failed: '#a9c2ee',
+    Skipped: '#c8c9ee',
+    NotRun: '#d3def5'
+};
+
+// How far back the dashboard's Recent Executions list reaches
+const DASHBOARD_RECENT_MONTHS = 2;
+
+// Stacked bar per module showing passed / failed / not run scenarios
+function renderDashboardModuleBreakdown(scenarioList, latestByName) {
+    const container = document.getElementById('dashboard-module-breakdown');
+    if (!container) return;
+
+    const modules = new Map();
+    scenarioList.forEach(s => {
+        const key = (s.module || 'Unassigned').trim().toLowerCase();
+        if (!modules.has(key)) {
+            modules.set(key, { name: (s.module || 'Unassigned').trim(), Passed: 0, Failed: 0, Skipped: 0, NotRun: 0, total: 0 });
+        }
+        const m = modules.get(key);
+        const latest = latestByName.get((s.name || '').trim().toLowerCase());
+        const status = latest && ['Passed', 'Failed', 'Skipped'].includes(latest.status) ? latest.status : 'NotRun';
+        m[status]++;
+        m.total++;
+    });
+
+    if (modules.size === 0) {
+        container.innerHTML = '<div style="color:#94a3b8;font-size:0.85em;">No scenarios yet</div>';
+        return;
+    }
+
+    container.innerHTML = [...modules.values()]
+        .sort((a, b) => b.total - a.total)
+        .map(m => {
+            const segments = ['Passed', 'Failed', 'Skipped', 'NotRun']
+                .filter(k => m[k] > 0)
+                .map(k => `<span style="width:${(m[k] / m.total) * 100}%;background:${DASHBOARD_STATUS_COLORS[k]};" title="${k === 'NotRun' ? 'Not Run' : k}: ${m[k]}"></span>`)
+                .join('');
+            return `<div class="module-row">
+                <div class="module-name" title="${escapeHtml(m.name)}">${escapeHtml(m.name)}</div>
+                <div class="module-bar">${segments}</div>
+                <div class="module-total">${m.total}</div>
+            </div>`;
+        })
+        .join('');
+}
+
+// Latest executions across all scenarios
+function renderDashboardRecentExecutions(historyList) {
+    const container = document.getElementById('dashboard-recent');
+    if (!container) return;
+
+    // Only show runs from the last 2 months
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - DASHBOARD_RECENT_MONTHS);
+    const recent = historyList.filter(h => (Date.parse(h.executedAt) || 0) >= cutoff.getTime());
+
+    if (!recent.length) {
+        container.innerHTML = `<div style="color:#94a3b8;font-size:0.85em;padding:8px 0;">No executions in the last ${DASHBOARD_RECENT_MONTHS} months. Run a scenario to see it here.</div>`;
+        return;
+    }
+
+    const rows = recent
+        .sort((a, b) => (Date.parse(b.executedAt) || 0) - (Date.parse(a.executedAt) || 0))
+        .slice(0, 25)
+        .map(h => {
+            const color = DASHBOARD_STATUS_COLORS[h.status] || DASHBOARD_STATUS_COLORS.NotRun;
+            const when = Date.parse(h.executedAt) ? new Date(h.executedAt).toLocaleString() : '';
+            const duration = typeof h.duration === 'number' ? `${h.duration}s` : '';
+            return `<tr>
+                <td>${escapeHtml(h.scenarioName || '')}</td>
+                <td>${escapeHtml(h.module || '')}</td>
+                <td><span class="status-pill" style="background:${color};">${escapeHtml(h.status || '')}</span></td>
+                <td>${escapeHtml(duration)}</td>
+                <td>${escapeHtml(when)}</td>
+            </tr>`;
+        })
+        .join('');
+
+    container.innerHTML = `<div class="recent-scroll"><table class="recent-table">
+        <thead><tr><th>Scenario</th><th>Module</th><th>Status</th><th>Duration</th><th>Executed</th></tr></thead>
+        <tbody>${rows}</tbody>
+    </table></div>`;
 }
 
 // Display pie chart with test results
@@ -840,7 +952,8 @@ function displayTestResultsPieChart(stats) {
     }
     
     // Calculate total
-    const total = stats.passed + stats.failed + stats.skipped;
+    const notRun = stats.notRun || 0;
+    const total = stats.passed + stats.failed + stats.skipped + notRun;
     
     // Safely update legend with counts
     const legendPassedEl = document.getElementById('legend-passed');
@@ -858,6 +971,11 @@ function displayTestResultsPieChart(stats) {
         legendSkippedEl.textContent = stats.skipped;
     }
     
+    const legendNotRunEl = document.getElementById('legend-notrun');
+    if (legendNotRunEl) {
+        legendNotRunEl.textContent = notRun;
+    }
+
     // Hide skipped legend if no skipped tests
     const skippedContainer = document.getElementById('legend-skipped-container');
     if (skippedContainer) {
@@ -882,32 +1000,64 @@ function displayTestResultsPieChart(stats) {
     if (stats.passed > 0) {
         labels.push('Passed');
         chartData.push(stats.passed);
-        colors.push('#10b981');
+        colors.push('#7ea3e6'); // pale blue
     }
-    
+
     if (stats.failed > 0) {
         labels.push('Failed');
         chartData.push(stats.failed);
-        colors.push('#ef4444');
+        colors.push('#a9c2ee'); // lighter pale blue
     }
-    
+
     if (stats.skipped > 0) {
         labels.push('Skipped');
         chartData.push(stats.skipped);
-        colors.push('#f59e0b');
+        colors.push('#c8c9ee'); // pale indigo
     }
-    
+
+    if (notRun > 0) {
+        labels.push('Not Run');
+        chartData.push(notRun);
+        colors.push('#d3def5'); // palest blue
+    }
+
+    // Draws each slice's percentage inside the slice
+    const sliceLabelPlugin = {
+        id: 'sliceLabels',
+        afterDatasetsDraw(chart) {
+            const c = chart.ctx;
+            const values = chart.data.datasets[0].data;
+            c.save();
+            c.font = '600 12px Segoe UI';
+            c.fillStyle = '#1e293b';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            chart.getDatasetMeta(0).data.forEach((arc, i) => {
+                const pct = Math.round((values[i] / total) * 100);
+                if (pct < 3) return; // too thin to label
+                const pos = arc.tooltipPosition();
+                c.fillText(`${pct}%`, pos.x, pos.y);
+            });
+            c.restore();
+        }
+    };
+
     // Create pie chart
     testResultsChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'pie',
+        plugins: [sliceLabelPlugin],
         data: {
             labels: labels,
             datasets: [{
                 data: chartData,
-                backgroundColor: colors
+                backgroundColor: colors,
+                borderColor: '#1e293b',
+                borderWidth: 1.5
             }]
         },
         options: {
+            // The canvas fills .pie-wrap, which grows with the screen height
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
@@ -928,7 +1078,6 @@ function displayTestResultsPieChart(stats) {
                     cornerRadius: 6
                 }
             },
-            cutout: '65%',
             animation: {
                 animateScale: true,
                 animateRotate: true
@@ -1171,8 +1320,8 @@ function displayAllScenarios(scenariosList) {
         // Execute button (Green)
         const executeBtn = document.createElement('button');
         executeBtn.title = 'Execute Scenario';
-        executeBtn.style.cssText = baseIconStyle + 'color: #10b981;';
-        executeBtn.onmouseover = () => { executeBtn.style.background = '#d1fae5'; };
+        executeBtn.style.cssText = baseIconStyle + 'color: #3f64a3;';
+        executeBtn.onmouseover = () => { executeBtn.style.background = '#dbe5fa'; };
         executeBtn.onmouseout = () => { executeBtn.style.background = 'transparent'; };
         executeBtn.innerHTML = '<i class="fas fa-play"></i>';
         executeBtn.onclick = () => executeScenario(scenario.module, scenario.name);
@@ -1191,8 +1340,8 @@ function displayAllScenarios(scenariosList) {
         // Delete button (Red)
         const deleteBtn = document.createElement('button');
         deleteBtn.title = 'Delete Scenario';
-        deleteBtn.style.cssText = baseIconStyle + 'color: #ef4444;';
-        deleteBtn.onmouseover = () => { deleteBtn.style.background = '#fee2e2'; };
+        deleteBtn.style.cssText = baseIconStyle + 'color: #a85b61;';
+        deleteBtn.onmouseover = () => { deleteBtn.style.background = '#f3e4e6'; };
         deleteBtn.onmouseout = () => { deleteBtn.style.background = 'transparent'; };
         deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
         deleteBtn.onclick = () => deleteScenario(scenario.module, scenario.name);
@@ -1263,8 +1412,8 @@ function generateScenariosPageButtons(currentPage, totalPages) {
         const isActive = i === currentPage;
         buttons += `
             <button onclick="goToScenariosPage(${i})" 
-                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#0f766e' : '#d1d5db'}; 
-                           background: ${isActive ? '#0f766e' : 'white'}; 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#1e3a8a' : '#d1d5db'}; 
+                           background: ${isActive ? '#1e3a8a' : 'white'}; 
                            color: ${isActive ? 'white' : '#374151'};
                            border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
                 ${i}
@@ -1636,7 +1785,7 @@ async function loadRecordView() {
                 </div>
             </div>
 
-            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(15, 118, 110, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
+            <div style="margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; background: rgba(30, 58, 138, 0.08); border-left: 3px solid var(--primary-color); color: #1f2937; font-size: 0.92rem;">
                 Enter scenario details, click Start Recording, perform actions in the opened browser, then click Stop Recording to save your scenario.
             </div>
 
@@ -1685,7 +1834,7 @@ async function loadRecordView() {
                 </div>
             </form>
 
-            <div id="recording-status" class="hidden" style="margin-top: 12px; padding: 12px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border-left: 4px solid var(--danger-color);">
+            <div id="recording-status" class="hidden" style="margin-top: 12px; padding: 12px; background: rgba(168, 91, 97, 0.1); border-radius: 8px; border-left: 4px solid var(--danger-color);">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="spinner" style="width: 20px; height: 20px; margin: 0;"></div>
                     <strong style="color: var(--danger-color);">Recording in progress...</strong>
@@ -2553,7 +2702,7 @@ async function loadExportView() {
                 <h2><i class="fas fa-file-export"></i> Script Export</h2>
             </div>
             <div class="card">
-                <div style="padding:16px;color:#dc2626;">
+                <div style="padding:16px;color:#a85b61;">
                     <strong>Unable to load Script Export view.</strong>
                     <div style="margin-top:8px;color:#7f1d1d;">${error.message || 'Unexpected error occurred while rendering export view.'}</div>
                 </div>
@@ -2626,7 +2775,7 @@ async function loadExportScenarios() {
 
         updateExportSelectionCount();
     } catch (error) {
-        container.innerHTML = '<div style="color:#dc2626;">Failed to load scenarios for export.</div>';
+        container.innerHTML = '<div style="color:#a85b61;">Failed to load scenarios for export.</div>';
         console.error('Failed to load export scenarios:', error);
     }
 }
@@ -2802,6 +2951,50 @@ async function loadExecuteView() {
 
         <div class="card">
             <div class="card-header">
+                <div class="card-title"><i class="fas fa-globe"></i> Parallel &amp; Cross-Browser Execution</div>
+                <small id="exec-options-status" style="color: #6b7280;"></small>
+            </div>
+            <small style="color: #6b7280; display: block; margin-bottom: 10px;">
+                Applies to Execute Module and Execute Tagged Tests. A single scenario runs once, in the Browser chosen under Configuration. Changes are saved automatically.
+            </small>
+            <div class="form-group" style="max-width: 320px;">
+                <label>Execution Mode</label>
+                <select class="form-control" id="exec-opt-mode" onchange="onExecutionModeChange()">
+                    <option value="Sequential">Sequential</option>
+                    <option value="Parallel">Parallel</option>
+                </select>
+            </div>
+            <div id="exec-opt-cross" class="hidden">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 6px;">
+                    <input type="checkbox" id="exec-opt-cross-browser" onchange="saveExecutionOptions()">
+                    <span>Enable Cross-Browser Parallel Execution</span>
+                </label>
+                <small style="color: #6b7280; display: block; margin-bottom: 10px;">
+                    Tests are spread across the selected browsers in round-robin order (Test1&rarr;Chrome, Test2&rarr;Firefox, Test3&rarr;Edge, Test4&rarr;Chrome...). Select at least two browsers.
+                </small>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                        <input type="checkbox" class="exec-browser-checkbox" value="Chrome" onchange="saveExecutionOptions()">
+                        <i class="fab fa-chrome" style="color: #4285F4;"></i><span>Chrome</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                        <input type="checkbox" class="exec-browser-checkbox" value="Firefox" onchange="saveExecutionOptions()">
+                        <i class="fab fa-firefox" style="color: #FF7139;"></i><span>Firefox</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                        <input type="checkbox" class="exec-browser-checkbox" value="Edge" onchange="saveExecutionOptions()">
+                        <i class="fab fa-edge" style="color: #0078D7;"></i><span>Edge</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                        <input type="checkbox" class="exec-browser-checkbox" value="Safari" onchange="saveExecutionOptions()">
+                        <i class="fab fa-safari" style="color: #006CFF;"></i><span>Safari</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
                 <div class="card-title">Console Output</div>
                 <button class="btn btn-secondary btn-icon" onclick="clearConsole()">
                     <i class="fas fa-eraser"></i> Clear
@@ -2812,6 +3005,8 @@ async function loadExecuteView() {
             </div>
         </div>
     `;
+    populateExecutionOptions();
+
     // Load modules and tags
     try {
         const modulesResponse = await fetch(`${API_BASE_URL}/scenarios/modules`);
@@ -2957,6 +3152,7 @@ async function executeScenario(module, name) {
 }
 
 async function executeModule() {
+    await executionOptionsSave;
     const module = document.getElementById('exec-module-all').value;
 
     if (!module) {
@@ -2988,6 +3184,7 @@ async function executeModule() {
 }
 
 async function executeTag() {
+    await executionOptionsSave;
     const tag = document.getElementById('exec-tag').value;
 
     if (!tag) {
@@ -3157,13 +3354,6 @@ async function loadConfigurationView() {
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Execution Mode</label>
-                                <select class="form-control" id="config-execution-mode" onchange="toggleCrossBrowserOptions()">
-                                    <option value="Sequential" ${configuration.executionMode === 'Sequential' ? 'selected' : ''}>Sequential</option>
-                                    <option value="Parallel" ${configuration.executionMode === 'Parallel' ? 'selected' : ''}>Parallel</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
                                 <label>Timeout (seconds)</label>
                                 <input type="number" class="form-control" id="config-timeout" 
                                        value="${configuration.timeoutInSeconds}" min="5" max="300">
@@ -3180,62 +3370,6 @@ async function loadConfigurationView() {
                                 <small style="color: #6b7280; display: block; margin-top: 5px;">
                                     Wait time applied after each recorded action (0 = no wait, recommended: 500-2000ms)
                                 </small>
-                            </div>
-                        </div>
-
-                        <!-- Cross-Browser Parallel Execution Options -->
-                        <div id="cross-browser-options" class="${configuration.executionMode === 'Parallel' ? '' : 'hidden'}" style="margin-top: 20px;">
-                            <div class="card" style="border: 2px solid #0f766e; background: rgba(15, 118, 110, 0.05);">
-                                <div class="card-header" style="background: rgba(15, 118, 110, 0.1);">
-                                    <div class="card-title">
-                                        <i class="fas fa-globe"></i> Cross-Browser Parallel Execution
-                                    </div>
-                                </div>
-                                <div style="padding: 20px;">
-                                    <div class="form-group">
-                                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                                            <input type="checkbox" id="config-cross-browser" ${configuration.crossBrowserParallelExecution ? 'checked' : ''}> 
-                                            <span>Enable Cross-Browser Parallel Execution</span>
-                                        </label>
-                                        <small style="color: #6b7280; display: block; margin-top: 5px;">
-                                            Distribute tests across multiple browsers simultaneously (e.g., Test 1→Chrome, Test 2→Firefox, Test 3→Edge)
-                                        </small>
-                                    </div>
-
-                                    <div id="browser-selection" style="margin-top: 20px;">
-                                        <label style="font-weight: 600; margin-bottom: 10px; display: block;">
-                                            Select Browsers for Parallel Execution:
-                                        </label>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
-                                                <input type="checkbox" class="browser-checkbox" value="Chrome" ${(configuration.parallelBrowsers?.includes('Chrome') || configuration.parallelBrowsers?.includes(0)) ? 'checked' : ''}> 
-                                                <i class="fab fa-chrome" style="color: #4285F4; font-size: 1.2em;"></i>
-                                                <span>Chrome</span>
-                                            </label>
-                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
-                                                <input type="checkbox" class="browser-checkbox" value="Firefox" ${(configuration.parallelBrowsers?.includes('Firefox') || configuration.parallelBrowsers?.includes(1)) ? 'checked' : ''}> 
-                                                <i class="fab fa-firefox" style="color: #FF7139; font-size: 1.2em;"></i>
-                                                <span>Firefox</span>
-                                            </label>
-                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
-                                                <input type="checkbox" class="browser-checkbox" value="Edge" ${(configuration.parallelBrowsers?.includes('Edge') || configuration.parallelBrowsers?.includes(2)) ? 'checked' : ''}> 
-                                                <i class="fab fa-edge" style="color: #0078D7; font-size: 1.2em;"></i>
-                                                <span>Edge</span>
-                                            </label>
-                                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; transition: all 0.2s;">
-                                                <input type="checkbox" class="browser-checkbox" value="Safari" ${(configuration.parallelBrowsers?.includes('Safari') || configuration.parallelBrowsers?.includes(3)) ? 'checked' : ''}> 
-                                                <i class="fab fa-safari" style="color: #006CFF; font-size: 1.2em;"></i>
-                                                <span>Safari</span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="alert alert-info" style="margin-top: 20px; background: rgba(15, 118, 110, 0.1); border-left: 4px solid #0f766e; padding: 15px; border-radius: 6px;">
-                                        <strong><i class="fas fa-info-circle"></i> How it works:</strong><br>
-                                        Tests will be distributed across selected browsers in round-robin fashion.<br>
-                                        <strong>Example:</strong> Test1→Chrome, Test2→Firefox, Test3→Edge, Test4→Chrome...
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -3284,18 +3418,9 @@ async function loadConfigurationView() {
 }
 
 async function saveConfiguration() {
-    const executionMode = document.getElementById('config-execution-mode').value;
-    const crossBrowserEnabled = document.getElementById('config-cross-browser')?.checked || false;
-    
-    // Get selected browsers
-    const browserCheckboxes = document.querySelectorAll('.browser-checkbox:checked');
-    const selectedBrowsers = Array.from(browserCheckboxes).map(cb => cb.value);
-    
-    console.log('🔍 Save Configuration Debug:');
-    console.log('- Execution Mode:', executionMode);
-    console.log('- Cross-Browser Enabled:', crossBrowserEnabled);
-    console.log('- Selected Browsers:', selectedBrowsers);
-    
+    // Execution mode and cross-browser settings live on the Execute Tests tab; keep them as stored
+    const executionMode = configuration.executionMode || 'Sequential';
+
     const updatedConfig = {
         automationFramework: document.getElementById('config-framework').value,
         browser: document.getElementById('config-browser').value,
@@ -3309,9 +3434,9 @@ async function saveConfiguration() {
         enableVideo: document.getElementById('config-video').checked,
         enableScreenshots: document.getElementById('config-screenshots').checked,
         enableSelfHealing: document.getElementById('config-self-healing').checked,
-        // Cross-browser settings
-        crossBrowserParallelExecution: executionMode === 'Parallel' && crossBrowserEnabled,
-        parallelBrowsers: selectedBrowsers.length > 0 ? selectedBrowsers : ['Chrome'],
+        // Cross-browser settings (managed on the Execute Tests tab)
+        crossBrowserParallelExecution: !!configuration.crossBrowserParallelExecution,
+        parallelBrowsers: (configuration.parallelBrowsers && configuration.parallelBrowsers.length > 0) ? configuration.parallelBrowsers : ['Chrome'],
         // Keep other settings from original config
         operatingSystem: configuration.operatingSystem || 'Windows',
         reportPath: configuration.reportPath || 'TestReports',
@@ -3350,8 +3475,6 @@ async function saveConfiguration() {
             configuration = data.configuration;
             
             console.log('✅ Updated global configuration:', configuration);
-            console.log('✅ Parallel Browsers in config:', configuration.parallelBrowsers);
-            console.log('✅ Cross-Browser Enabled:', configuration.crossBrowserParallelExecution);
             
             // Store in localStorage for persistence
             try {
@@ -3368,7 +3491,7 @@ async function saveConfiguration() {
             if (saveBtn) {
                 const originalText = saveBtn.innerHTML;
                 saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-                saveBtn.style.background = '#10b981';
+                saveBtn.style.background = '#3f64a3';
                 setTimeout(() => {
                     saveBtn.innerHTML = originalText;
                     saveBtn.style.background = '';
@@ -3385,17 +3508,82 @@ async function saveConfiguration() {
     }
 }
 
-// Toggle cross-browser options visibility
+// ---- Execute Tests tab: execution mode and cross-browser options ----
+let executionOptionsSave = Promise.resolve();
+
 function toggleCrossBrowserOptions() {
-    const executionMode = document.getElementById('config-execution-mode')?.value;
-    const crossBrowserDiv = document.getElementById('cross-browser-options');
-    
-    if (crossBrowserDiv) {
-        if (executionMode === 'Parallel') {
-            crossBrowserDiv.classList.remove('hidden');
-        } else {
-            crossBrowserDiv.classList.add('hidden');
+    const mode = document.getElementById('exec-opt-mode')?.value;
+    const crossDiv = document.getElementById('exec-opt-cross');
+    if (crossDiv) crossDiv.classList.toggle('hidden', mode !== 'Parallel');
+}
+
+async function populateExecutionOptions() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/configuration`);
+        const data = await response.json();
+        if (!data.success) return;
+        configuration = data.configuration;
+
+        const modeEl = document.getElementById('exec-opt-mode');
+        if (!modeEl) return;
+        modeEl.value = configuration.executionMode === 'Parallel' ? 'Parallel' : 'Sequential';
+        document.getElementById('exec-opt-cross-browser').checked = !!configuration.crossBrowserParallelExecution;
+        const selected = configuration.parallelBrowsers || [];
+        document.querySelectorAll('.exec-browser-checkbox').forEach(cb => {
+            cb.checked = selected.includes(cb.value);
+        });
+        toggleCrossBrowserOptions();
+    } catch (error) {
+        console.warn('Could not load execution options:', error);
+    }
+}
+
+function onExecutionModeChange() {
+    toggleCrossBrowserOptions();
+    saveExecutionOptions();
+}
+
+// Saves are queued so rapid changes (and an Execute click right after) never overlap
+function saveExecutionOptions() {
+    executionOptionsSave = executionOptionsSave.then(doSaveExecutionOptions);
+    return executionOptionsSave;
+}
+
+async function doSaveExecutionOptions() {
+    const statusEl = document.getElementById('exec-options-status');
+    const modeEl = document.getElementById('exec-opt-mode');
+    if (!modeEl) return;
+
+    try {
+        // The API replaces the whole configuration, so start from what is stored now
+        const current = await (await fetch(`${API_BASE_URL}/configuration`)).json();
+        if (!current.success) throw new Error(current.error || 'Could not read configuration');
+
+        const mode = modeEl.value;
+        const browsers = Array.from(document.querySelectorAll('.exec-browser-checkbox:checked')).map(cb => cb.value);
+        const body = {
+            ...current.configuration,
+            executionMode: mode,
+            crossBrowserParallelExecution: mode === 'Parallel' && document.getElementById('exec-opt-cross-browser').checked,
+            parallelBrowsers: browsers.length > 0 ? browsers : ['Chrome']
+        };
+
+        const response = await fetch(`${API_BASE_URL}/configuration`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || 'Save failed');
+
+        configuration = data.configuration;
+        if (statusEl) {
+            statusEl.textContent = 'Saved';
+            setTimeout(() => { if (statusEl.textContent === 'Saved') statusEl.textContent = ''; }, 2000);
         }
+    } catch (error) {
+        if (statusEl) statusEl.textContent = '';
+        showError('Failed to save execution options: ' + error.message);
     }
 }
 
@@ -3421,7 +3609,7 @@ async function loadResultsView() {
                 </div>
                 <div class="stat-details">
                     <h3 id="results-total-passed">0</h3>
-                    <p>Passed Tests</p>
+                    <p>Passed Runs</p>
                 </div>
             </div>
             
@@ -3431,7 +3619,7 @@ async function loadResultsView() {
                 </div>
                 <div class="stat-details">
                     <h3 id="results-total-failed">0</h3>
-                    <p>Failed Tests</p>
+                    <p>Failed Runs</p>
                 </div>
             </div>
             
@@ -3461,6 +3649,7 @@ async function loadResultsView() {
             <div class="card-header">
                 <div class="card-title">
                     <i class="fas fa-filter"></i> Filters
+                    <small id="results-hidden-note" style="margin-left: 12px; font-weight: 400; color: #6b7280;"></small>
                 </div>
                 <button class="btn btn-secondary btn-sm" onclick="clearAllTestFilters()">
                     <i class="fas fa-times"></i> Clear All
@@ -3474,6 +3663,13 @@ async function loadResultsView() {
                             <option value="">All</option>
                             <option value="normal" selected>Normal Only</option>
                             <option value="ddt">DDT Only</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label>Scenarios</label>
+                        <select class="form-control" id="filter-scenario-scope" onchange="applyTestFilters()">
+                            <option value="existing" selected>Existing only</option>
+                            <option value="all">All history</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin: 0;">
@@ -3567,6 +3763,13 @@ async function loadResultsView() {
 // Global variables for test results filtering and pagination
 let allTestHistory = [];
 let filteredTestHistory = [];
+// Lower-cased names of the scenarios that exist now (null = unknown, so nothing is hidden)
+let currentScenarioNames = null;
+
+// "Demo_Test [DDT - Iteration 2]" belongs to scenario "Demo_Test"
+function baseScenarioName(name) {
+    return (name || '').split(/\s*\[\s*(?:DDT|Iteration|Row\s+\d+)/i)[0].trim().toLowerCase();
+}
 let currentPage = 1;
 const recordsPerPage = 10;
 
@@ -3578,6 +3781,18 @@ async function loadAndDisplayTestResults() {
 
         if (data.success && data.history && data.history.length > 0) {
             allTestHistory = data.history;
+
+            // Which scenarios still exist (used by the "Existing only" filter)
+            currentScenarioNames = null;
+            try {
+                const scenariosResponse = await fetch(`${API_BASE_URL}/scenarios`);
+                const scenariosData = await scenariosResponse.json();
+                if (scenariosData.success && Array.isArray(scenariosData.scenarios)) {
+                    currentScenarioNames = new Set(scenariosData.scenarios.map(sc => (sc.name || sc.Name || '').trim().toLowerCase()));
+                }
+            } catch (scenarioError) {
+                console.warn('Could not load scenarios for the history filter:', scenarioError);
+            }
 
             // Populate filter dropdowns
             populateTestFilterDropdowns();
@@ -3624,7 +3839,7 @@ function applyTestFilters() {
     if (executionTypeFilter === 'normal') {
         // Only show tests WITHOUT DDT markers (rowIndex, iteration, etc.)
         filtered = filtered.filter(h => {
-            const name = h.testCaseName || '';
+            const name = h.scenarioName || h.testCaseName || '';
             const hasRowIndex = h.rowIndex !== undefined && h.rowIndex !== null;
             const hasDDTMarker = /\[\s*DDT|\[\s*Iteration|\[\s*Row\s+\d+/i.test(name);
             return !hasRowIndex && !hasDDTMarker;
@@ -3632,11 +3847,26 @@ function applyTestFilters() {
     } else if (executionTypeFilter === 'ddt') {
         // Only show tests WITH DDT markers
         filtered = filtered.filter(h => {
-            const name = h.testCaseName || '';
+            const name = h.scenarioName || h.testCaseName || '';
             const hasRowIndex = h.rowIndex !== undefined && h.rowIndex !== null;
             const hasDDTMarker = /\[\s*DDT|\[\s*Iteration|\[\s*Row\s+\d+/i.test(name);
             return hasRowIndex || hasDDTMarker;
         });
+    }
+
+    // Apply scenario scope filter: hide runs of scenarios that were renamed or deleted
+    const scopeEl = document.getElementById('filter-scenario-scope');
+    const hiddenNote = document.getElementById('results-hidden-note');
+    let hiddenRuns = 0;
+    if ((!scopeEl || scopeEl.value === 'existing') && currentScenarioNames) {
+        const beforeScope = filtered.length;
+        filtered = filtered.filter(h => currentScenarioNames.has(baseScenarioName(h.scenarioName || h.testCaseName)));
+        hiddenRuns = beforeScope - filtered.length;
+    }
+    if (hiddenNote) {
+        hiddenNote.textContent = hiddenRuns > 0
+            ? `${hiddenRuns} run${hiddenRuns === 1 ? '' : 's'} of renamed or deleted scenarios hidden`
+            : '';
     }
 
     // Apply status filter
@@ -3728,6 +3958,7 @@ function displayFilteredTestResults(history) {
 // Clear all filters
 function clearAllTestFilters() {
     document.getElementById('filter-execution-type').value = 'normal';
+    document.getElementById('filter-scenario-scope').value = 'existing';
     document.getElementById('filter-status').selectedIndex = 0;
     document.getElementById('filter-browser').selectedIndex = 0;
     document.getElementById('filter-environment').selectedIndex = 0;
@@ -3856,8 +4087,8 @@ function displayResultsHistory(historyList) {
         const index = startIndex + paginatedIndex;
         const statusClass = item.status === 'Passed' ? 'success' :
             item.status === 'Failed' ? 'danger' : 'warning';
-        const statusBadgeColor = item.status === 'Passed' ? '#10b981' :
-            item.status === 'Failed' ? '#ef4444' : '#f59e0b';
+        const statusBadgeColor = item.status === 'Passed' ? '#7ea3e6' :
+            item.status === 'Failed' ? '#a9c2ee' : '#c8c9ee';
 
         const executedDate = new Date(item.executedAt);
         const formattedDate = executedDate.toLocaleString('en-US', {
@@ -3887,7 +4118,7 @@ function displayResultsHistory(historyList) {
                                     <div style="font-weight:600;color:#111827;line-height:1.35;">${escapeHtml(getProfessionalResultName(item.scenarioName, item.rowIndex))}</div>
                                 </td>
                                 <td>
-                                    <span class="badge" style="background-color: ${statusBadgeColor}; color: white; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                    <span class="badge" style="background-color: ${statusBadgeColor}; color: #172554; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 600;">
                                         ${escapeHtml(item.status.toUpperCase())}
                                     </span>
                                 </td>
@@ -3972,8 +4203,8 @@ function generatePageButtons(currentPage, totalPages) {
         const isActive = i === currentPage;
         buttons += `
             <button onclick="goToPage(${i})" 
-                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#0f766e' : '#d1d5db'}; 
-                           background: ${isActive ? '#0f766e' : 'white'}; 
+                    style="padding: 8px 12px; border: 1px solid ${isActive ? '#1e3a8a' : '#d1d5db'}; 
+                           background: ${isActive ? '#1e3a8a' : 'white'}; 
                            color: ${isActive ? 'white' : '#374151'};
                            border-radius: 4px; cursor: pointer; font-weight: ${isActive ? '600' : '400'};">
                 ${i}
@@ -4196,7 +4427,7 @@ async function deleteSelectedTests() {
                     <button onclick="closeDeleteConfirmation()" style="background: #9ca3af; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; min-width: 80px;">
                         Cancel
                     </button>
-                    <button onclick="confirmDelete()" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; min-width: 80px;">
+                    <button onclick="confirmDelete()" style="background: #a85b61; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.9em; min-width: 80px;">
                         Delete
                     </button>
                 </div>
@@ -4320,7 +4551,7 @@ function viewEvidence(index) {
                     <h2 style="margin: 0; color: #1f2937;">
                         <i class="fas fa-images"></i> Evidence - ${escapeHtml(getProfessionalResultName(item.scenarioName, item.rowIndex))}
                     </h2>
-                    <button onclick="closeDynamicModal('evidence-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                    <button onclick="closeDynamicModal('evidence-modal')" style="background: #a85b61; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
@@ -4330,7 +4561,7 @@ function viewEvidence(index) {
                 ${stepsWithScreenshots.map((step, idx) => `
                     <div style="margin-bottom: 30px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: #f9fafb;">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="background: #0f766e; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                            <div style="background: #1e3a8a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
                                 ${idx + 1}
                             </div>
                             <div style="flex: 1;">
@@ -4403,24 +4634,24 @@ function viewLogs(index) {
                         <p style="margin: 8px 0 0 0; color: #6b7280;">
                             Module: <strong>${escapeHtml(item.module)}</strong> | 
                             Duration: <strong>${item.duration}s</strong> | 
-                            Status: <strong style="color: ${item.status === 'Passed' ? '#10b981' : '#ef4444'};">${item.status}</strong>
+                            Status: <strong style="color: ${item.status === 'Passed' ? '#3f64a3' : '#a85b61'};">${item.status}</strong>
                         </p>
                     </div>
-                    <button onclick="closeDynamicModal('logs-modal')" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                    <button onclick="closeDynamicModal('logs-modal')" style="background: #a85b61; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                         <i class="fas fa-times"></i> Close
                     </button>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px;">
                     <div style="background: #f3f4f6; padding: 12px; border-radius: 6px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #0f766e;">${totalSteps}</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1e3a8a;">${totalSteps}</div>
                         <div style="font-size: 13px; color: #6b7280;">Total Steps</div>
                     </div>
-                    <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #10b981;">${passedSteps}</div>
+                    <div style="background: #eef3fc; padding: 12px; border-radius: 6px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #3f64a3;">${passedSteps}</div>
                         <div style="font-size: 13px; color: #6b7280;">Passed Steps</div>
                     </div>
                     <div style="background: #fef2f2; padding: 12px; border-radius: 6px; text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #ef4444;">${failedSteps}</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #a85b61;">${failedSteps}</div>
                         <div style="font-size: 13px; color: #6b7280;">Failed Steps</div>
                     </div>
                 </div>
@@ -4442,15 +4673,15 @@ function viewLogs(index) {
                         </thead>
                         <tbody>
                             ${item.steps.map((step, idx) => {
-        const statusColor = step.status === 'Passed' ? '#10b981' :
-            step.status === 'Failed' ? '#ef4444' : '#f59e0b';
-        const statusBg = step.status === 'Passed' ? '#f0fdf4' :
+        const statusColor = step.status === 'Passed' ? '#3f64a3' :
+            step.status === 'Failed' ? '#a85b61' : '#8a6d3b';
+        const statusBg = step.status === 'Passed' ? '#eef3fc' :
             step.status === 'Failed' ? '#fef2f2' : '#fef3c7';
         const rowBg = step.status === 'Failed' ? '#fef2f2' : 'white';
 
         return `
                                     <tr style="border-bottom: 1px solid #e5e7eb; background: ${rowBg};">
-                                        <td style="padding: 16px; font-weight: 600; color: #0f766e;">${idx + 1}</td>
+                                        <td style="padding: 16px; font-weight: 600; color: #1e3a8a;">${idx + 1}</td>
                                         <td style="padding: 16px;">
                                             <strong style="color: #1f2937;">${escapeHtml(step.stepName)}</strong>
                                         </td>
@@ -4465,13 +4696,13 @@ function viewLogs(index) {
                                         </td>
                                         <td style="padding: 16px;">
                                             ${step.status === 'Passed' ?
-                '<span style="color: #10b981; font-size: 13px;"><i class="fas fa-check"></i> Step executed successfully</span>' :
+                '<span style="color: #3f64a3; font-size: 13px;"><i class="fas fa-check"></i> Step executed successfully</span>' :
                 step.error ?
-                    `<div style="background: #fff7ed; border-left: 3px solid #ef4444; padding: 10px; border-radius: 4px;">
-                                                        <div style="color: #ef4444; font-weight: 600; font-size: 13px; margin-bottom: 4px;">
+                    `<div style="background: #fff7ed; border-left: 3px solid #a85b61; padding: 10px; border-radius: 4px;">
+                                                        <div style="color: #a85b61; font-weight: 600; font-size: 13px; margin-bottom: 4px;">
                                                             <i class="fas fa-exclamation-triangle"></i> Error:
                                                         </div>
-                                                        <div style="color: #991b1b; font-size: 13px; font-family: 'Courier New', monospace;">
+                                                        <div style="color: #7a3a40; font-size: 13px; font-family: 'Courier New', monospace;">
                                                             ${escapeHtml(step.error)}
                                                         </div>
                                                     </div>` :
@@ -4485,11 +4716,11 @@ function viewLogs(index) {
                     </table>
                 </div>
                 ${item.error ? `
-                    <div style="margin-top: 20px; background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 16px;">
-                        <h3 style="margin: 0 0 12px 0; color: #991b1b; font-size: 16px;">
+                    <div style="margin-top: 20px; background: #fef2f2; border: 2px solid #a85b61; border-radius: 8px; padding: 16px;">
+                        <h3 style="margin: 0 0 12px 0; color: #7a3a40; font-size: 16px;">
                             <i class="fas fa-exclamation-triangle"></i> Test Execution Error
                         </h3>
-                        <pre style="background: white; padding: 12px; border-radius: 4px; color: #991b1b; margin: 0; overflow-x: auto; font-size: 13px;">${escapeHtml(item.error)}</pre>
+                        <pre style="background: white; padding: 12px; border-radius: 4px; color: #7a3a40; margin: 0; overflow-x: auto; font-size: 13px;">${escapeHtml(item.error)}</pre>
                     </div>
                 ` : ''}
             </div>

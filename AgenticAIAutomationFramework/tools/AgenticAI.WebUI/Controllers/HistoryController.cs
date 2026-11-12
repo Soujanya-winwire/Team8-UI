@@ -375,7 +375,7 @@ namespace AgenticAI.WebUI.Controllers
 <head>
   <meta charset=""UTF-8"" />
   <meta name=""viewport"" content=""width=device-width,initial-scale=1"" />
-    <title>WinUITest - Test Results Report</title>
+    <title>Win Test Hub - Test Results Report</title>
   <style>
         :root {{
             --bg: #f5f7fb;
@@ -405,8 +405,7 @@ namespace AgenticAI.WebUI.Controllers
         }}
         .title {{ margin: 0; font-size: 1.2rem; font-weight: 700; }}
         .meta {{ color: var(--muted); font-size: 0.9rem; margin-top: 4px; }}
-        .brand-winui {{ color: var(--blue); }}
-        .brand-test {{ color: var(--red); }}
+        .brand-name {{ color: #1e3a8a; }}
         .stats {{ display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }}
         .stat {{ background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }}
         .stat .k {{ font-size: 1.2rem; font-weight: 700; }}
@@ -440,7 +439,7 @@ namespace AgenticAI.WebUI.Controllers
     <div class=""container"">
         <div class=""report-header"">
             <div>
-                <h1 class=""title""><span class=""brand-winui"">WinUI</span><span class=""brand-test"">Test</span> Results Report</h1>
+                <h1 class=""title""><span class=""brand-name"">Win Test Hub</span> Results Report</h1>
                 <div class=""meta"">Generated at {DateTime.Now:yyyy-MM-dd HH:mm:ss} • Interactive HTML</div>
             </div>
             <div class=""meta""><strong>{selected.Count}</strong> selected result(s)</div>
@@ -559,10 +558,10 @@ namespace AgenticAI.WebUI.Controllers
 
             return $@"<!DOCTYPE html>
 <html lang=""en""><head><meta charset=""UTF-8""/><meta name=""viewport"" content=""width=device-width,initial-scale=1""/>
-<title>WinUITest — Extent Report</title><style>
+<title>Win Test Hub — Extent Report</title><style>
 *{{box-sizing:border-box;margin:0;padding:0}}body{{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1e293b}}
 .er-nav{{background:#1b2631;color:#ecf0f1;padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}}
-.brand-w{{color:#5b9bd5;font-weight:700;font-size:1.15rem}}.brand-t{{color:#e84354;font-weight:700;font-size:1.15rem}}
+.brand-w{{color:#8fb0ea;font-weight:700;font-size:1.15rem}}
 .rpt-lbl{{color:#bdc3c7;font-size:1rem}}.gen-t{{margin-left:auto;font-size:0.78rem;color:#95a5a6}}
 .er-dash{{background:#fff;border-bottom:1px solid #dfe6e9;padding:14px 24px}}
 .stats-row{{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}}
@@ -601,7 +600,7 @@ namespace AgenticAI.WebUI.Controllers
 .sn{{color:#34495e;font-weight:500}}.se{{margin-top:3px;padding:3px 8px;background:#fef2f2;border-radius:4px;border-left:3px solid #e84354;color:#c0392b;font-size:0.78rem}}
 @media(max-width:600px){{.module-cards{{grid-template-columns:1fr}}.er-nav,.er-dash,.er-body{{padding:10px}}}}
 </style></head><body>
-<div class=""er-nav""><span class=""brand-w"">WinUI</span><span class=""brand-t"">Test</span><span class=""rpt-lbl"">&nbsp;Extent Report</span><span class=""gen-t"">Generated {DateTime.Now:yyyy-MM-dd HH:mm:ss}</span></div>
+<div class=""er-nav""><span class=""brand-w"">Win Test Hub</span><span class=""rpt-lbl"">&nbsp;Extent Report</span><span class=""gen-t"">Generated {DateTime.Now:yyyy-MM-dd HH:mm:ss}</span></div>
 <div class=""er-dash"">
   <div class=""stats-row"">
     <div class=""sc sc-tot""><div class=""sv"">{selected.Count}</div><div class=""sl"">Total</div></div>
